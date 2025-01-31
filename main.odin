@@ -26,7 +26,12 @@ buffer_listener := wl.wl_buffer_listener {
 
 done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.uint32_t) {
 	context = runtime.default_context()
+	fmt.println("done")
 	state := cast(^state.State)data
+
+	wl_callback_destroy(wl_callback)
+	wl_callback := wl.wl_surface_frame(state.surface)
+	wl.wl_callback_add_listener(wl_callback, &frame_callback_listener, state)
 
 	// Maybe render code goes here
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
@@ -40,11 +45,11 @@ frame_callback_listener := wl.wl_callback_listener {
 }
 
 surface_configure :: proc "c" (data: rawptr, surface: ^wl.xdg_surface, serial: c.uint32_t) {
-	//context = runtime.default_context()
+	context = runtime.default_context()
+	fmt.println("surface_configure")
 	state := cast(^state.State)data
-	//
 	//fmt.println("surface configure")
-	//wl.xdg_surface_ack_configure(surface, serial)
+	wl.xdg_surface_ack_configure(surface, serial)
 	//
 	//buffer := get_buffer(state, 800, 600)
 	//wl.wl_surface_attach(state.surface, buffer, 0, 0)
@@ -68,29 +73,6 @@ main :: proc() {
 
 	wl.wl_surface_commit(state.surface) // This first commit is needed by egl or egl.SwapBuffers() will panic
 	wl.xdg_surface_add_listener(xdg_surface, &surface_listener, &state)
-
-
-	// // EGL initialization stuff
-	// rctx := render.init_egl(display)
-	// egl_window := wl.egl_window_create(state.surface, 800, 600)
-	// egl_surface := egl.CreateWindowSurface(
-	// 	rctx.display,
-	// 	rctx.config,
-	// 	egl.NativeWindowType(egl_window),
-	// 	nil,
-	// )
-
-	// if egl_surface == egl.NO_SURFACE {
-	// 	fmt.println("Error creating window surface")
-	// 	return
-
-	// }
-	// if (!egl.MakeCurrent(rctx.display, egl_surface, egl_surface, rctx.ctx)) {
-	// 	fmt.println("Error making current!")
-	// 	return
-	// }
-	// gl.load_up_to(int(1), 5, egl.gl_set_proc_address)
-
 
 	wl_callback := wl.wl_surface_frame(state.surface)
 	wl.wl_callback_add_listener(wl_callback, &frame_callback_listener, &state)
