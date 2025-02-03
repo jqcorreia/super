@@ -3,12 +3,11 @@ package state
 import "core:c"
 import "core:fmt"
 
-import "vendor:egl"
 import gl "vendor:OpenGL"
+import "vendor:egl"
 
 import "../render"
 import wl "../wayland-odin/wayland"
-
 
 
 State :: struct {
@@ -68,14 +67,14 @@ registry_listener := wl.wl_registry_listener {
 	global_remove = global_remove,
 }
 
-init_state :: proc() -> State {
-	width := 800
-	height := 600
+init :: proc() -> State {
+	width: i32 = 800
+	height: i32 = 600
 
 	state: State = {}
 
 	display := wl.display_connect(nil)
-    state.display = display
+	state.display = display
 	registry := wl.wl_display_get_registry(display)
 
 	wl.wl_registry_add_listener(registry, &registry_listener, &state)
@@ -88,7 +87,7 @@ init_state :: proc() -> State {
 
 	rctx := render.init_egl(display)
 
-	egl_window := wl.egl_window_create(state.surface, 800, 600)
+	egl_window := wl.egl_window_create(state.surface, width, height)
 	egl_surface := egl.CreateWindowSurface(
 		rctx.display,
 		rctx.config,
@@ -107,7 +106,7 @@ init_state :: proc() -> State {
 	gl.load_up_to(int(1), 5, egl.gl_set_proc_address)
 	state.egl.display = rctx.display
 	state.egl.ctx = rctx.ctx
-    state.egl.surface = egl_surface
+	state.egl.surface = egl_surface
 
 	return state
 }

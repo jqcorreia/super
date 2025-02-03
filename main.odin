@@ -34,10 +34,6 @@ done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.u
 	wl.wl_callback_add_listener(wl_callback, &frame_callback_listener, state)
 
 	// Maybe render code goes here
-	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
-	gl.Clear(gl.COLOR_BUFFER_BIT)
-	gl.Flush()
-	egl.SwapBuffers(state.egl.display, state.egl.surface)
 }
 
 frame_callback_listener := wl.wl_callback_listener {
@@ -64,9 +60,8 @@ wl_callback_destroy :: proc "c" (wl_callback: ^wl.wl_callback) {
 
 main :: proc() {
 	using state
-	state := init_state()
+	state := init()
 
-	fmt.println(state)
 	xdg_surface := wl.xdg_wm_base_get_xdg_surface(state.xdg_base, state.surface)
 	toplevel := wl.xdg_surface_get_toplevel(xdg_surface)
 	wl.xdg_toplevel_set_title(toplevel, "Odin Wayland")
@@ -80,5 +75,9 @@ main :: proc() {
 
 	for {
 		wl.display_dispatch(state.display)
+		gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
+		gl.Clear(gl.COLOR_BUFFER_BIT)
+		gl.Flush()
+		egl.SwapBuffers(state.egl.display, state.egl.surface)
 	}
 }
