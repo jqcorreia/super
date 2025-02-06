@@ -103,7 +103,7 @@ init :: proc() -> State {
 		fmt.println("Error making current!")
 	}
 
-	gl.load_up_to(int(1), 5, egl.gl_set_proc_address)
+	gl.load_up_to(int(3), 2, egl.gl_set_proc_address)
 	state.egl.display = rctx.display
 	state.egl.ctx = rctx.ctx
 	state.egl.surface = egl_surface

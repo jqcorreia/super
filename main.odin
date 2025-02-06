@@ -26,7 +26,7 @@ buffer_listener := wl.wl_buffer_listener {
 
 done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.uint32_t) {
 	context = runtime.default_context()
-	fmt.println("done")
+	// fmt.println("done")
 	state := cast(^state.State)data
 
 	wl_callback_destroy(wl_callback)
@@ -58,6 +58,19 @@ wl_callback_destroy :: proc "c" (wl_callback: ^wl.wl_callback) {
 	wl.proxy_destroy(cast(^wl.wl_proxy)wl_callback)
 }
 
+draw :: proc() {
+	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
+	gl.Clear(gl.COLOR_BUFFER_BIT)
+	vertices: []f32 = {-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0}
+
+	vbo: u32
+	gl.GenBuffers(1, &vbo)
+	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
+	gl.BufferData(gl.ARRAY_BUFFER, size_of(vertices), &vertices[0], gl.STATIC_DRAW)
+
+	gl.Flush()
+}
+
 main :: proc() {
 	using state
 	state := init()
@@ -75,9 +88,7 @@ main :: proc() {
 
 	for {
 		wl.display_dispatch(state.display)
-		gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
-		gl.Clear(gl.COLOR_BUFFER_BIT)
-		gl.Flush()
+		draw()
 		egl.SwapBuffers(state.egl.display, state.egl.surface)
 	}
 }
