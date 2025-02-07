@@ -58,23 +58,59 @@ wl_callback_destroy :: proc "c" (wl_callback: ^wl.wl_callback) {
 	wl.proxy_destroy(cast(^wl.wl_proxy)wl_callback)
 }
 
-draw :: proc() {
+draw :: proc(shader: u32) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
-	vertices: []f32 = {-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0}
+
+	vertices := [?]f32{-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0}
+
+	vao: u32
+	gl.GenVertexArrays(3, &vao)
+	gl.BindVertexArray(vao)
 
 	vbo: u32
 	gl.GenBuffers(1, &vbo)
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 	gl.BufferData(gl.ARRAY_BUFFER, size_of(vertices), &vertices[0], gl.STATIC_DRAW)
 
+	gl.EnableVertexAttribArray(0)
+	gl.VertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, 0, 0)
+	// setup vao
+	// vao: u32
+	// gl.GenVertexArrays(1, &vao)
+
+	// gl.BindVertexArray(vao)
+
+	// // setup vbo
+	// vertex_data := [?]f32{-0.3, -0.3, 0.3, -0.3, 0.0, 0.5}
+
+	// vbo: u32
+	// gl.GenBuffers(1, &vbo)
+
+	// gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
+	// gl.BufferData(gl.ARRAY_BUFFER, size_of(vertex_data), &vertex_data[0], gl.STATIC_DRAW)
+
+	// gl.EnableVertexAttribArray(0)
+	// gl.VertexAttribPointer(0, 2, gl.FLOAT, gl.FALSE, 0, 0)
+
+	// gl.UseProgram(shader)
 	gl.Flush()
+}
+
+load_shader :: proc() -> u32 {
+	shaders, result := gl.load_shaders_file("shaders/basic.vs", "shaders/basic.fs")
+
+	fmt.println(result)
+	return shaders
 }
 
 main :: proc() {
 	using state
 	state := init()
 
+	shader := load_shader()
+
+	fmt.println(shader)
 	xdg_surface := wl.xdg_wm_base_get_xdg_surface(state.xdg_base, state.surface)
 	toplevel := wl.xdg_surface_get_toplevel(xdg_surface)
 	wl.xdg_toplevel_set_title(toplevel, "Odin Wayland")
@@ -88,7 +124,7 @@ main :: proc() {
 
 	for {
 		wl.display_dispatch(state.display)
-		draw()
+		draw(shader)
 		egl.SwapBuffers(state.egl.display, state.egl.surface)
 	}
 }
