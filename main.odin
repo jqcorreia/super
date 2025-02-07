@@ -75,6 +75,11 @@ draw :: proc(shader: u32) {
 
 	gl.EnableVertexAttribArray(0)
 	gl.VertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, 0, 0)
+	gl.UseProgram(shader)
+
+	// draw stuff
+	gl.BindVertexArray(vao)
+	gl.DrawArraysInstanced(gl.TRIANGLES, 0, 3, 2)
 	// setup vao
 	// vao: u32
 	// gl.GenVertexArrays(1, &vao)
@@ -93,7 +98,6 @@ draw :: proc(shader: u32) {
 	// gl.EnableVertexAttribArray(0)
 	// gl.VertexAttribPointer(0, 2, gl.FLOAT, gl.FALSE, 0, 0)
 
-	// gl.UseProgram(shader)
 	gl.Flush()
 }
 
