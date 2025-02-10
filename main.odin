@@ -65,7 +65,7 @@ draw :: proc(shader: u32) {
 	vertices := [?]f32{-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0}
 
 	vao: u32
-	gl.GenVertexArrays(3, &vao)
+	gl.GenVertexArrays(1, &vao)
 	gl.BindVertexArray(vao)
 
 	vbo: u32
@@ -75,11 +75,7 @@ draw :: proc(shader: u32) {
 
 	gl.EnableVertexAttribArray(0)
 	gl.VertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, 0, 0)
-	gl.UseProgram(shader)
 
-	// draw stuff
-	gl.BindVertexArray(vao)
-	gl.DrawArraysInstanced(gl.TRIANGLES, 0, 3, 2)
 	// setup vao
 	// vao: u32
 	// gl.GenVertexArrays(1, &vao)
@@ -98,6 +94,11 @@ draw :: proc(shader: u32) {
 	// gl.EnableVertexAttribArray(0)
 	// gl.VertexAttribPointer(0, 2, gl.FLOAT, gl.FALSE, 0, 0)
 
+	// draw stuff
+	gl.UseProgram(shader)
+	gl.Uniform4f(gl.GetUniformLocation(shader, cstring("input")), 1.0, 0.0, 0.0, 0.0)
+	gl.BindVertexArray(vao)
+	gl.DrawArraysInstanced(gl.TRIANGLES, 0, 3, 2)
 	gl.Flush()
 }
 
