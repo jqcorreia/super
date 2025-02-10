@@ -96,7 +96,8 @@ draw :: proc(shader: u32) {
 
 	// draw stuff
 	gl.UseProgram(shader)
-	gl.Uniform4f(gl.GetUniformLocation(shader, cstring("input")), 1.0, 0.0, 0.0, 0.0)
+	color := []f32{1.0, 0.0, 0.0, 0.0}
+	gl.Uniform4fv(gl.GetUniformLocation(shader, cstring("input")), 1, raw_data(color))
 	gl.BindVertexArray(vao)
 	gl.DrawArraysInstanced(gl.TRIANGLES, 0, 3, 2)
 	gl.Flush()
