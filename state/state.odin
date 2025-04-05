@@ -11,17 +11,18 @@ import wl "../wayland-odin/wayland"
 
 
 State :: struct {
-	display:        ^wl.wl_display,
-	compositor:     ^wl.wl_compositor,
-	xdg_base:       ^wl.xdg_wm_base,
-	shm:            ^wl.wl_shm,
-	surface:        ^wl.wl_surface,
-	egl:            struct {
+	display:             ^wl.wl_display,
+	compositor:          ^wl.wl_compositor,
+	xdg_base:            ^wl.xdg_wm_base,
+	zwlr_layer_shell_v1: ^wl.zwlr_layer_shell_v1,
+	shm:                 ^wl.wl_shm,
+	surface:             ^wl.wl_surface,
+	egl:                 struct {
 		ctx:     egl.Context,
 		display: egl.Display,
 		surface: egl.Surface,
 	},
-	shader_program: u32,
+	shader_program:      u32,
 }
 
 global :: proc "c" (
@@ -55,6 +56,16 @@ global :: proc "c" (
 				registry,
 				name,
 				&wl.xdg_wm_base_interface,
+				version,
+			))
+	}
+	if interface == wl.zwlr_layer_shell_v1_interface.name {
+		state: ^State = cast(^State)data
+		state.zwlr_layer_shell_v1 =
+		cast(^wl.zwlr_layer_shell_v1)(wl.wl_registry_bind(
+				registry,
+				name,
+				&wl.zwlr_layer_shell_v1_interface,
 				version,
 			))
 	}

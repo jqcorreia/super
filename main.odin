@@ -23,6 +23,26 @@ buffer_listener := wl.wl_buffer_listener {
 		wl.wl_buffer_destroy(wl_buffer)
 	},
 }
+layer_listener := wl.zwlr_layer_surface_v1_listener {
+	configure = proc "c" (
+		data: rawptr,
+		surface: ^wl.zwlr_layer_surface_v1,
+		serial: c.uint32_t,
+		width: c.uint32_t,
+		height: c.uint32_t,
+	) {
+		context = runtime.default_context()
+		fmt.println("surface_configure")
+		state := cast(^state.State)data
+		wl.zwlr_layer_surface_v1_ack_configure(surface, serial)
+		//
+		//buffer := get_buffer(state, 800, 600)
+		//wl.wl_surface_attach(state.surface, buffer, 0, 0)
+		wl.wl_surface_damage(state.surface, 0, 0, c.INT32_MAX, c.INT32_MAX)
+		wl.wl_surface_commit(state.surface)
+	},
+}
+
 
 done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.uint32_t) {
 	context = runtime.default_context()
@@ -92,6 +112,13 @@ load_shader :: proc() -> u32 {
 	return shaders
 }
 
+ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP :: 2
+ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM :: 2
+ZWLR_LAYER_SURFACE_V1_ANCHOR_LEFT :: 4
+ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT :: 8
+
+XDG_OR_LAYER :: "layer"
+
 main :: proc() {
 	using state
 	state := init()
@@ -99,13 +126,29 @@ main :: proc() {
 	shader := load_shader()
 	state.shader_program = shader
 
-	fmt.println(shader)
-	xdg_surface := wl.xdg_wm_base_get_xdg_surface(state.xdg_base, state.surface)
-	toplevel := wl.xdg_surface_get_toplevel(xdg_surface)
-	wl.xdg_toplevel_set_title(toplevel, "Odin Wayland")
+	if XDG_OR_LAYER == "layer" {
+		layer_surface := wl.zwlr_layer_shell_v1_get_layer_surface(
+			state.zwlr_layer_shell_v1,
+			state.surface,
+			nil,
+			3,
+			"test",
+		)
+		wl.zwlr_layer_surface_v1_add_listener(layer_surface, &layer_listener, &state)
+		wl.zwlr_layer_surface_v1_set_size(layer_surface, 320, 100)
+		wl.zwlr_layer_surface_v1_set_anchor(
+			layer_surface,
+			ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM | ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT,
+		)
+	} else {
+		xdg_surface := wl.xdg_wm_base_get_xdg_surface(state.xdg_base, state.surface)
+		toplevel := wl.xdg_surface_get_toplevel(xdg_surface)
+		wl.xdg_toplevel_set_title(toplevel, "Odin Wayland")
+		wl.xdg_surface_add_listener(xdg_surface, &surface_listener, &state)
+	}
+
 
 	wl.wl_surface_commit(state.surface) // This first commit is needed by egl or egl.SwapBuffers() will panic
-	wl.xdg_surface_add_listener(xdg_surface, &surface_listener, &state)
 
 	wl_callback := wl.wl_surface_frame(state.surface)
 	wl.wl_callback_add_listener(wl_callback, &frame_callback_listener, &state)
