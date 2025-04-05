@@ -76,13 +76,21 @@ wl_callback_destroy :: proc "c" (wl_callback: ^wl.wl_callback) {
 	wl.proxy_destroy(cast(^wl.wl_proxy)wl_callback)
 }
 
-draw :: proc(shader: u32) {
-	// gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
-	gl.ClearColor(0.0, 0.0, 0.0, 0.0)
-	gl.Clear(gl.COLOR_BUFFER_BIT)
-
-	// vertices := [?]f32{-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0}
-	vertices := [?]f32{-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.5, 0.5, 0.0, -0.5, 0.5, 0.0}
+draw_rect :: proc(x, y, width, height: f32, shader: u32) {
+	vertices := [?]f32 {
+		f32(x),
+		f32(y),
+		0.0,
+		f32(x + width),
+		f32(y),
+		0.0,
+		f32(x + width),
+		f32(y + height),
+		0.0,
+		f32(x),
+		f32(y + height),
+		0.0,
+	}
 
 	vao: u32
 	gl.GenVertexArrays(1, &vao)
@@ -97,12 +105,49 @@ draw :: proc(shader: u32) {
 	gl.VertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, 0, 0)
 
 	// draw stuff
-	gl.UseProgram(shader)
-	color := []f32{1.0, 0.0, 0.0, 1.0}
+	color := []f32{1.0, 1.0, 1.0, 1.0}
 	gl.Uniform4fv(gl.GetUniformLocation(shader, cstring("input")), 1, raw_data(color))
+	gl.UseProgram(shader)
 	gl.BindVertexArray(vao)
-	// gl.DrawArraysInstanced(gl.QUADS, 0, 4, 1)
-	gl.DrawArrays(gl.TRIANGLE_STRIP, 0, 4)
+	gl.DrawArrays(gl.TRIANGLE_FAN, 0, 4)
+}
+
+// draw :: proc(shader: u32) {
+// 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
+// 	// gl.ClearColor(0.0, 0.0, 0.0, 0.0)
+// 	gl.Clear(gl.COLOR_BUFFER_BIT)
+
+// 	// vertices := [?]f32{-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0}
+// 	vertices := [?]f32{-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.5, 0.5, 0.0, -0.5, 0.5, 0.0}
+
+// 	vao: u32
+// 	gl.GenVertexArrays(1, &vao)
+// 	gl.BindVertexArray(vao)
+
+// 	vbo: u32
+// 	gl.GenBuffers(1, &vbo)
+// 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
+// 	gl.BufferData(gl.ARRAY_BUFFER, size_of(vertices), &vertices[0], gl.STATIC_DRAW)
+
+// 	gl.EnableVertexAttribArray(0)
+// 	gl.VertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, 0, 0)
+
+// 	// draw stuff
+// 	gl.UseProgram(shader)
+// 	color := []f32{1.0, 0.0, 0.0, 1.0}
+// 	gl.Uniform4fv(gl.GetUniformLocation(shader, cstring("input")), 1, raw_data(color))
+// 	gl.BindVertexArray(vao)
+// 	// gl.DrawArraysInstanced(gl.QUADS, 0, 4, 1)
+// 	gl.DrawArrays(gl.TRIANGLE_STRIP, 0, 4)
+// 	gl.Flush()
+// }
+
+draw :: proc(shader: u32) {
+	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
+	// gl.ClearColor(0.0, 0.0, 0.0, 0.0)
+	gl.Clear(gl.COLOR_BUFFER_BIT)
+
+	draw_rect(0, 0, 50, 50, shader)
 	gl.Flush()
 }
 
