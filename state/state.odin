@@ -80,8 +80,8 @@ registry_listener := wl.wl_registry_listener {
 }
 
 init :: proc() -> State {
-	width: i32 = 800
-	height: i32 = 600
+	width: i32 = 320
+	height: i32 = 100
 
 	state: State = {}
 

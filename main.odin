@@ -77,7 +77,8 @@ wl_callback_destroy :: proc "c" (wl_callback: ^wl.wl_callback) {
 }
 
 draw :: proc(shader: u32) {
-	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
+	// gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
+	gl.ClearColor(0.0, 0.0, 0.0, 0.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	// vertices := [?]f32{-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0}
@@ -97,7 +98,7 @@ draw :: proc(shader: u32) {
 
 	// draw stuff
 	gl.UseProgram(shader)
-	color := []f32{1.0, 0.0, 0.0, 0.0}
+	color := []f32{1.0, 0.0, 0.0, 1.0}
 	gl.Uniform4fv(gl.GetUniformLocation(shader, cstring("input")), 1, raw_data(color))
 	gl.BindVertexArray(vao)
 	// gl.DrawArraysInstanced(gl.QUADS, 0, 4, 1)
