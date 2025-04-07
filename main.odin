@@ -1,19 +1,18 @@
 package main
 
+import "base:runtime"
 import "core:c"
 import "core:c/libc"
 import "core:fmt"
+import "core:sys/posix"
+import "core:time"
+
 import "render"
 import p "render/primitives"
-import wl "wayland-odin/wayland"
-
-import "core:sys/posix"
-
-import "base:runtime"
+import "state"
 import gl "vendor:OpenGL"
 import "vendor:egl"
-
-import "state"
+import wl "wayland-odin/wayland"
 
 surface_listener := wl.xdg_surface_listener {
 	configure = surface_configure,
@@ -53,7 +52,7 @@ done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.u
 	wl.wl_callback_add_listener(wl_callback, &frame_callback_listener, state)
 
 	// Maybe render code goes here
-	draw(state.shader_programs["singularity"])
+	draw(state)
 }
 
 frame_callback_listener := wl.wl_callback_listener {
@@ -107,13 +106,14 @@ wl_callback_destroy :: proc "c" (wl_callback: ^wl.wl_callback) {
 // 	gl.Flush()
 // }
 
-draw :: proc(shader: u32) {
+draw :: proc(state: ^state.State) {
+	shader := state.shader_programs["Singularity"]
+
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	// gl.ClearColor(0.0, 0.0, 0.0, 0.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	p.draw_rect(100, 100, 200, 200, shader)
-	p.draw_rect(0, 0, 200, 200, shader)
 	gl.Flush()
 }
 
@@ -142,7 +142,7 @@ main :: proc() {
 		"shaders/basic_frag.glsl",
 	)
 
-	state.shader_programs["singularity"] = load_shader(
+	state.shader_programs["Singularity"] = load_shader(
 		"shaders/basic_vert.glsl",
 		"shaders/singularity.glsl",
 	)
@@ -183,6 +183,7 @@ main :: proc() {
 	//wl.wl_surface_commit(state.surface)
 
 	for {
+		state.time_elapsed = time.diff(state.start_time, time.now())
 		wl.display_dispatch(state.display)
 		egl.SwapBuffers(state.egl.display, state.egl.surface)
 	}

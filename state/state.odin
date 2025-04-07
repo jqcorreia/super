@@ -1,15 +1,15 @@
 package state
 
-import "core:c"
-import "core:fmt"
-
-import gl "vendor:OpenGL"
-import "vendor:egl"
-
 import "../render"
 import wl "../wayland-odin/wayland"
 
+import "core:c"
+import "core:fmt"
+import "core:time"
+
 import "base:runtime"
+import gl "vendor:OpenGL"
+import "vendor:egl"
 
 State :: struct {
 	display:             ^wl.wl_display,
@@ -25,6 +25,8 @@ State :: struct {
 	},
 	shader_programs:     map[string]u32,
 	output:              ^wl.wl_output,
+	start_time:          time.Time,
+	time_elapsed:        time.Duration,
 }
 
 global :: proc "c" (
@@ -34,7 +36,7 @@ global :: proc "c" (
 	interface: cstring,
 	version: c.uint32_t,
 ) {
-	context = runtime.default_context()
+	// context = runtime.default_context()
 	if interface == wl.wl_compositor_interface.name {
 		state: ^State = cast(^State)data
 		state.compositor =
@@ -46,17 +48,17 @@ global :: proc "c" (
 			))
 	}
 
-	if interface == wl.wl_output_interface.name {
-		fmt.println("Found output")
-		state: ^State = cast(^State)data
-		if state.output != nil {
-			fmt.println("Output already set")
-			return
-		}
+	// if interface == wl.wl_output_interface.name {
+	// 	fmt.println("Found output")
+	// 	state: ^State = cast(^State)data
+	// 	if state.output != nil {
+	// 		fmt.println("Output already set")
+	// 		return
+	// 	}
 
-		state.output =
-		cast(^wl.wl_output)(wl.wl_registry_bind(registry, name, &wl.wl_output_interface, version))
-	}
+	// 	state.output =
+	// 	cast(^wl.wl_output)(wl.wl_registry_bind(registry, name, &wl.wl_output_interface, version))
+	// }
 
 	if interface == wl.wl_shm_interface.name {
 		state: ^State = cast(^State)data
@@ -97,6 +99,7 @@ registry_listener := wl.wl_registry_listener {
 init :: proc(width: i32, height: i32) -> State {
 	state: State = {}
 
+	state.start_time = time.now()
 	display := wl.display_connect(nil)
 	state.display = display
 	registry := wl.wl_display_get_registry(display)
