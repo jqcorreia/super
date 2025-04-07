@@ -112,7 +112,7 @@ draw :: proc(shader: u32) {
 	// gl.ClearColor(0.0, 0.0, 0.0, 0.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-	p.draw_rect(100, 100, 200, 10, shader)
+	p.draw_rect(100, 100, 200, 200, shader)
 	gl.Flush()
 }
 
