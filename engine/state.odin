@@ -1,4 +1,4 @@
-package state
+package engine
 
 import "../render"
 import wl "../wayland-odin/wayland"
@@ -23,6 +23,7 @@ State :: struct {
 		display: egl.Display,
 		surface: egl.Surface,
 	},
+	egl_render_context:  render.RenderContext,
 	shader_programs:     map[string]u32,
 	output:              ^wl.wl_output,
 	start_time:          time.Time,
@@ -102,17 +103,26 @@ init :: proc(width: i32, height: i32) -> State {
 	state.start_time = time.now()
 	display := wl.display_connect(nil)
 	state.display = display
-	registry := wl.wl_display_get_registry(display)
 
-	wl.wl_registry_add_listener(registry, &registry_listener, &state)
-
+	// Get registry, add a global listener and get things started
 	// Do a roundtrip in order to get registry info and populate the wayland part of state
+	registry := wl.wl_display_get_registry(display)
+	wl.wl_registry_add_listener(registry, &registry_listener, &state)
 	wl.display_roundtrip(display)
+
+	// Initialize EGL and OpenGL
+	rctx := render.init_egl(display)
+	state.egl_render_context = rctx
+
+	//TODO(quadrado): Properly understand this and document it
+	// This somehow loads the proper function pointers or something...
+	gl.load_up_to(int(3), 2, egl.gl_set_proc_address)
+
+	// surface := create_surface(&state, width, height)
+	// state.surface = surface.surface
 
 	// Create the surface
 	state.surface = wl.wl_compositor_create_surface(state.compositor)
-
-	rctx := render.init_egl(display)
 
 	egl_window := wl.egl_window_create(state.surface, width, height)
 	egl_surface := egl.CreateWindowSurface(
@@ -130,10 +140,45 @@ init :: proc(width: i32, height: i32) -> State {
 		fmt.println("Error making current!")
 	}
 
-	gl.load_up_to(int(3), 2, egl.gl_set_proc_address)
 	state.egl.display = rctx.display
 	state.egl.ctx = rctx.ctx
 	state.egl.surface = egl_surface
 
 	return state
+}
+
+create_surface :: proc(state: ^State, width: i32, height: i32) -> Surface {
+	surface: Surface = {}
+	surface.width = width
+	surface.height = height
+	surface.surface = wl.wl_compositor_create_surface(state.compositor)
+
+	if surface.surface == nil {
+		fmt.println("Error creating surface")
+		return surface
+	}
+
+	egl_window := wl.egl_window_create(state.surface, width, height)
+	egl_surface := egl.CreateWindowSurface(
+		state.egl_render_context.display,
+		state.egl_render_context.config,
+		egl.NativeWindowType(egl_window),
+		nil,
+	)
+
+	if egl_surface == egl.NO_SURFACE {
+		fmt.println("Error creating window surface")
+
+	}
+	if (!egl.MakeCurrent(
+			   state.egl_render_context.display,
+			   egl_surface,
+			   egl_surface,
+			   state.egl_render_context.ctx,
+		   )) {
+		fmt.println("Error making current!")
+	}
+
+
+	return surface
 }

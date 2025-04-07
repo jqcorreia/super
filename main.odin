@@ -7,9 +7,9 @@ import "core:fmt"
 import "core:sys/posix"
 import "core:time"
 
+import "engine"
 import "render"
 import p "render/primitives"
-import "state"
 import gl "vendor:OpenGL"
 import "vendor:egl"
 import wl "wayland-odin/wayland"
@@ -33,7 +33,7 @@ layer_listener := wl.zwlr_layer_surface_v1_listener {
 	) {
 		context = runtime.default_context()
 		fmt.println("layer_configure")
-		state := cast(^state.State)data
+		state := cast(^engine.State)data
 		wl.zwlr_layer_surface_v1_ack_configure(surface, serial)
 		//
 		//buffer := get_buffer(state, 800, 600)
@@ -46,7 +46,7 @@ layer_listener := wl.zwlr_layer_surface_v1_listener {
 
 done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.uint32_t) {
 	context = runtime.default_context()
-	state := cast(^state.State)data
+	state := cast(^engine.State)data
 	wl_callback_destroy(wl_callback)
 	wl_callback := wl.wl_surface_frame(state.surface)
 	wl.wl_callback_add_listener(wl_callback, &frame_callback_listener, state)
@@ -62,7 +62,7 @@ frame_callback_listener := wl.wl_callback_listener {
 surface_configure :: proc "c" (data: rawptr, surface: ^wl.xdg_surface, serial: c.uint32_t) {
 	context = runtime.default_context()
 	fmt.println("surface_configure")
-	state := cast(^state.State)data
+	state := cast(^engine.State)data
 	wl.xdg_surface_ack_configure(surface, serial)
 	//
 	//buffer := get_buffer(state, 800, 600)
@@ -106,7 +106,7 @@ wl_callback_destroy :: proc "c" (wl_callback: ^wl.wl_callback) {
 // 	gl.Flush()
 // }
 
-draw :: proc(state: ^state.State) {
+draw :: proc(state: ^engine.State) {
 	shader := state.shader_programs["Singularity"]
 
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
@@ -134,7 +134,7 @@ XDG_OR_LAYER :: "layer"
 WIDTH :: 800
 HEIGHT :: 600
 main :: proc() {
-	using state
+	using engine
 	state := init(WIDTH, HEIGHT)
 
 	state.shader_programs["Basic"] = load_shader(
