@@ -9,6 +9,7 @@ import "vendor:egl"
 import "../render"
 import wl "../wayland-odin/wayland"
 
+import "base:runtime"
 
 State :: struct {
 	display:             ^wl.wl_display,
@@ -23,6 +24,7 @@ State :: struct {
 		surface: egl.Surface,
 	},
 	shader_program:      u32,
+	output:              ^wl.wl_output,
 }
 
 global :: proc "c" (
@@ -32,6 +34,7 @@ global :: proc "c" (
 	interface: cstring,
 	version: c.uint32_t,
 ) {
+	context = runtime.default_context()
 	if interface == wl.wl_compositor_interface.name {
 		state: ^State = cast(^State)data
 		state.compositor =
@@ -41,6 +44,18 @@ global :: proc "c" (
 				&wl.wl_compositor_interface,
 				version,
 			))
+	}
+
+	if interface == wl.wl_output_interface.name {
+		fmt.println("Found output")
+		state: ^State = cast(^State)data
+		if state.output != nil {
+			fmt.println("Output already set")
+			return
+		}
+
+		state.output =
+		cast(^wl.wl_output)(wl.wl_registry_bind(registry, name, &wl.wl_output_interface, version))
 	}
 
 	if interface == wl.wl_shm_interface.name {
@@ -79,9 +94,7 @@ registry_listener := wl.wl_registry_listener {
 	global_remove = global_remove,
 }
 
-init :: proc() -> State {
-	width: i32 = 800
-	height: i32 = 600
+init :: proc(width: i32, height: i32) -> State {
 	state: State = {}
 
 	display := wl.display_connect(nil)

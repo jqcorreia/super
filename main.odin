@@ -33,7 +33,7 @@ layer_listener := wl.zwlr_layer_surface_v1_listener {
 		height: c.uint32_t,
 	) {
 		context = runtime.default_context()
-		fmt.println("surface_configure")
+		fmt.println("layer_configure")
 		state := cast(^state.State)data
 		wl.zwlr_layer_surface_v1_ack_configure(surface, serial)
 		//
@@ -128,11 +128,13 @@ ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM :: 2
 ZWLR_LAYER_SURFACE_V1_ANCHOR_LEFT :: 4
 ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT :: 8
 
-XDG_OR_LAYER :: "xdg"
+XDG_OR_LAYER :: "layer"
 
+WIDTH :: 800
+HEIGHT :: 600
 main :: proc() {
 	using state
-	state := init()
+	state := init(WIDTH, HEIGHT)
 
 	shader := load_shader()
 	state.shader_program = shader
@@ -146,11 +148,19 @@ main :: proc() {
 			"test",
 		)
 		wl.zwlr_layer_surface_v1_add_listener(layer_surface, &layer_listener, &state)
-		wl.zwlr_layer_surface_v1_set_size(layer_surface, 320, 100)
+		wl.zwlr_layer_surface_v1_set_size(layer_surface, WIDTH, HEIGHT)
 		wl.zwlr_layer_surface_v1_set_anchor(
 			layer_surface,
 			ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM | ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT,
 		)
+		wl.display_dispatch(state.display) // This dispatch makes sure that the layer surface is configured
+
+		// This not working, don't know why
+		//wl.zwlr_layer_surface_v1_set_exclusive_edge(
+		//	layer_surface,
+		//	ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM | ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT,
+		//)
+		//wl.zwlr_layer_surface_v1_set_exclusive_zone(layer_surface, 1000)
 	} else {
 		xdg_surface := wl.xdg_wm_base_get_xdg_surface(state.xdg_base, state.surface)
 		toplevel := wl.xdg_surface_get_toplevel(xdg_surface)
@@ -163,7 +173,7 @@ main :: proc() {
 
 	wl_callback := wl.wl_surface_frame(state.surface)
 	wl.wl_callback_add_listener(wl_callback, &frame_callback_listener, &state)
-	wl.wl_surface_commit(state.surface)
+	//wl.wl_surface_commit(state.surface)
 
 	for {
 		wl.display_dispatch(state.display)
