@@ -45,6 +45,11 @@ draw_rect :: proc(x, y, width, height: f32, shader: u32) {
 	gl.Uniform4fv(gl.GetUniformLocation(shader, cstring("input")), 1, raw_data(color))
 	gl.Uniform2fv(gl.GetUniformLocation(shader, cstring("position")), 1, raw_data([]f32{x, y}))
 	gl.Uniform2fv(
+		gl.GetUniformLocation(shader, cstring("resolution")),
+		1,
+		raw_data([]f32{width, height}),
+	)
+	gl.Uniform2fv(
 		gl.GetUniformLocation(shader, cstring("size")),
 		1,
 		raw_data([]f32{width, height}),

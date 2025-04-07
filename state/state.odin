@@ -23,7 +23,7 @@ State :: struct {
 		display: egl.Display,
 		surface: egl.Surface,
 	},
-	shader_program:      u32,
+	shader_programs:     map[string]u32,
 	output:              ^wl.wl_output,
 }
 

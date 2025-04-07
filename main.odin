@@ -53,7 +53,7 @@ done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.u
 	wl.wl_callback_add_listener(wl_callback, &frame_callback_listener, state)
 
 	// Maybe render code goes here
-	draw(state.shader_program)
+	draw(state.shader_programs["singularity"])
 }
 
 frame_callback_listener := wl.wl_callback_listener {
@@ -113,11 +113,12 @@ draw :: proc(shader: u32) {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	p.draw_rect(100, 100, 200, 200, shader)
+	p.draw_rect(0, 0, 200, 200, shader)
 	gl.Flush()
 }
 
-load_shader :: proc() -> u32 {
-	shaders, result := gl.load_shaders_file("shaders/basic.vs", "shaders/basic.fs")
+load_shader :: proc(vertex_shader_path: string, fragment_shader_path: string) -> u32 {
+	shaders, result := gl.load_shaders_file(vertex_shader_path, fragment_shader_path)
 
 	fmt.println(result)
 	return shaders
@@ -136,8 +137,15 @@ main :: proc() {
 	using state
 	state := init(WIDTH, HEIGHT)
 
-	shader := load_shader()
-	state.shader_program = shader
+	state.shader_programs["Basic"] = load_shader(
+		"shaders/basic_vert.glsl",
+		"shaders/basic_frag.glsl",
+	)
+
+	state.shader_programs["singularity"] = load_shader(
+		"shaders/basic_vert.glsl",
+		"shaders/singularity.glsl",
+	)
 
 	if XDG_OR_LAYER == "layer" {
 		layer_surface := wl.zwlr_layer_shell_v1_get_layer_surface(
@@ -167,7 +175,6 @@ main :: proc() {
 		wl.xdg_toplevel_set_title(toplevel, "Odin Wayland")
 		wl.xdg_surface_add_listener(xdg_surface, &surface_listener, &state)
 	}
-
 
 	wl.wl_surface_commit(state.surface) // This first commit is needed by egl or egl.SwapBuffers() will panic
 
