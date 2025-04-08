@@ -1,4 +1,5 @@
 main
 super
 .gdb_history
+vgcore.*
 
