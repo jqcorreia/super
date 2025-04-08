@@ -12,6 +12,7 @@ Canvas :: struct {
 	height:      i32,
 	surface:     ^wl.wl_surface,
 	egl_surface: egl.Surface,
+	xdg_surface: ^wl.xdg_surface,
 }
 
 surface_listener := wl.xdg_surface_listener {
@@ -29,8 +30,8 @@ surface_configure :: proc "c" (data: rawptr, surface: ^wl.xdg_surface, serial: c
 	wl.wl_surface_commit(canvas.surface)
 }
 
-create_canvas :: proc(state: ^State, width: i32, height: i32) -> Canvas {
-	canvas: Canvas = {}
+create_canvas :: proc(state: ^State, width: i32, height: i32) -> ^Canvas {
+	canvas := new(Canvas)
 	canvas.width = width
 	canvas.height = height
 	canvas.surface = wl.wl_compositor_create_surface(state.compositor)
@@ -63,10 +64,15 @@ create_canvas :: proc(state: ^State, width: i32, height: i32) -> Canvas {
 
 	canvas.egl_surface = egl_surface
 
-	// xdg_surface := wl.xdg_wm_base_get_xdg_surface(state.xdg_base, canvas.surface)
-	// toplevel := wl.xdg_surface_get_toplevel(xdg_surface)
-	// wl.xdg_toplevel_set_title(toplevel, "Odin Wayland")
-	// wl.xdg_surface_add_listener(xdg_surface, &surface_listener, &canvas)
+	canvas.xdg_surface = wl.xdg_wm_base_get_xdg_surface(state.xdg_base, canvas.surface)
+	toplevel := wl.xdg_surface_get_toplevel(canvas.xdg_surface)
+	wl.xdg_toplevel_set_title(toplevel, "Odin Wayland")
+	fmt.println("Canvas", canvas)
+	wl.xdg_surface_add_listener(canvas.xdg_surface, &surface_listener, canvas)
 
 	return canvas
+}
+
+add_listener :: proc(canvas: ^Canvas) {
+	wl.xdg_surface_add_listener(canvas.xdg_surface, &surface_listener, canvas)
 }

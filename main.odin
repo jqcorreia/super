@@ -14,9 +14,9 @@ import gl "vendor:OpenGL"
 import "vendor:egl"
 import wl "wayland-odin/wayland"
 
-surface_listener := wl.xdg_surface_listener {
-	configure = surface_configure,
-}
+// surface_listener := wl.xdg_surface_listener {
+// 	configure = surface_configure,
+// }
 
 buffer_listener := wl.wl_buffer_listener {
 	release = proc "c" (data: rawptr, wl_buffer: ^wl.wl_buffer) {
@@ -49,8 +49,8 @@ done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.u
 	canvas := cast(^engine.Canvas)data
 	fmt.println("-----------_", canvas)
 	wl_callback_destroy(wl_callback)
-	wl_callback := wl.wl_surface_frame(canvas.surface)
-	wl.wl_callback_add_listener(wl_callback, &frame_callback_listener, canvas)
+	callback := wl.wl_surface_frame(canvas.surface)
+	wl.wl_callback_add_listener(callback, &frame_callback_listener, canvas)
 
 	// Maybe render code goes here
 	// draw(state)
@@ -64,16 +64,16 @@ frame_callback_listener := wl.wl_callback_listener {
 	done = done,
 }
 
-surface_configure :: proc "c" (data: rawptr, surface: ^wl.xdg_surface, serial: c.uint32_t) {
-	context = runtime.default_context()
-	fmt.println("surface_configure")
-	canvas := cast(^engine.Canvas)data
-	fmt.println(canvas)
+// surface_configure :: proc "c" (data: rawptr, surface: ^wl.xdg_surface, serial: c.uint32_t) {
+// 	context = runtime.default_context()
+// 	fmt.println("surface_configure")
+// 	canvas := cast(^engine.Canvas)data
+// 	fmt.println(canvas)
 
-	wl.xdg_surface_ack_configure(surface, serial)
-	wl.wl_surface_damage(canvas.surface, 0, 0, c.INT32_MAX, c.INT32_MAX)
-	wl.wl_surface_commit(canvas.surface)
-}
+// 	wl.xdg_surface_ack_configure(surface, serial)
+// 	wl.wl_surface_damage(canvas.surface, 0, 0, c.INT32_MAX, c.INT32_MAX)
+// 	wl.wl_surface_commit(canvas.surface)
+// }
 
 // This should be generated once this whole thing works
 wl_callback_destroy :: proc "c" (wl_callback: ^wl.wl_callback) {
@@ -108,6 +108,7 @@ XDG_OR_LAYER :: "xdg"
 
 WIDTH :: 800
 HEIGHT :: 600
+
 main :: proc() {
 	using engine
 	state := init(WIDTH, HEIGHT)
@@ -146,16 +147,17 @@ main :: proc() {
 		//)
 		//wl.zwlr_layer_surface_v1_set_exclusive_zone(layer_surface, 1000)
 	} else {
-		xdg_surface := wl.xdg_wm_base_get_xdg_surface(state.xdg_base, canvas.surface)
-		toplevel := wl.xdg_surface_get_toplevel(xdg_surface)
-		wl.xdg_toplevel_set_title(toplevel, "Odin Wayland")
-		wl.xdg_surface_add_listener(xdg_surface, &surface_listener, &canvas)
+		// xdg_surface := wl.xdg_wm_base_get_xdg_surface(state.xdg_base, canvas.surface)
+		// toplevel := wl.xdg_surface_get_toplevel(xdg_surface)
+		// wl.xdg_toplevel_set_title(toplevel, "Odin Wayland")
+		// wl.xdg_surface_add_listener(canvas.xdg_surface, &engine.surface_listener, &canvas)
+		// engine.add_listener(&canvas)
 	}
 
 	wl.wl_surface_commit(canvas.surface) // This first commit is needed by egl or egl.SwapBuffers() will panic
 
 	wl_callback := wl.wl_surface_frame(canvas.surface)
-	wl.wl_callback_add_listener(wl_callback, &frame_callback_listener, &canvas)
+	wl.wl_callback_add_listener(wl_callback, &frame_callback_listener, canvas)
 	wl.wl_surface_commit(canvas.surface)
 
 	for {
