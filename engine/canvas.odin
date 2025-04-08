@@ -4,25 +4,25 @@ import wl "../wayland-odin/wayland"
 import "core:fmt"
 import "vendor:egl"
 
-Surface :: struct {
+Canvas :: struct {
 	width:       i32,
 	height:      i32,
 	surface:     ^wl.wl_surface,
 	egl_surface: egl.Surface,
 }
 
-create_surface :: proc(state: ^State, width: i32, height: i32) -> Surface {
-	surface: Surface = {}
-	surface.width = width
-	surface.height = height
-	surface.surface = wl.wl_compositor_create_surface(state.compositor)
+create_canvas :: proc(state: ^State, width: i32, height: i32) -> Canvas {
+	canvas: Canvas = {}
+	canvas.width = width
+	canvas.height = height
+	canvas.surface = wl.wl_compositor_create_surface(state.compositor)
 
-	if surface.surface == nil {
+	if canvas.surface == nil {
 		fmt.println("Error creating surface")
-		return surface
+		return canvas
 	}
 
-	egl_window := wl.egl_window_create(state.surface, width, height)
+	egl_window := wl.egl_window_create(canvas.surface, width, height)
 	egl_surface := egl.CreateWindowSurface(
 		state.egl_render_context.display,
 		state.egl_render_context.config,
@@ -43,6 +43,7 @@ create_surface :: proc(state: ^State, width: i32, height: i32) -> Surface {
 		fmt.println("Error making current!")
 	}
 
+	canvas.egl_surface = egl_surface
 
-	return surface
+	return canvas
 }

@@ -17,13 +17,8 @@ State :: struct {
 	xdg_base:            ^wl.xdg_wm_base,
 	zwlr_layer_shell_v1: ^wl.zwlr_layer_shell_v1,
 	shm:                 ^wl.wl_shm,
-	surface:             ^wl.wl_surface,
-	egl:                 struct {
-		ctx:     egl.Context,
-		display: egl.Display,
-		surface: egl.Surface,
-	},
 	egl_render_context:  render.RenderContext,
+	egl_surface:         egl.Surface,
 	shader_programs:     map[string]u32,
 	output:              ^wl.wl_output,
 	start_time:          time.Time,
@@ -108,29 +103,6 @@ init :: proc(width: i32, height: i32) -> State {
 
 	// surface := create_surface(&state, width, height)
 	// state.surface = surface.surface
-
-	// Create the surface
-	state.surface = wl.wl_compositor_create_surface(state.compositor)
-
-	egl_window := wl.egl_window_create(state.surface, width, height)
-	egl_surface := egl.CreateWindowSurface(
-		rctx.display,
-		rctx.config,
-		egl.NativeWindowType(egl_window),
-		nil,
-	)
-
-	if egl_surface == egl.NO_SURFACE {
-		fmt.println("Error creating window surface")
-
-	}
-	if (!egl.MakeCurrent(rctx.display, egl_surface, egl_surface, rctx.ctx)) {
-		fmt.println("Error making current!")
-	}
-
-	state.egl.display = rctx.display
-	state.egl.ctx = rctx.ctx
-	state.egl.surface = egl_surface
 
 	return state
 }
