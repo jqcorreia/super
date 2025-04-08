@@ -113,7 +113,7 @@ draw :: proc(state: ^engine.State) {
 	// gl.ClearColor(0.0, 0.0, 0.0, 0.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-	p.draw_rect(100, 100, 200, 200, shader)
+	p.draw_rect(100, 100, 200, 200, shader, state)
 	gl.Flush()
 }
 
