@@ -16,7 +16,7 @@ State :: struct {
 	compositor:          ^wl.wl_compositor,
 	xdg_base:            ^wl.xdg_wm_base,
 	zwlr_layer_shell_v1: ^wl.zwlr_layer_shell_v1,
-	shm:                 ^wl.wl_shm,
+	seat:                ^wl.wl_seat,
 	egl_render_context:  render.RenderContext,
 	egl_surface:         egl.Surface,
 	shader_programs:     map[string]u32,
@@ -44,12 +44,6 @@ global :: proc "c" (
 			))
 	}
 
-	if interface == wl.wl_shm_interface.name {
-		state: ^State = cast(^State)data
-		state.shm =
-		cast(^wl.wl_shm)(wl.wl_registry_bind(registry, name, &wl.wl_shm_interface, version))
-	}
-
 	if interface == wl.xdg_wm_base_interface.name {
 		state: ^State = cast(^State)data
 		state.xdg_base =
@@ -70,6 +64,11 @@ global :: proc "c" (
 				version,
 			))
 	}
+	if interface == wl.wl_seat_interface.name {
+		state: ^State = cast(^State)data
+		state.seat =
+		cast(^wl.wl_seat)(wl.wl_registry_bind(registry, name, &wl.wl_seat_interface, version))
+	}
 }
 
 global_remove :: proc "c" (data: rawptr, registry: ^wl.wl_registry, name: c.uint32_t) {
@@ -78,6 +77,59 @@ global_remove :: proc "c" (data: rawptr, registry: ^wl.wl_registry, name: c.uint
 registry_listener := wl.wl_registry_listener {
 	global        = global,
 	global_remove = global_remove,
+}
+
+keyboard_listener := wl.wl_keyboard_listener {
+	keymap = proc "c" (
+		data: rawptr,
+		keyboard: ^wl.wl_keyboard,
+		format: c.uint32_t,
+		fd: c.int32_t,
+		size: c.uint32_t,
+	) {
+	},
+	enter = proc "c" (
+		data: rawptr,
+		keyboard: ^wl.wl_keyboard,
+		serial: c.uint32_t,
+		surface: ^wl.wl_surface,
+		keys: ^wl.wl_array,
+	) {
+	},
+	leave = proc "c" (
+		data: rawptr,
+		keyboard: ^wl.wl_keyboard,
+		serial: c.uint32_t,
+		surface: ^wl.wl_surface,
+	) {
+	},
+	key = proc "c" (
+		data: rawptr,
+		keyboard: ^wl.wl_keyboard,
+		serial: c.uint32_t,
+		time: c.uint32_t,
+		key: c.uint32_t,
+		state: c.uint32_t,
+	) {
+		// context = runtime.default_context()
+		// fmt.println("Key pressed: ", key, " state: ", state)
+	},
+	modifiers = proc "c" (
+		data: rawptr,
+		wl_keyboard: ^wl.wl_keyboard,
+		serial: c.uint32_t,
+		mods_depressed: c.uint32_t,
+		mods_latched: c.uint32_t,
+		mods_locked: c.uint32_t,
+		group: c.uint32_t,
+	) {
+	},
+	repeat_info = proc "c" (
+		data: rawptr,
+		wl_keyboard: ^wl.wl_keyboard,
+		rate: c.int32_t,
+		delay: c.int32_t,
+	) {},
 }
 
 init :: proc(width: i32, height: i32) -> State {
@@ -103,6 +155,9 @@ init :: proc(width: i32, height: i32) -> State {
 
 	// surface := create_surface(&state, width, height)
 	// state.surface = surface.surface
+
+	// keyboard := wl.wl_seat_get_keyboard(state.seat)
+	// wl.wl_keyboard_add_listener(keyboard, &keyboard_listener, nil)
 
 	return state
 }
