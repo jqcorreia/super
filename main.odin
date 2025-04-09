@@ -138,7 +138,7 @@ seat_listener := wl.wl_seat_listener {
 		fmt.println("Capabilities: ", capabilities)
 		state := cast(^engine.State)data
 		fmt.println("State: ", state)
-		// pointer := wl.wl_seat_get_pointer(state.seat)
+		pointer := wl.wl_seat_get_pointer(state.seat)
 	},
 	name = proc "c" (data: rawptr, wl_seat: ^wl.wl_seat, name: cstring) {
 		context = runtime.default_context()
