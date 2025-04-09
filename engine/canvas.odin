@@ -143,7 +143,7 @@ set_draw_callback :: proc(state: ^State, canvas: ^Canvas, draw_proc: proc(_: ^St
 
 	wl_callback := wl.wl_surface_frame(canvas.surface)
 	// cc := new(CanvasCallback, context.allocator)
-	cc := new(CanvasCallback, context.allocator)
+	cc := new(CanvasCallback, context.temp_allocator)
 	cc.canvas = canvas
 	cc.state = state
 	wl.wl_callback_add_listener(wl_callback, &frame_callback_listener2, cc)
