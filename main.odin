@@ -12,7 +12,15 @@ import gl "vendor:OpenGL"
 import "vendor:egl"
 import wl "wayland-odin/wayland"
 
-draw :: proc(state: ^engine.State) {
+draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
+	// if (!egl.MakeCurrent(
+	// 		   state.egl_render_context.display,
+	// 		   canvas.egl_surface,
+	// 		   canvas.egl_surface,
+	// 		   state.egl_render_context.ctx,
+	// 	   )) {
+	// 	fmt.println("Error making current!")
+	// }
 	shader := state.shader_programs["Singularity"]
 
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
@@ -21,6 +29,8 @@ draw :: proc(state: ^engine.State) {
 
 	p.draw_rect(0, 0, 800, 600, shader, state)
 	gl.Flush()
+
+	// egl.SwapBuffers(state.egl_render_context.display, canvas.egl_surface)
 }
 
 load_shader :: proc(vertex_shader_path: string, fragment_shader_path: string) -> u32 {
@@ -37,6 +47,9 @@ main :: proc() {
 	state := engine.init(WIDTH, HEIGHT)
 	canvas := engine.create_canvas(&state, WIDTH, HEIGHT, engine.CanvasType.Window)
 	engine.set_draw_callback(&state, canvas, draw)
+
+	// canvas2 := engine.create_canvas(&state, WIDTH, HEIGHT, engine.CanvasType.Layer)
+	// engine.set_draw_callback(&state, canvas2, draw)
 
 	state.shader_programs["Basic"] = load_shader(
 		"shaders/basic_vert.glsl",

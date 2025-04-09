@@ -7,12 +7,14 @@ import "vendor:egl"
 import "base:runtime"
 import "core:c"
 
+DrawProc :: proc(_: ^Canvas, _: ^State)
+
 Canvas :: struct {
 	width:       i32,
 	height:      i32,
 	surface:     ^wl.wl_surface,
 	egl_surface: egl.Surface,
-	draw:        proc(_: ^State),
+	draw:        DrawProc,
 }
 
 CanvasType :: enum {
@@ -131,14 +133,14 @@ done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.u
 	callback := wl.wl_surface_frame(cc.canvas.surface)
 	wl.wl_callback_add_listener(callback, &frame_callback, cc)
 
-	cc.canvas.draw(cc.state)
+	cc.canvas.draw(cc.canvas, cc.state)
 }
 
 frame_callback := wl.wl_callback_listener {
 	done = done,
 }
 
-set_draw_callback :: proc(state: ^State, canvas: ^Canvas, draw_proc: proc(_: ^State)) {
+set_draw_callback :: proc(state: ^State, canvas: ^Canvas, draw_proc: DrawProc) {
 	canvas.draw = draw_proc
 
 	wl_callback := wl.wl_surface_frame(canvas.surface)
