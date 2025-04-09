@@ -129,12 +129,12 @@ done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.u
 	cc := cast(^CanvasCallback)data
 	wl_callback_destroy(wl_callback)
 	callback := wl.wl_surface_frame(cc.canvas.surface)
-	wl.wl_callback_add_listener(callback, &frame_callback_listener2, cc)
+	wl.wl_callback_add_listener(callback, &frame_callback, cc)
 
 	cc.canvas.draw(cc.state)
 }
 
-frame_callback_listener2 := wl.wl_callback_listener {
+frame_callback := wl.wl_callback_listener {
 	done = done,
 }
 
@@ -142,10 +142,9 @@ set_draw_callback :: proc(state: ^State, canvas: ^Canvas, draw_proc: proc(_: ^St
 	canvas.draw = draw_proc
 
 	wl_callback := wl.wl_surface_frame(canvas.surface)
-	// cc := new(CanvasCallback, context.allocator)
 	cc := new(CanvasCallback, context.temp_allocator)
 	cc.canvas = canvas
 	cc.state = state
-	wl.wl_callback_add_listener(wl_callback, &frame_callback_listener2, cc)
+	wl.wl_callback_add_listener(wl_callback, &frame_callback, cc)
 	wl.wl_surface_commit(canvas.surface)
 }
