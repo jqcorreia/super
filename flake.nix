@@ -31,6 +31,7 @@
           seer
           odin_updated
           libGL
+          valgrind
         ];
         shellHook = "zsh";
         name = "super dev shell";
