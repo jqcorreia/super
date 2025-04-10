@@ -2,4 +2,5 @@ main
 super
 .gdb_history
 vgcore.*
+libwayland*
 

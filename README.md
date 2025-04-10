@@ -5,6 +5,8 @@ Press &lt;super> to do stuff!
 - [x] working layer and window surfaces
 - [x] semblance of an engine with abstracted canvas creation
 - [x] rudimentary shader map
-- [ ] keyboard input * 
+- [x] keyboard input 
+- [ ] keyboard event controller 
+- [ ] text rendering !
 
-* == ongoing
+! == ongoing

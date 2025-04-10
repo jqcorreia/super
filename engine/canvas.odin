@@ -35,9 +35,9 @@ ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT :: 8
 window_listener := wl.xdg_surface_listener {
 	configure = proc "c" (data: rawptr, surface: ^wl.xdg_surface, serial: c.uint32_t) {
 		context = runtime.default_context()
-		fmt.println("surface_configure")
+		// fmt.println("surface_configure")
 		canvas := cast(^Canvas)data
-		fmt.println(canvas)
+		// fmt.println(canvas)
 
 		wl.xdg_surface_ack_configure(surface, serial)
 		wl.wl_surface_damage(canvas.surface, 0, 0, c.INT32_MAX, c.INT32_MAX)
