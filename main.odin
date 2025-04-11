@@ -14,13 +14,13 @@ import wl "wayland-odin/wayland"
 
 draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 	shader := state.shaders->get("Singularity")
-	// shader2 := state.shaders->get("Basic")
+	shader2 := state.shaders->get("Basic")
 
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	p.draw_rect(0, 0, 800, 600, shader, state)
-	// p.draw_rect(50, 50, 200, 100, shader2, state)
+	p.draw_rect(50, 50, 200, 100, shader2, state)
 	gl.Flush()
 }
 
@@ -62,7 +62,6 @@ main :: proc() {
 					fmt.println("Key released: ", e.key)
 				}
 			}
-
 		}
 	}
 }

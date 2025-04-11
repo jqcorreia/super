@@ -4,6 +4,7 @@ import wl "../wayland-odin/wayland"
 import "base:runtime"
 import "core:c"
 import "core:fmt"
+import "core:sys/posix"
 
 KeyPressed :: struct {
 	key: c.uint32_t,
@@ -25,13 +26,13 @@ Input :: struct {
 seat_listener := wl.wl_seat_listener {
 	capabilities = proc "c" (data: rawptr, wl_seat: ^wl.wl_seat, capabilities: c.uint32_t) {
 		context = runtime.default_context()
-		fmt.println("Capabilities: ", capabilities)
+		fmt.println("Input capabilities: ", capabilities)
 		state := cast(^State)data
-		fmt.println("State: ", state)
 		pointer := wl.wl_seat_get_pointer(state.seat)
 		wl.wl_pointer_add_listener(pointer, &pointer_listener, state)
 		keyboard := wl.wl_seat_get_keyboard(state.seat)
 		wl.wl_keyboard_add_listener(keyboard, &keyboard_listener, state)
+
 	},
 	name = proc "c" (data: rawptr, wl_seat: ^wl.wl_seat, name: cstring) {
 		context = runtime.default_context()
@@ -49,6 +50,14 @@ keyboard_listener := wl.wl_keyboard_listener {
 	) {
 		context = runtime.default_context()
 		fmt.println("Keymap: ", format, fd, size)
+		buf := posix.mmap(
+			nil,
+			uint(size),
+			{posix.Prot_Flag_Bits.READ},
+			{posix.Map_Flag_Bits.PRIVATE},
+			cast(posix.FD)fd,
+		)
+		// fmt.println(cast(cstring)buf)
 	},
 	enter = proc "c" (
 		data: rawptr,
