@@ -2,6 +2,7 @@ package engine
 
 import "../render"
 import wl "../wayland-odin/wayland"
+import "../xkbcommon"
 
 import "core:c"
 import "core:fmt"
@@ -25,6 +26,7 @@ State :: struct {
 	input:               ^Input,
 	shaders:             Shaders,
 	running:             bool,
+	keymap_state:        ^xkbcommon.xkb_state,
 }
 
 global :: proc "c" (

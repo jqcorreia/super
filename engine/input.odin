@@ -1,6 +1,7 @@
 package engine
 
 import wl "../wayland-odin/wayland"
+import "../xkbcommon"
 import "base:runtime"
 import "core:c"
 import "core:fmt"
@@ -32,7 +33,6 @@ seat_listener := wl.wl_seat_listener {
 		wl.wl_pointer_add_listener(pointer, &pointer_listener, state)
 		keyboard := wl.wl_seat_get_keyboard(state.seat)
 		wl.wl_keyboard_add_listener(keyboard, &keyboard_listener, state)
-
 	},
 	name = proc "c" (data: rawptr, wl_seat: ^wl.wl_seat, name: cstring) {
 		context = runtime.default_context()
@@ -48,7 +48,9 @@ keyboard_listener := wl.wl_keyboard_listener {
 		fd: c.int32_t,
 		size: c.uint32_t,
 	) {
+		// This event contains a file descriptor for the current keymap in xkb formaty
 		context = runtime.default_context()
+		state := cast(^State)data
 		fmt.println("Keymap: ", format, fd, size)
 		buf := posix.mmap(
 			nil,
@@ -57,7 +59,20 @@ keyboard_listener := wl.wl_keyboard_listener {
 			{posix.Map_Flag_Bits.PRIVATE},
 			cast(posix.FD)fd,
 		)
-		// fmt.println(cast(cstring)buf)
+		fmt.println(cast(cstring)buf)
+		ctx := xkbcommon.context_new(10)
+		km := xkbcommon.keymap_new_from_string(
+			ctx,
+			cstring(buf),
+			xkbcommon.keymap_format.XKB_KEYMAP_FORMAT_TEXT_V1,
+			xkbcommon.keymap_compile_flags.XKB_KEYMAP_COMPILE_NO_FLAGS,
+		)
+		ks := xkbcommon.state_new(km)
+		state.keymap_state = ks
+		fmt.println(km)
+		fmt.println(ks)
+		posix.munmap(buf, uint(size))
+		posix.close(cast(posix.FD)fd)
 	},
 	enter = proc "c" (
 		data: rawptr,
@@ -83,12 +98,19 @@ keyboard_listener := wl.wl_keyboard_listener {
 		state: c.uint32_t,
 	) {
 		context = runtime.default_context()
+		_state := cast(^State)data
+		keycode := key + 8 // This converts evdev events 
 		if state == 0 {
 			event := KeyPressed {
 				key = key,
 			}
-			state := cast(^State)data
-			append(&state.input.events, event)
+			buf: [16]u8
+			xkbcommon.state_key_get_utf8(_state.keymap_state, keycode, cstring(&buf[0]), 128)
+			fmt.println("!!!!", buf)
+			fmt.println("????", string(buf[:]))
+
+			// fmt.println(xkbcommon.state_key_get_one_sym(_state.keymap_state, keycode))
+			append(&_state.input.events, event)
 		}
 
 		if state == 1 {
@@ -96,7 +118,7 @@ keyboard_listener := wl.wl_keyboard_listener {
 				key = key,
 			}
 			state := cast(^State)data
-			append(&state.input.events, event)
+			append(&_state.input.events, event)
 		}
 	},
 	modifiers = proc "c" (
@@ -146,7 +168,7 @@ pointer_listener := wl.wl_pointer_listener {
 		surface_y: wl.wl_fixed_t,
 	) {
 		context = runtime.default_context()
-		fmt.println("Pointer motion", surface_x, surface_y)
+		// fmt.println("Pointer motion", surface_x, surface_y)
 	},
 	button = proc "c" (
 		data: rawptr,
