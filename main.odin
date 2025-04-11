@@ -16,13 +16,10 @@ draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 	shader := state.shaders->get("Singularity")
 
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
-	// gl.ClearColor(0.0, 0.0, 0.0, 0.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	p.draw_rect(0, 0, 800, 600, shader, state)
 	gl.Flush()
-
-	// egl.SwapBuffers(state.egl_render_context.display, canvas.egl_surface)
 }
 
 
@@ -31,8 +28,8 @@ HEIGHT :: 600
 
 main :: proc() {
 	state := engine.init(WIDTH, HEIGHT)
-	canvas := engine.create_canvas(state, WIDTH, HEIGHT, engine.CanvasType.Window)
-	engine.set_draw_callback(state, canvas, draw)
+	canvas := engine.create_canvas(state, WIDTH, HEIGHT, engine.CanvasType.Window, draw)
+	// engine.set_draw_callback(state, canvas, draw)
 
 	state.shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
 	state.shaders->new("Singularity", "shaders/basic_vert.glsl", "shaders/singularity.glsl")

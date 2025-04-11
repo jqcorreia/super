@@ -61,7 +61,13 @@ layer_listener := wl.zwlr_layer_surface_v1_listener {
 		wl.wl_surface_commit(canvas.surface)
 	},
 }
-create_canvas :: proc(state: ^State, width: i32, height: i32, type: CanvasType) -> ^Canvas {
+create_canvas :: proc(
+	state: ^State,
+	width: i32,
+	height: i32,
+	type: CanvasType,
+	draw_proc: DrawProc,
+) -> ^Canvas {
 	canvas := new(Canvas)
 	canvas.width = width
 	canvas.height = height
@@ -118,6 +124,15 @@ create_canvas :: proc(state: ^State, width: i32, height: i32, type: CanvasType) 
 		wl.display_dispatch(state.display) // This dispatch makes sure that the layer surface is configured
 	}
 
+	canvas.draw = draw_proc
+
+	wl_callback := wl.wl_surface_frame(canvas.surface)
+	cc := new(CanvasCallback, context.temp_allocator)
+	cc.canvas = canvas
+	cc.state = state
+	wl.wl_callback_add_listener(wl_callback, &frame_callback, cc)
+	wl.wl_surface_commit(canvas.surface)
+
 	return canvas
 }
 
@@ -141,12 +156,4 @@ frame_callback := wl.wl_callback_listener {
 }
 
 set_draw_callback :: proc(state: ^State, canvas: ^Canvas, draw_proc: DrawProc) {
-	canvas.draw = draw_proc
-
-	wl_callback := wl.wl_surface_frame(canvas.surface)
-	cc := new(CanvasCallback, context.temp_allocator)
-	cc.canvas = canvas
-	cc.state = state
-	wl.wl_callback_add_listener(wl_callback, &frame_callback, cc)
-	wl.wl_surface_commit(canvas.surface)
 }
