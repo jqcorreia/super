@@ -22,6 +22,8 @@ State :: struct {
 	shader_programs:     map[string]u32,
 	start_time:          time.Time,
 	time_elapsed:        time.Duration,
+	input:               ^Input,
+	shaders:             Shaders,
 }
 
 global :: proc "c" (
@@ -80,8 +82,8 @@ registry_listener := wl.wl_registry_listener {
 
 init :: proc(width: i32, height: i32) -> ^State {
 	state := new(State)
-
 	state.start_time = time.now()
+
 	display := wl.display_connect(nil)
 	state.display = display
 
@@ -90,6 +92,7 @@ init :: proc(width: i32, height: i32) -> ^State {
 	registry := wl.wl_display_get_registry(display)
 	wl.wl_registry_add_listener(registry, &registry_listener, state)
 	wl.display_roundtrip(display)
+
 
 	// Initialize EGL and OpenGL
 	rctx := render.init_egl(display)
@@ -101,5 +104,10 @@ init :: proc(width: i32, height: i32) -> ^State {
 
 	fmt.println("Seat", state.seat)
 
+	// Initialize input controller
+	init_input(state)
+
+	// Initialize shaders controller
+	state.shaders = create_shaders_controller()
 	return state
 }
