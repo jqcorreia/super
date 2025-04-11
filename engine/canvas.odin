@@ -154,6 +154,3 @@ done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.u
 frame_callback := wl.wl_callback_listener {
 	done = done,
 }
-
-set_draw_callback :: proc(state: ^State, canvas: ^Canvas, draw_proc: DrawProc) {
-}

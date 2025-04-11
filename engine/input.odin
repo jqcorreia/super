@@ -13,12 +13,13 @@ KeyReleased :: struct {
 	key: c.uint32_t,
 }
 
-InputEvents :: union {
+InputEvent :: union {
 	KeyPressed,
+	KeyReleased,
 }
 
 Input :: struct {
-	events: []InputEvents,
+	events: [dynamic]InputEvent,
 }
 
 seat_listener := wl.wl_seat_listener {
@@ -73,7 +74,21 @@ keyboard_listener := wl.wl_keyboard_listener {
 		state: c.uint32_t,
 	) {
 		context = runtime.default_context()
-		fmt.println("Key:", key, "state:", state)
+		if state == 0 {
+			event := KeyPressed {
+				key = key,
+			}
+			state := cast(^State)data
+			append(&state.input.events, event)
+		}
+
+		if state == 1 {
+			event := KeyReleased {
+				key = key,
+			}
+			state := cast(^State)data
+			append(&state.input.events, event)
+		}
 	},
 	modifiers = proc "c" (
 		data: rawptr,
@@ -121,8 +136,8 @@ pointer_listener := wl.wl_pointer_listener {
 		surface_x: wl.wl_fixed_t,
 		surface_y: wl.wl_fixed_t,
 	) {
-		// context = runtime.default_context()
-		// fmt.println("Pointer motion", surface_x, surface_y)
+		context = runtime.default_context()
+		fmt.println("Pointer motion", surface_x, surface_y)
 	},
 	button = proc "c" (
 		data: rawptr,
@@ -170,7 +185,18 @@ pointer_listener := wl.wl_pointer_listener {
 init_input :: proc(state: ^State) {
 	fmt.println("Initializing input controller.")
 	input := new(Input)
+	input.events = make([dynamic]InputEvent)
 
 	wl.wl_seat_add_listener(state.seat, &seat_listener, state)
 	state.input = input
+}
+
+consume_all_events :: proc(input: ^Input) -> [dynamic]InputEvent {
+	events: [dynamic]InputEvent
+	for event in input.events {
+		append(&events, event)
+	}
+	clear(&input.events)
+
+	return events
 }

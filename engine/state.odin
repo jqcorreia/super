@@ -24,6 +24,7 @@ State :: struct {
 	time_elapsed:        time.Duration,
 	input:               ^Input,
 	shaders:             Shaders,
+	running:             bool,
 }
 
 global :: proc "c" (
@@ -109,5 +110,6 @@ init :: proc(width: i32, height: i32) -> ^State {
 
 	// Initialize shaders controller
 	state.shaders = create_shaders_controller()
+	state.running = true
 	return state
 }
