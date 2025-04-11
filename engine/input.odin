@@ -5,7 +5,20 @@ import "base:runtime"
 import "core:c"
 import "core:fmt"
 
+KeyPressed :: struct {
+	key: c.uint32_t,
+}
+
+KeyReleased :: struct {
+	key: c.uint32_t,
+}
+
+InputEvents :: union {
+	KeyPressed,
+}
+
 Input :: struct {
+	events: []InputEvents,
 }
 
 seat_listener := wl.wl_seat_listener {
