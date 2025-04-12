@@ -32,7 +32,8 @@
           odin_updated
           libGL
           valgrind
-          libxkbcommon
+
+          libschrift
         ];
         shellHook = "zsh";
         name = "super dev shell";

@@ -41,6 +41,8 @@ draw_rect :: proc(x, y, width, height: f32, shader: u32, state: ^engine.State) {
 	gl.EnableVertexAttribArray(0)
 	gl.VertexAttribPointer(0, 2, gl.FLOAT, gl.FALSE, 0, 0)
 
+	gl.UseProgram(shader)
+
 	// draw stuff
 	color := []f32{1.0, 0.0, 0.0, 1.0}
 	projectionMatrix := ortho(0, 800, 600, 0)
@@ -67,7 +69,11 @@ draw_rect :: proc(x, y, width, height: f32, shader: u32, state: ^engine.State) {
 		false,
 		raw_data(&projectionMatrix),
 	)
-	gl.UseProgram(shader)
 	gl.BindVertexArray(vao)
 	gl.DrawArrays(gl.TRIANGLE_FAN, 0, 4)
+
+	gl.BindVertexArray(0)
+	gl.BindBuffer(gl.ARRAY_BUFFER, 0)
+	gl.DeleteBuffers(1, &vbo)
+	gl.DeleteVertexArrays(1, &vao)
 }

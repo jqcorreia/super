@@ -21,7 +21,8 @@ draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	p.draw_rect(0, 0, 800, 600, shader, state)
-	// p.draw_rect(50, 50, 200, 100, shader2, state)
+	p.draw_rect(50, 50, 200, 100, shader2, state)
+
 	gl.Flush()
 }
 
