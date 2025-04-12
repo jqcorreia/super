@@ -17,24 +17,22 @@ foreign xkb {
 	compose_state_feed :: proc(state: ^xkb_compose_state, key_sym: u32) -> xkb_compose_feed_result ---
 	compose_state_get_status :: proc(state: ^xkb_compose_state) -> xkb_compose_status ---
 	compose_state_get_utf8 :: proc(state: ^xkb_compose_state, buffer: cstring, size: c.size_t) -> c.int ---
+	state_update_key :: proc(state: ^xkb_state, key: c.uint32_t, is_pressed: bool) ---
 }
 
-// compose_table := xkb_compose_table_new_from_locale(context, "pt_BR.UTF-8", 0)
-// compose_state := xkb_compose_state_new(compose_table, 0)
-
+// Opaque structs
 xkb_context :: struct {
 }
 xkb_keymap :: struct {
 }
 xkb_state :: struct {
 }
-
 xkb_compose_table :: struct {
 }
-
 xkb_compose_state :: struct {
 }
 
+// Various enums
 keymap_format :: enum u32 {
 	XKB_KEYMAP_FORMAT_TEXT_V1 = 1,
 }
