@@ -50,17 +50,21 @@ main :: proc() {
 		// Consume all events and do eventual dispatching
 		events := engine.consume_all_events(state.input)
 		for event in events {
-			switch e in event {
+			#partial switch e in event {
 			case engine.KeyPressed:
 				{
 					if e.key == xlib.KeySym.XK_Escape {
 						state.running = false
 					}
-					// fmt.println("Key pressed: ", e.key)
+					fmt.println("Key pressed: ", e.key)
 				}
 			case engine.KeyReleased:
 				{
 					// fmt.println("Key released: ", e.key)
+				}
+			case engine.TextInput:
+				{
+					fmt.println("Text input: ", e.text)
 				}
 			}
 		}
