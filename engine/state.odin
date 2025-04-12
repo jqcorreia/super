@@ -26,7 +26,7 @@ State :: struct {
 	input:               ^Input,
 	shaders:             Shaders,
 	running:             bool,
-	keymap_state:        ^xkbcommon.xkb_state,
+	xkb:                 Xkb,
 }
 
 global :: proc "c" (

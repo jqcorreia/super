@@ -10,6 +10,7 @@ import "render"
 import p "render/primitives"
 import gl "vendor:OpenGL"
 import "vendor:egl"
+import xlib "vendor:x11/xlib"
 import wl "wayland-odin/wayland"
 
 draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
@@ -52,14 +53,14 @@ main :: proc() {
 			switch e in event {
 			case engine.KeyPressed:
 				{
-					if e.key == 1 {
+					if e.key == xlib.KeySym.XK_Escape {
 						state.running = false
 					}
-					fmt.println("Key pressed: ", e.key)
+					// fmt.println("Key pressed: ", e.key)
 				}
 			case engine.KeyReleased:
 				{
-					fmt.println("Key released: ", e.key)
+					// fmt.println("Key released: ", e.key)
 				}
 			}
 		}

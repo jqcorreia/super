@@ -6,13 +6,14 @@ import "base:runtime"
 import "core:c"
 import "core:fmt"
 import "core:sys/posix"
+import "vendor:x11/xlib"
 
 KeyPressed :: struct {
-	key: c.uint32_t,
+	key: xlib.KeySym,
 }
 
 KeyReleased :: struct {
-	key: c.uint32_t,
+	key: xlib.KeySym,
 }
 
 InputEvent :: union {
@@ -22,6 +23,12 @@ InputEvent :: union {
 
 Input :: struct {
 	events: [dynamic]InputEvent,
+}
+
+Xkb :: struct {
+	keymap:  ^xkbcommon.xkb_keymap,
+	state:   ^xkbcommon.xkb_state,
+	compose: ^xkbcommon.xkb_compose_state,
 }
 
 seat_listener := wl.wl_seat_listener {
@@ -59,7 +66,7 @@ keyboard_listener := wl.wl_keyboard_listener {
 			{posix.Map_Flag_Bits.PRIVATE},
 			cast(posix.FD)fd,
 		)
-		fmt.println(cast(cstring)buf)
+		// fmt.println(cast(cstring)buf)
 		ctx := xkbcommon.context_new(10)
 		km := xkbcommon.keymap_new_from_string(
 			ctx,
@@ -68,7 +75,15 @@ keyboard_listener := wl.wl_keyboard_listener {
 			xkbcommon.keymap_compile_flags.XKB_KEYMAP_COMPILE_NO_FLAGS,
 		)
 		ks := xkbcommon.state_new(km)
-		state.keymap_state = ks
+		compose_table := xkbcommon.compose_table_new_from_locale(ctx, "pt_PT.UTF-8", 0)
+		compose := xkbcommon.compose_state_new(compose_table, 0)
+
+		state.xkb = Xkb {
+			keymap  = km,
+			state   = ks,
+			compose = compose,
+		}
+
 		fmt.println(km)
 		fmt.println(ks)
 		posix.munmap(buf, uint(size))
@@ -99,27 +114,47 @@ keyboard_listener := wl.wl_keyboard_listener {
 	) {
 		context = runtime.default_context()
 		_state := cast(^State)data
-		keycode := key + 8 // This converts evdev events 
+
+		// This converts evdev events to xkb events 
+		keycode := key + 8
+		key_sym := xkbcommon.state_key_get_one_sym(_state.xkb.state, keycode)
+
+		// fmt.println(key_sym)
 		if state == 0 {
 			event := KeyPressed {
-				key = key,
+				key = key_sym,
 			}
-			buf: [16]u8
-			xkbcommon.state_key_get_utf8(_state.keymap_state, keycode, cstring(&buf[0]), 128)
-			fmt.println("!!!!", buf)
-			fmt.println("????", string(buf[:]))
-
-			// fmt.println(xkbcommon.state_key_get_one_sym(_state.keymap_state, keycode))
 			append(&_state.input.events, event)
+
+
+			xkbcommon.compose_state_feed(_state.xkb.compose, c.uint32_t(key_sym))
+			status := xkbcommon.compose_state_get_status(_state.xkb.compose)
+			if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSED {
+				buf: [4]u8
+				xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
+				fmt.print(string(buf[:]))
+				// fmt.println("!!!!", buf)
+				// fmt.println("????", string(buf[:]))
+			} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_CANCELLED {
+				// Cancelled, do nothing
+				fmt.println("Cancelled")
+			} else {
+				buf: [16]u8
+				xkbcommon.state_key_get_utf8(_state.xkb.state, keycode, cstring(&buf[0]), 128)
+				// fmt.println("!!!!", buf)
+				// fmt.println("????", string(buf[:]))
+				fmt.print(string(buf[:]))
+			}
 		}
 
 		if state == 1 {
 			event := KeyReleased {
-				key = key,
+				key = key_sym,
 			}
 			state := cast(^State)data
 			append(&_state.input.events, event)
 		}
+
 	},
 	modifiers = proc "c" (
 		data: rawptr,

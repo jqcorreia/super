@@ -12,40 +12,28 @@ foreign xkb {
 	state_new :: proc(keymap: ^xkb_keymap) -> ^xkb_state ---
 	state_key_get_one_sym :: proc(state: ^xkb_state, key: c.uint32_t) -> xlib.KeySym ---
 	state_key_get_utf8 :: proc(state: ^xkb_state, key: c.uint32_t, buffer: cstring, size: c.size_t) ---
+	compose_table_new_from_locale :: proc(ctx: ^xkb_context, locale: cstring, flags: u32) -> ^xkb_compose_table ---
+	compose_state_new :: proc(table: ^xkb_compose_table, flags: u32) -> ^xkb_compose_state ---
+	compose_state_feed :: proc(state: ^xkb_compose_state, key_sym: u32) -> xkb_compose_feed_result ---
+	compose_state_get_status :: proc(state: ^xkb_compose_state) -> xkb_compose_status ---
+	compose_state_get_utf8 :: proc(state: ^xkb_compose_state, buffer: cstring, size: c.size_t) -> c.int ---
 }
 
+// compose_table := xkb_compose_table_new_from_locale(context, "pt_BR.UTF-8", 0)
+// compose_state := xkb_compose_state_new(compose_table, 0)
 
-// struct xkb_context {
-//     int refcnt;
+xkb_context :: struct {
+}
+xkb_keymap :: struct {
+}
+xkb_state :: struct {
+}
 
-//     ATTR_PRINTF(3, 0) void (*log_fn)(struct xkb_context *ctx,
-//                                      enum xkb_log_level level,
-//                                      const char *fmt, va_list args);
-//     enum xkb_log_level log_level;
-//     int log_verbosity;
-//     void *user_data;
+xkb_compose_table :: struct {
+}
 
-//     struct xkb_rule_names names_dflt;
-
-//     darray(char *) includes;
-//     darray(char *) failed_includes;
-
-//     struct atom_table *atom_table;
-
-//     /* Used and allocated by xkbcommon-x11, free()d with the context. */
-//     void *x11_atom_cache;
-
-//     /* Buffer for the *Text() functions. */
-//     char text_buffer[2048];
-//     size_t text_next;
-
-//     unsigned int use_environment_names : 1;
-//     unsigned int use_secure_getenv : 1;
-// };
-
-xkb_context :: struct {}
-xkb_keymap :: struct {}
-xkb_state :: struct {}
+xkb_compose_state :: struct {
+}
 
 keymap_format :: enum u32 {
 	XKB_KEYMAP_FORMAT_TEXT_V1 = 1,
@@ -53,4 +41,19 @@ keymap_format :: enum u32 {
 
 keymap_compile_flags :: enum u32 {
 	XKB_KEYMAP_COMPILE_NO_FLAGS = 0,
+}
+
+xkb_compose_feed_result :: enum u32 {
+	XKB_COMPOSE_FEED_IGNORED  = 0,
+	XKB_COMPOSE_FEED_ACCEPTED = 1,
+}
+xkb_compose_status :: enum {
+	/** The initial state; no sequence has started yet. */
+	XKB_COMPOSE_NOTHING,
+	/** In the middle of a sequence. */
+	XKB_COMPOSE_COMPOSING,
+	/** A complete sequence has been matched. */
+	XKB_COMPOSE_COMPOSED,
+	/** The last sequence was cancelled due to an unmatched keysym. */
+	XKB_COMPOSE_CANCELLED,
 }
