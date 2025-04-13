@@ -13,6 +13,7 @@ import "vendor:egl"
 import xlib "vendor:x11/xlib"
 import wl "wayland-odin/wayland"
 
+
 draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 	shader := state.shaders->get("Singularity")
 	shader2 := state.shaders->get("Basic")
@@ -22,6 +23,8 @@ draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 
 	p.draw_rect(0, 0, 800, 600, shader, state)
 	p.draw_rect(50, 50, 200, 100, shader2, state)
+	p.draw_text("Hello World", 50, 50, state)
+
 
 	gl.Flush()
 }
@@ -36,7 +39,6 @@ main :: proc() {
 
 	state.shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
 	state.shaders->new("Singularity", "shaders/basic_vert.glsl", "shaders/singularity.glsl")
-
 
 	for state.running == true {
 		state.time_elapsed = time.diff(state.start_time, time.now())

@@ -27,6 +27,7 @@ State :: struct {
 	shaders:             Shaders,
 	running:             bool,
 	xkb:                 Xkb,
+	font:                SFT,
 }
 
 global :: proc "c" (
@@ -82,6 +83,7 @@ registry_listener := wl.wl_registry_listener {
 	global_remove = global_remove,
 }
 
+FONT :: "/nix/store/z2lkf8q9ii0h46h782qy0i5dp18im047-nerdfonts-3.2.1/share/fonts/truetype/NerdFonts/JetBrainsMonoNerdFontMono-LightItalic.ttf"
 
 init :: proc(width: i32, height: i32) -> ^State {
 	state := new(State)
@@ -113,5 +115,8 @@ init :: proc(width: i32, height: i32) -> ^State {
 	// Initialize shaders controller
 	state.shaders = create_shaders_controller()
 	state.running = true
+
+	// Load font
+	state.font = load_font(FONT, 32)
 	return state
 }
