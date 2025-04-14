@@ -121,6 +121,7 @@ create_canvas :: proc(
 			layer_surface,
 			ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM | ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT,
 		)
+		wl.zwlr_layer_surface_v1_set_keyboard_interactivity(layer_surface, 2)
 		wl.display_dispatch(state.display) // This dispatch makes sure that the layer surface is configured
 	}
 
