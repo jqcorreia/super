@@ -158,7 +158,7 @@ pointer_listener := wl.wl_pointer_listener {
 		surface_y: wl.wl_fixed_t,
 	) {
 		context = runtime.default_context()
-		// fmt.println("Pointer motion", surface_x, surface_y)
+		fmt.println("Pointer motion", (surface_x / 256.0), (surface_y / 256.0))
 	},
 	button = proc "c" (
 		data: rawptr,
