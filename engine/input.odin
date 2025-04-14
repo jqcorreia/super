@@ -143,16 +143,26 @@ keyboard_listener := wl.wl_keyboard_listener {
 
 			xkbcommon.compose_state_feed(_state.xkb.compose, c.uint32_t(key_sym))
 			status := xkbcommon.compose_state_get_status(_state.xkb.compose)
-			buf: [4]u8
+			buf: []u8 = make([]u8, 4)
 			if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSED {
-				xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
-				append(&_state.input.events, TextInput{text = strings.clone_from_bytes(buf[:])})
-			} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_CANCELLED {
+				size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
+				append(&_state.input.events, TextInput{text = string(buf[:size])})
+			} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_CANCELLED ||
+			   status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSING {
 				// Cancelled, do nothing
 				// fmt.println("Cancelled")
+			} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_NOTHING {
+				size := xkbcommon.state_key_get_utf8(
+					_state.xkb.state,
+					keycode,
+					cstring(&buf[0]),
+					4,
+				)
+				append(&_state.input.events, TextInput{text = string(buf[:size])})
 			} else {
-				xkbcommon.state_key_get_utf8(_state.xkb.state, keycode, cstring(&buf[0]), 4)
-				append(&_state.input.events, TextInput{text = strings.clone_from_bytes(buf[:])})
+				size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
+				fmt.println(size)
+				append(&_state.input.events, TextInput{text = string(buf[:size])})
 			}
 			xkbcommon.state_update_key(_state.xkb.state, keycode, true)
 		}

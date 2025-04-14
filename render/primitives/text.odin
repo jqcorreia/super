@@ -98,7 +98,7 @@ draw_text :: proc(text: string, x: u32, y: u32, state: ^engine.State) {
 		gl.Uniform2fv(
 			gl.GetUniformLocation(shader, cstring("position")),
 			1,
-			raw_data([]f32{f32(current_x), f32(f32(y) - f32(metrics.yOffset))}),
+			raw_data([]f32{f32(current_x), f32(f32(y) + f32(metrics.yOffset))}),
 		)
 		gl.Uniform2fv(
 			gl.GetUniformLocation(shader, cstring("size")),

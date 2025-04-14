@@ -23,7 +23,7 @@ draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 
 	p.draw_rect(0, 0, 800, 600, shader, state)
 	p.draw_rect(50, 50, 200, 100, shader2, state)
-	p.draw_text("Hello", 50, 50, state)
+	p.draw_text(state.text, 50, 200, state)
 
 
 	gl.Flush()
@@ -60,6 +60,9 @@ main :: proc() {
 					if e.key == xlib.KeySym.XK_Escape {
 						state.running = false
 					}
+					if e.key == xlib.KeySym.XK_BackSpace {
+						state.text = state.text[:len(state.text) - 2]
+					}
 					fmt.println("Key pressed: ", e.key)
 				}
 			case engine.KeyReleased:
@@ -68,6 +71,7 @@ main :: proc() {
 				}
 			case engine.TextInput:
 				{
+					state.text = fmt.tprintf("%s%s", state.text, e.text)
 					fmt.println("Text input: ", e.text)
 				}
 			}

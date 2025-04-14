@@ -11,7 +11,7 @@ foreign xkb {
 	keymap_new_from_string :: proc(ctx: ^xkb_context, str: cstring, format: keymap_format, compile_flags: keymap_compile_flags) -> ^xkb_keymap ---
 	state_new :: proc(keymap: ^xkb_keymap) -> ^xkb_state ---
 	state_key_get_one_sym :: proc(state: ^xkb_state, key: c.uint32_t) -> xlib.KeySym ---
-	state_key_get_utf8 :: proc(state: ^xkb_state, key: c.uint32_t, buffer: cstring, size: c.size_t) ---
+	state_key_get_utf8 :: proc(state: ^xkb_state, key: c.uint32_t, buffer: cstring, size: c.size_t) -> c.int ---
 	compose_table_new_from_locale :: proc(ctx: ^xkb_context, locale: cstring, flags: u32) -> ^xkb_compose_table ---
 	compose_state_new :: proc(table: ^xkb_compose_table, flags: u32) -> ^xkb_compose_state ---
 	compose_state_feed :: proc(state: ^xkb_compose_state, key_sym: u32) -> xkb_compose_feed_result ---
@@ -21,16 +21,11 @@ foreign xkb {
 }
 
 // Opaque structs
-xkb_context :: struct {
-}
-xkb_keymap :: struct {
-}
-xkb_state :: struct {
-}
-xkb_compose_table :: struct {
-}
-xkb_compose_state :: struct {
-}
+xkb_context :: struct {}
+xkb_keymap :: struct {}
+xkb_state :: struct {}
+xkb_compose_table :: struct {}
+xkb_compose_state :: struct {}
 
 // Various enums
 keymap_format :: enum u32 {

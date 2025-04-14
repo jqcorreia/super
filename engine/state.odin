@@ -28,6 +28,7 @@ State :: struct {
 	running:             bool,
 	xkb:                 Xkb,
 	font:                SFT,
+	text:                string,
 }
 
 global :: proc "c" (
@@ -119,5 +120,8 @@ init :: proc(width: i32, height: i32) -> ^State {
 
 	// Load font
 	state.font = load_font(FONT, 100)
+
+
+	state.text = ""
 	return state
 }
