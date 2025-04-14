@@ -88,6 +88,7 @@ registry_listener := wl.wl_registry_listener {
 // FONT :: "/usr/share/fonts/TTF/JetBrainsMonoNerdFontMono-Medium.ttf"
 
 FONT :: "JetBrainsMono Nerd Font Mono"
+// FONT :: "DejaVuSansM Nerd Font Mono"
 
 init :: proc(width: i32, height: i32) -> ^State {
 	state := new(State)

@@ -16,30 +16,6 @@ foreign sft {
 	render :: proc(font: ^SFT, glyph: SFT_Glyph, image: SFT_Image) ---
 }
 
-// struct SFT
-// {
-// 	SFT_Font *font;
-// 	double    xScale;
-// 	double    yScale;
-// 	double    xOffset;
-// 	double    yOffset;
-// 	int       flags;
-// };
-
-// struct SFT_Font
-// {
-// 	const uint8_t *memory;
-// 	uint_fast32_t  size;
-// #if defined(_WIN32)
-// 	HANDLE         mapping;
-// #endif
-// 	int            source;
-
-// 	uint_least16_t unitsPerEm;
-// 	int_least16_t  locaFormat;
-// 	uint_least16_t numLongHmtx;
-// };
-
 SFT :: struct {
 	font:    ^SFT_Font,
 	xScale:  c.double,
@@ -50,7 +26,9 @@ SFT :: struct {
 }
 
 SFT_Font :: struct {
+	// Opaque struct
 }
+
 SFT_Glyph :: c.uint32_t
 
 SFT_GMetrics :: struct {
@@ -87,33 +65,13 @@ load_font :: proc(filename: string, size: f64) -> SFT {
 	return sft
 }
 
-// let mut file_map: HashMap<String, String> = HashMap::new();
-// let fc_list = Command::new("fc-list").output();
-
-// for line in String::from_utf8(fc_list.unwrap().stdout).unwrap().lines() {
-//     if !line.contains("style=Regular") {
-//         continue;
-//     }
-//     let split = line.split(":").collect::<Vec<&str>>();
-//     let path = split.first().unwrap();
-//     let family_names = split.get(1).unwrap();
-//     for family in family_names.split(",") {
-//         file_map.insert(family.trim().to_string(), path.to_string());
-//     }
-// }
-// FontManager {
-//     file_map,
-//     ttf,
-//     cache: HashMap::new().into(),
-// }
-
 get_font_map :: proc() -> map[string]string {
 	fonts := make(map[string]string)
 
 	_, out, _, _ := os2.process_exec({command = {"fc-list"}}, context.allocator)
 
 	for line, i in strings.split(string(out), "\n") {
-		if strings.contains(line, "style=Regular") {
+		if !strings.contains(line, "style=Regular") {
 			continue
 		}
 
