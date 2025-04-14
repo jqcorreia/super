@@ -23,7 +23,7 @@ draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 
 	p.draw_rect(0, 0, 800, 600, shader, state)
 	p.draw_rect(50, 50, 200, 100, shader2, state)
-	p.draw_text("Hello World", 50, 50, state)
+	p.draw_text("Hello", 50, 50, state)
 
 
 	gl.Flush()

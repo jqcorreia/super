@@ -83,7 +83,8 @@ registry_listener := wl.wl_registry_listener {
 	global_remove = global_remove,
 }
 
-FONT :: "/nix/store/z2lkf8q9ii0h46h782qy0i5dp18im047-nerdfonts-3.2.1/share/fonts/truetype/NerdFonts/JetBrainsMonoNerdFontMono-LightItalic.ttf"
+// FONT :: "/nix/store/z2lkf8q9ii0h46h782qy0i5dp18im047-nerdfonts-3.2.1/share/fonts/truetype/NerdFonts/JetBrainsMonoNerdFontMono-LightItalic.ttf"
+FONT :: "/usr/share/fonts/TTF/JetBrainsMonoNerdFontMono-Medium.ttf"
 
 init :: proc(width: i32, height: i32) -> ^State {
 	state := new(State)
