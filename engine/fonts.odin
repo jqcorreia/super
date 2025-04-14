@@ -1,6 +1,8 @@
 package engine
 
 import "core:c"
+import "core:fmt"
+import "core:os/os2"
 import "core:strings"
 
 foreign import sft "system:libschrift.a"
@@ -83,4 +85,51 @@ load_font :: proc(filename: string, size: f64) -> SFT {
 	sft.flags = SFT_DOWNWARD_Y
 
 	return sft
+}
+
+// let mut file_map: HashMap<String, String> = HashMap::new();
+// let fc_list = Command::new("fc-list").output();
+
+// for line in String::from_utf8(fc_list.unwrap().stdout).unwrap().lines() {
+//     if !line.contains("style=Regular") {
+//         continue;
+//     }
+//     let split = line.split(":").collect::<Vec<&str>>();
+//     let path = split.first().unwrap();
+//     let family_names = split.get(1).unwrap();
+//     for family in family_names.split(",") {
+//         file_map.insert(family.trim().to_string(), path.to_string());
+//     }
+// }
+// FontManager {
+//     file_map,
+//     ttf,
+//     cache: HashMap::new().into(),
+// }
+
+get_font_map :: proc() -> map[string]string {
+	fonts := make(map[string]string)
+
+	_, out, _, _ := os2.process_exec({command = {"fc-list"}}, context.allocator)
+
+	for line, i in strings.split(string(out), "\n") {
+		if strings.contains(line, "style=Regular") {
+			continue
+		}
+
+		split := strings.split(line, ":")
+		path := split[0]
+
+		// Guard against odd lines
+		if len(split) < 2 {
+			continue
+		}
+
+		family_names := split[1]
+		for fname in strings.split(family_names, ",") {
+			fonts[strings.trim_left(fname, " ")] = path
+		}
+	}
+
+	return fonts
 }

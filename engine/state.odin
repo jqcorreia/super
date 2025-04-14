@@ -85,7 +85,9 @@ registry_listener := wl.wl_registry_listener {
 }
 
 // FONT :: "/nix/store/z2lkf8q9ii0h46h782qy0i5dp18im047-nerdfonts-3.2.1/share/fonts/truetype/NerdFonts/JetBrainsMonoNerdFontMono-LightItalic.ttf"
-FONT :: "/usr/share/fonts/TTF/JetBrainsMonoNerdFontMono-Medium.ttf"
+// FONT :: "/usr/share/fonts/TTF/JetBrainsMonoNerdFontMono-Medium.ttf"
+
+FONT :: "JetBrainsMono Nerd Font Mono"
 
 init :: proc(width: i32, height: i32) -> ^State {
 	state := new(State)
@@ -118,10 +120,13 @@ init :: proc(width: i32, height: i32) -> ^State {
 	state.shaders = create_shaders_controller()
 	state.running = true
 
-	// Load font
-	state.font = load_font(FONT, 100)
+	// Load font(s)
+	font_map := get_font_map()
+	state.font = load_font(font_map[FONT], 32)
 
 
 	state.text = ""
+
+	// list_fonts()
 	return state
 }

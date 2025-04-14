@@ -45,13 +45,6 @@ main :: proc() {
 	for state.running == true {
 		state.time_elapsed = time.diff(state.start_time, time.now())
 
-		// this call will process all the wayland messages
-		// - drawing will be done as a result
-		// - event gathering
-		// - etc
-		wl.display_dispatch(state.display)
-		egl.SwapBuffers(state.egl_render_context.display, canvas.egl_surface)
-
 		// Consume all events and do eventual dispatching
 		events := engine.consume_all_events(state.input)
 		for event in events {
@@ -68,7 +61,6 @@ main :: proc() {
 								0,
 								strings.rune_count(state.text) - 1,
 							)
-							// state.text = state.text[:len(state.text) - 1]
 						}
 					}
 					fmt.println("Key pressed: ", e.key)
@@ -85,5 +77,13 @@ main :: proc() {
 				}
 			}
 		}
+
+		// this call will process all the wayland messages
+		// - drawing will be done as a result
+		// - event gathering
+		// - etc
+		wl.display_dispatch(state.display)
+		egl.SwapBuffers(state.egl_render_context.display, canvas.egl_surface)
+
 	}
 }
