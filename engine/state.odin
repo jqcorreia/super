@@ -112,8 +112,6 @@ init :: proc(width: i32, height: i32) -> ^State {
 	// This somehow loads the proper function pointers or something...
 	gl.load_up_to(int(3), 2, egl.gl_set_proc_address)
 
-	fmt.println("Seat", state.seat)
-
 	// Initialize input controller
 	init_input(state)
 
