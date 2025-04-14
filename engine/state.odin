@@ -122,9 +122,8 @@ init :: proc(width: i32, height: i32) -> ^State {
 	state.running = true
 
 	// Load font(s)
-	font_map := get_font_map()
-	state.font = load_font(font_map[FONT], 32)
-
+	fm := new_font_manager()
+	state.font = fm->load_font(FONT, 32)
 
 	state.text = ""
 

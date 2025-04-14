@@ -48,9 +48,35 @@ SFT_Image :: struct {
 SFT_DOWNWARD_Y :: 0x01
 
 
-load_font :: proc(filename: string, size: f64) -> SFT {
+FontManager :: struct {
+	font_map:     map[string]string,
+	loaded_fonts: map[string]SFT,
+	load_font:    proc(fm: ^FontManager, filename: string, size: f64) -> SFT,
+}
+
+new_font_manager :: proc() -> FontManager {
+	loaded_fonts := make(map[string]SFT)
+	font_map := get_font_map()
+
+	fm: FontManager
+
+	fm.font_map = font_map
+	fm.loaded_fonts = loaded_fonts
+	fm.load_font = load_font
+
+	return fm
+}
+
+load_font :: proc(fm: ^FontManager, name: string, size: f64) -> SFT {
+	// Check if the font is already loaded
+	if _sft, ok := fm.loaded_fonts[name]; ok {
+		fmt.println("Font already loaded:", name)
+		return _sft
+	}
+
+	fmt.println("Loading new font:", name)
 	font: ^SFT_Font
-	font = loadfile(strings.clone_to_cstring(filename))
+	font = loadfile(strings.clone_to_cstring(fm.font_map[name]))
 	if (font == nil) {
 		panic("Failed to load font")
 	}
@@ -61,6 +87,8 @@ load_font :: proc(filename: string, size: f64) -> SFT {
 	sft.xOffset = 0.0
 	sft.yOffset = 0.0
 	sft.flags = SFT_DOWNWARD_Y
+
+	fm.loaded_fonts[name] = sft
 
 	return sft
 }
