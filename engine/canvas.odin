@@ -7,14 +7,14 @@ import "vendor:egl"
 import "base:runtime"
 import "core:c"
 
-DrawProc :: proc(_: ^Canvas, _: ^State)
+CanvasDrawProc :: proc(_: ^Canvas, _: ^State)
 
 Canvas :: struct {
 	width:       i32,
 	height:      i32,
 	surface:     ^wl.wl_surface,
 	egl_surface: egl.Surface,
-	draw:        DrawProc,
+	draw:        CanvasDrawProc,
 }
 
 CanvasType :: enum {
@@ -66,7 +66,7 @@ create_canvas :: proc(
 	width: i32,
 	height: i32,
 	type: CanvasType,
-	draw_proc: DrawProc,
+	draw_proc: CanvasDrawProc,
 ) -> ^Canvas {
 	canvas := new(Canvas)
 	canvas.width = width
