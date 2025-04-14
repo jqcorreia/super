@@ -10,7 +10,8 @@ foreign import sft "system:libschrift.a"
 foreign sft {
 	loadfile :: proc(filename: cstring) -> ^SFT_Font ---
 	lookup :: proc(font: ^SFT, ch: c.char, glyph: ^SFT_Glyph) ---
-	gmetrics :: proc(glyph: SFT_Glyph, metrics: ^SFT_GMetrics) ---
+	gmetrics :: proc(font: ^SFT, glyph: SFT_Glyph, metrics: ^SFT_GMetrics) ---
+	render :: proc(font: ^SFT, glyph: SFT_Glyph, image: SFT_Image) ---
 }
 
 // struct SFT
@@ -48,12 +49,24 @@ SFT :: struct {
 
 SFT_Font :: struct {
 }
-SFT_Glyph :: struct {
-}
+SFT_Glyph :: c.uint32_t
+
 SFT_GMetrics :: struct {
+	advanceWidth:    c.double,
+	leftSideBearing: c.double,
+	yOffset:         c.int,
+	minWidth:        c.int,
+	minHeight:       c.int,
+}
+
+SFT_Image :: struct {
+	pixels: rawptr,
+	width:  c.int,
+	height: c.int,
 }
 
 SFT_DOWNWARD_Y :: 0x01
+
 
 load_font :: proc(filename: string, size: f64) -> SFT {
 	font: ^SFT_Font

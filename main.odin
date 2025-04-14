@@ -39,6 +39,7 @@ main :: proc() {
 
 	state.shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
 	state.shaders->new("Singularity", "shaders/basic_vert.glsl", "shaders/singularity.glsl")
+	state.shaders->new("Text", "shaders/solid_text_vert.glsl", "shaders/solid_text_frag.glsl")
 
 	for state.running == true {
 		state.time_elapsed = time.diff(state.start_time, time.now())

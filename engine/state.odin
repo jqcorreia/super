@@ -117,6 +117,6 @@ init :: proc(width: i32, height: i32) -> ^State {
 	state.running = true
 
 	// Load font
-	state.font = load_font(FONT, 32)
+	state.font = load_font(FONT, 100)
 	return state
 }
