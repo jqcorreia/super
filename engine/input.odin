@@ -1,7 +1,7 @@
 package engine
 
-import wl "../wayland-odin/wayland"
-import "../xkbcommon"
+import wl "../vendor/wayland-odin/wayland"
+import "../vendor/xkbcommon"
 import "base:runtime"
 import "core:c"
 import "core:fmt"

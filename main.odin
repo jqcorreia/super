@@ -9,10 +9,10 @@ import "core:time"
 import "engine"
 import "render"
 import p "render/primitives"
+import wl "vendor/wayland-odin/wayland"
 import gl "vendor:OpenGL"
 import "vendor:egl"
 import xlib "vendor:x11/xlib"
-import wl "wayland-odin/wayland"
 
 
 draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {

@@ -1,6 +1,6 @@
 package engine
 
-import wl "../wayland-odin/wayland"
+import wl "../vendor/wayland-odin/wayland"
 import "core:fmt"
 import "vendor:egl"
 
