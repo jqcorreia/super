@@ -110,63 +110,7 @@ keyboard_listener := wl.wl_keyboard_listener {
 		surface: ^wl.wl_surface,
 	) {
 	},
-	key = proc "c" (
-		data: rawptr,
-		keyboard: ^wl.wl_keyboard,
-		serial: c.uint32_t,
-		time: c.uint32_t,
-		key: c.uint32_t,
-		state: c.uint32_t,
-	) {
-		context = runtime.default_context()
-		_state := cast(^State)data
-
-		// This converts evdev events to xkb events 
-		keycode := key + 8
-		key_sym := xkbcommon.state_key_get_one_sym(_state.xkb.state, keycode)
-
-		if state == 0 {
-			event := KeyReleased {
-				key = key_sym,
-			}
-			state := cast(^State)data
-			append(&_state.input.events, event)
-			xkbcommon.state_update_key(_state.xkb.state, keycode, false)
-		}
-
-		if state == 1 {
-			event := KeyPressed {
-				key = key_sym,
-			}
-			append(&_state.input.events, event)
-
-
-			xkbcommon.compose_state_feed(_state.xkb.compose, c.uint32_t(key_sym))
-			status := xkbcommon.compose_state_get_status(_state.xkb.compose)
-			buf: []u8 = make([]u8, 4)
-			if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSED {
-				size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
-				append(&_state.input.events, TextInput{text = string(buf[:size])})
-			} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_CANCELLED ||
-			   status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSING {
-				// Cancelled, do nothing
-				// fmt.println("Cancelled")
-			} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_NOTHING {
-				size := xkbcommon.state_key_get_utf8(
-					_state.xkb.state,
-					keycode,
-					cstring(&buf[0]),
-					4,
-				)
-				append(&_state.input.events, TextInput{text = string(buf[:size])})
-			} else {
-				size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
-				fmt.println(size)
-				append(&_state.input.events, TextInput{text = string(buf[:size])})
-			}
-			xkbcommon.state_update_key(_state.xkb.state, keycode, true)
-		}
-	},
+	key = key_handler,
 	modifiers = proc "c" (
 		data: rawptr,
 		wl_keyboard: ^wl.wl_keyboard,
@@ -257,6 +201,61 @@ pointer_listener := wl.wl_pointer_listener {
 		axis: c.uint32_t,
 		direction: c.uint32_t,
 	) {},
+}
+
+key_handler :: proc "c" (
+	data: rawptr,
+	keyboard: ^wl.wl_keyboard,
+	serial: c.uint32_t,
+	time: c.uint32_t,
+	key: c.uint32_t,
+	state: c.uint32_t,
+) {
+	context = runtime.default_context()
+	_state := cast(^State)data
+
+	// This converts evdev events to xkb events 
+	keycode := key + 8
+	key_sym := xkbcommon.state_key_get_one_sym(_state.xkb.state, keycode)
+
+	if state == 0 {
+		event := KeyReleased {
+			key = key_sym,
+		}
+		state := cast(^State)data
+		append(&_state.input.events, event)
+		xkbcommon.state_update_key(_state.xkb.state, keycode, false)
+	}
+
+	if state == 1 {
+		event := KeyPressed {
+			key = key_sym,
+		}
+		append(&_state.input.events, event)
+
+		if key_sym == xlib.KeySym.XK_BackSpace {
+			return
+		}
+
+		xkbcommon.compose_state_feed(_state.xkb.compose, c.uint32_t(key_sym))
+		status := xkbcommon.compose_state_get_status(_state.xkb.compose)
+		buf: []byte = make([]byte, 4)
+		if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSED {
+			size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
+			append(&_state.input.events, TextInput{text = string(buf[:size])})
+		} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_CANCELLED ||
+		   status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSING {
+			// Cancelled, do nothing
+			// fmt.println("Cancelled")
+		} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_NOTHING {
+			size := xkbcommon.state_key_get_utf8(_state.xkb.state, keycode, cstring(&buf[0]), 4)
+			append(&_state.input.events, TextInput{text = string(buf[:size])})
+		} else {
+			size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
+			append(&_state.input.events, TextInput{text = string(buf[:size])})
+		}
+		xkbcommon.state_update_key(_state.xkb.state, keycode, true)
+	}
 }
 
 init_input :: proc(state: ^State) {

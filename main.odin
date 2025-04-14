@@ -3,6 +3,7 @@ package main
 import "base:runtime"
 import "core:c"
 import "core:fmt"
+import "core:strings"
 import "core:time"
 
 import "engine"
@@ -22,7 +23,7 @@ draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	p.draw_rect(0, 0, 800, 600, shader, state)
-	p.draw_rect(50, 50, 200, 100, shader2, state)
+	// p.draw_rect(50, 50, 200, 100, shader2, state)
 	p.draw_text(state.text, 50, 200, state)
 
 
@@ -61,7 +62,14 @@ main :: proc() {
 						state.running = false
 					}
 					if e.key == xlib.KeySym.XK_BackSpace {
-						state.text = state.text[:len(state.text) - 2]
+						if len(state.text) > 0 {
+							state.text, _ = strings.substring(
+								state.text,
+								0,
+								strings.rune_count(state.text) - 1,
+							)
+							// state.text = state.text[:len(state.text) - 1]
+						}
 					}
 					fmt.println("Key pressed: ", e.key)
 				}
@@ -71,7 +79,8 @@ main :: proc() {
 				}
 			case engine.TextInput:
 				{
-					state.text = fmt.tprintf("%s%s", state.text, e.text)
+					// state.text = fmt.tprintf("%s%s", state.text, e.text)
+					state.text = strings.concatenate([]string{state.text, e.text})
 					fmt.println("Text input: ", e.text)
 				}
 			}
