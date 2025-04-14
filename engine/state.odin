@@ -84,11 +84,8 @@ registry_listener := wl.wl_registry_listener {
 	global_remove = global_remove,
 }
 
-// FONT :: "/nix/store/z2lkf8q9ii0h46h782qy0i5dp18im047-nerdfonts-3.2.1/share/fonts/truetype/NerdFonts/JetBrainsMonoNerdFontMono-LightItalic.ttf"
-// FONT :: "/usr/share/fonts/TTF/JetBrainsMonoNerdFontMono-Medium.ttf"
 
 FONT :: "JetBrainsMono Nerd Font Mono"
-// FONT :: "DejaVuSansM Nerd Font Mono"
 
 init :: proc(width: i32, height: i32) -> ^State {
 	state := new(State)
@@ -121,7 +118,7 @@ init :: proc(width: i32, height: i32) -> ^State {
 
 	// Load font(s)
 	fm := new_font_manager()
-	state.font = fm->load_font(FONT, 32)
+	state.font = fm->load_font(FONT, 36)
 
 	state.text = ""
 

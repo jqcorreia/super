@@ -36,7 +36,7 @@ HEIGHT :: 600
 
 main :: proc() {
 	state := engine.init(WIDTH, HEIGHT)
-	canvas := engine.create_canvas(state, WIDTH, HEIGHT, engine.CanvasType.Layer, draw)
+	canvas := engine.create_canvas(state, WIDTH, HEIGHT, engine.CanvasType.Window, draw)
 
 	state.shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
 	state.shaders->new("Singularity", "shaders/basic_vert.glsl", "shaders/singularity.glsl")
