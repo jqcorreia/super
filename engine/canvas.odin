@@ -112,16 +112,19 @@ create_canvas :: proc(
 			state.zwlr_layer_shell_v1,
 			canvas.surface,
 			nil,
-			3,
+			wl.zwlr_layer_shell_v1_layer.OVERLAY,
 			"test",
 		)
 		wl.zwlr_layer_surface_v1_add_listener(layer_surface, &layer_listener, canvas)
 		wl.zwlr_layer_surface_v1_set_size(layer_surface, u32(width), u32(height))
 		wl.zwlr_layer_surface_v1_set_anchor(
 			layer_surface,
-			ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM | ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT,
+			wl.zwlr_layer_surface_v1_anchor.BOTTOM | wl.zwlr_layer_surface_v1_anchor.RIGHT,
 		)
-		wl.zwlr_layer_surface_v1_set_keyboard_interactivity(layer_surface, 2)
+		wl.zwlr_layer_surface_v1_set_keyboard_interactivity(
+			layer_surface,
+			wl.zwlr_layer_surface_v1_keyboard_interactivity.ON_DEMAND,
+		)
 		wl.display_dispatch(state.display) // This dispatch makes sure that the layer surface is configured
 	}
 
