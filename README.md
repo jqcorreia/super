@@ -8,8 +8,10 @@ Press &lt;super> to do stuff!
 - [x] keyboard input 
 - [x] keyboard event controller 
 - [x] keyboard with deadkeys and keyboard state
+- [x] Font manager (fc-list based)
+- [x] Primitive text rendering (libschrift based)
+- [ ] Keyboard repeat ! 
 - [ ] mouse input
 - [ ] fix WAYLAND_DEBUG crashing (prolly wayland-odin's fault)
-- [ ] text rendering !
 
 ! == ongoing
