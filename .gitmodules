@@ -1,3 +1,6 @@
 [submodule "wayland-odin"]
 	path = wayland-odin
 	url = git@github.com:jqcorreia/wayland-odin.git
+[submodule "vendor/wayland-odin"]
+	path = vendor/wayland-odin
+	url = git@github.com:jqcorreia/wayland-odin.git
