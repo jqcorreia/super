@@ -8,6 +8,7 @@ import "core:c"
 import "core:fmt"
 import "core:time"
 
+// import "../widgets"
 import "base:runtime"
 import gl "vendor:OpenGL"
 import "vendor:egl"
@@ -29,6 +30,7 @@ State :: struct {
 	xkb:                 Xkb,
 	font:                SFT,
 	text:                string,
+	// widget_list:         [dynamic]widgets.Widget,
 }
 
 global :: proc "c" (

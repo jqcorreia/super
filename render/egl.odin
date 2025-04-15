@@ -20,19 +20,6 @@ RenderContext :: struct {
 	config:  egl.Config,
 }
 
-// EGLBoolean eglGetConfigs( 	EGLDisplay display,
-//   	EGLConfig * configs,
-//   	EGLint config_size,
-//   	EGLint * num_config);
-// EGL_BAD_DISPLAY :: 0x3008
-
-//m_pEglDisplay = m_sProc.eglGetPlatformDisplayEXT(
-//	gbm ? EGL_PLATFORM_GBM_KHR : EGL_PLATFORM_DEVICE_EXT,
-//	gbm ? m_pGbmDevice : m_pEglDevice,
-//	attrs.data(),
-//)
-
-// // loadGLProc(&m_sProc.eglGetPlatformDisplayEXT, "eglGetPlatformDisplayEXT");
 eglGetPlatformDisplayEXT :: proc "c" (
 	platform: int,
 	native_display: rawptr,
