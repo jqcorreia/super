@@ -136,14 +136,14 @@ create_canvas :: proc(
 }
 
 // This should be generated once this whole thing works
-wl_callback_destroy :: proc "c" (wl_callback: ^wl.wl_callback) {
-	wl.proxy_destroy(cast(^wl.wl_proxy)wl_callback)
-}
+// wl_callback_destroy :: proc "c" (wl_callback: ^wl.wl_callback) {
+// 	wl.proxy_destroy(cast(^wl.wl_proxy)wl_callback)
+// }
 
 done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.uint32_t) {
 	context = runtime.default_context()
 	cc := cast(^CanvasCallback)data
-	wl_callback_destroy(wl_callback)
+	wl.wl_callback_destroy(wl_callback)
 	callback := wl.wl_surface_frame(cc.canvas.surface)
 	wl.wl_callback_add_listener(callback, &frame_callback, cc)
 
