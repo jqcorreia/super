@@ -27,11 +27,6 @@ CanvasCallback :: struct {
 	canvas: ^Canvas,
 }
 
-ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP :: 2
-ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM :: 2
-ZWLR_LAYER_SURFACE_V1_ANCHOR_LEFT :: 4
-ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT :: 8
-
 window_listener := wl.xdg_surface_listener {
 	configure = proc "c" (data: rawptr, surface: ^wl.xdg_surface, serial: c.uint32_t) {
 		context = runtime.default_context()
