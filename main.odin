@@ -7,8 +7,6 @@ import "core:strings"
 import "core:time"
 
 import "engine"
-import "render"
-import p "render/primitives"
 import wl "vendor/wayland-odin/wayland"
 import gl "vendor:OpenGL"
 import "vendor:egl"
