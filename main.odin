@@ -16,7 +16,18 @@ import xlib "vendor:x11/xlib"
 import "widgets"
 
 
-draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
+WIDTH :: 800
+HEIGHT :: 600
+
+
+App :: struct {
+	widget_list: [dynamic]widgets.Widget,
+}
+
+
+app := App{}
+
+app_draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 	shader := state.platform_state.shaders->get("Singularity")
 	shader2 := state.platform_state.shaders->get("Basic")
 	text_shader := state.platform_state.shaders->get("Text")
@@ -28,25 +39,25 @@ draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 	// p.draw_rect(50, 50, 200, 100, shader2, state)
 	p.draw_text(state.text, 50, 200, &state.font, text_shader)
 
+	for w in app.widget_list {
+		w.draw(canvas, state)
+	}
 
 	gl.Flush()
 }
 
-
-WIDTH :: 800
-HEIGHT :: 600
-
 main :: proc() {
 	state := engine.init(WIDTH, HEIGHT)
-	canvas := engine.create_canvas(state, WIDTH, HEIGHT, engine.CanvasType.Window, draw)
+	canvas := engine.create_canvas(state, WIDTH, HEIGHT, engine.CanvasType.Window, app_draw)
 
 	shaders := &state.platform_state.shaders
 	shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
 	shaders->new("Singularity", "shaders/basic_vert.glsl", "shaders/singularity.glsl")
 	shaders->new("Text", "shaders/solid_text_vert.glsl", "shaders/solid_text_frag.glsl")
 
-	_widgets: [dynamic]widgets.Widget
-	append(&_widgets, widgets.Label{})
+
+	append(&app.widget_list, widgets.new_label(10, 10, "hello"))
+
 	for state.running == true {
 		state.time_elapsed = time.diff(state.start_time, time.now())
 

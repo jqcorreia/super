@@ -3,6 +3,7 @@ package widgets
 import "../engine"
 import "../platform"
 import p "../platform/primitives"
+import "core:fmt"
 
 WidgetDrawProc :: proc(canvas: ^engine.Canvas, state: ^engine.State)
 
@@ -18,7 +19,8 @@ Label :: struct {
 }
 
 label_draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
-	p.draw_rect(0, 0, 800, 600, state.platform_state.shaders->get("Basic"), state)
+	fmt.println("Cneas")
+	p.draw_rect(200, 200, 200, 300, state.platform_state.shaders->get("Basic"), state)
 }
 
 new_label :: proc(x: u32, y: u32, text: string) -> Label {

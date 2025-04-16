@@ -13,6 +13,7 @@ import "base:runtime"
 import gl "vendor:OpenGL"
 import "vendor:egl"
 
+
 State :: struct {
 	platform_state: ^platform.PlatformState,
 	start_time:     time.Time,
@@ -20,7 +21,6 @@ State :: struct {
 	text:           string,
 	running:        bool,
 	font:           platform.SFT,
-	// widget_list:         [dynamic]widgets.Widget,
 }
 
 
