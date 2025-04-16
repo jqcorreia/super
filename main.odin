@@ -7,6 +7,8 @@ import "core:strings"
 import "core:time"
 
 import "engine"
+import "platform"
+import p "platform/primitives"
 import wl "vendor/wayland-odin/wayland"
 import gl "vendor:OpenGL"
 import "vendor:egl"
@@ -15,15 +17,16 @@ import "widgets"
 
 
 draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
-	shader := state.shaders->get("Singularity")
-	shader2 := state.shaders->get("Basic")
+	shader := state.platform_state.shaders->get("Singularity")
+	shader2 := state.platform_state.shaders->get("Basic")
+	text_shader := state.platform_state.shaders->get("Text")
 
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	p.draw_rect(0, 0, 800, 600, shader, state)
 	// p.draw_rect(50, 50, 200, 100, shader2, state)
-	p.draw_text(state.text, 50, 200, state)
+	p.draw_text(state.text, 50, 200, &state.font, text_shader)
 
 
 	gl.Flush()
@@ -37,9 +40,10 @@ main :: proc() {
 	state := engine.init(WIDTH, HEIGHT)
 	canvas := engine.create_canvas(state, WIDTH, HEIGHT, engine.CanvasType.Window, draw)
 
-	state.shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
-	state.shaders->new("Singularity", "shaders/basic_vert.glsl", "shaders/singularity.glsl")
-	state.shaders->new("Text", "shaders/solid_text_vert.glsl", "shaders/solid_text_frag.glsl")
+	shaders := &state.platform_state.shaders
+	shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
+	shaders->new("Singularity", "shaders/basic_vert.glsl", "shaders/singularity.glsl")
+	shaders->new("Text", "shaders/solid_text_vert.glsl", "shaders/solid_text_frag.glsl")
 
 	_widgets: [dynamic]widgets.Widget
 	append(&_widgets, widgets.Label{})
@@ -47,10 +51,10 @@ main :: proc() {
 		state.time_elapsed = time.diff(state.start_time, time.now())
 
 		// Consume all events and do eventual dispatching
-		events := engine.consume_all_events(state.input)
+		events := state.platform_state.input->consume_all_events()
 		for event in events {
 			#partial switch e in event {
-			case engine.KeyPressed:
+			case platform.KeyPressed:
 				{
 					if e.key == xlib.KeySym.XK_Escape {
 						state.running = false
@@ -66,11 +70,11 @@ main :: proc() {
 					}
 					fmt.println("Key pressed: ", e.key)
 				}
-			case engine.KeyReleased:
+			case platform.KeyReleased:
 				{
 					// fmt.println("Key released: ", e.key)
 				}
-			case engine.TextInput:
+			case platform.TextInput:
 				{
 					// state.text = fmt.tprintf("%s%s", state.text, e.text)
 					state.text = strings.concatenate([]string{state.text, e.text})
@@ -79,11 +83,12 @@ main :: proc() {
 			}
 		}
 
+		//FIXME(quadrado): Abstract this into the platform itself
 		// this call will process all the wayland messages
 		// - drawing will be done as a result
 		// - event gathering
 		// - etc
-		wl.display_dispatch(state.display)
-		egl.SwapBuffers(state.egl_render_context.display, canvas.egl_surface)
+		wl.display_dispatch(state.platform_state.display)
+		egl.SwapBuffers(state.platform_state.egl_render_context.display, canvas.egl_surface)
 	}
 }

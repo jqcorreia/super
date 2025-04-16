@@ -28,7 +28,8 @@ InputEvent :: union {
 }
 
 Input :: struct {
-	events: [dynamic]InputEvent,
+	events:             [dynamic]InputEvent,
+	consume_all_events: proc(input: ^Input) -> [dynamic]InputEvent,
 }
 
 Xkb :: struct {
@@ -262,6 +263,7 @@ init_input :: proc(state: ^PlatformState) {
 	fmt.println("Initializing input controller.")
 	input := new(Input)
 	input.events = make([dynamic]InputEvent)
+	input.consume_all_events = consume_all_events
 
 	wl.wl_seat_add_listener(state.seat, &seat_listener, state)
 	state.input = input

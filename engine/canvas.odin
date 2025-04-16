@@ -1,4 +1,4 @@
-package platform
+package engine
 
 import wl "../vendor/wayland-odin/wayland"
 import "core:fmt"
@@ -54,13 +54,29 @@ layer_listener := wl.zwlr_layer_surface_v1_listener {
 		wl.wl_surface_commit(canvas.surface)
 	},
 }
+
+done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.uint32_t) {
+	context = runtime.default_context()
+	cc := cast(^CanvasCallback)data
+	wl.wl_callback_destroy(wl_callback)
+	callback := wl.wl_surface_frame(cc.canvas.surface)
+	wl.wl_callback_add_listener(callback, &frame_callback, cc)
+
+	cc.canvas.draw(cc.canvas, cc.state)
+}
+
+frame_callback := wl.wl_callback_listener {
+	done = done,
+}
+
 create_canvas :: proc(
-	state: ^State,
+	engine_state: ^State,
 	width: i32,
 	height: i32,
 	type: CanvasType,
 	draw_proc: CanvasDrawProc,
 ) -> ^Canvas {
+	state := engine_state.platform_state
 	canvas := new(Canvas)
 	canvas.width = width
 	canvas.height = height
@@ -126,28 +142,9 @@ create_canvas :: proc(
 	wl_callback := wl.wl_surface_frame(canvas.surface)
 	cc := new(CanvasCallback, context.temp_allocator)
 	cc.canvas = canvas
-	cc.state = state
+	cc.state = engine_state
 	wl.wl_callback_add_listener(wl_callback, &frame_callback, cc)
 	wl.wl_surface_commit(canvas.surface)
 
 	return canvas
-}
-
-// This should be generated once this whole thing works
-// wl_callback_destroy :: proc "c" (wl_callback: ^wl.wl_callback) {
-// 	wl.proxy_destroy(cast(^wl.wl_proxy)wl_callback)
-// }
-
-done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.uint32_t) {
-	context = runtime.default_context()
-	cc := cast(^CanvasCallback)data
-	wl.wl_callback_destroy(wl_callback)
-	callback := wl.wl_surface_frame(cc.canvas.surface)
-	wl.wl_callback_add_listener(callback, &frame_callback, cc)
-
-	cc.canvas.draw(cc.canvas, cc.state)
-}
-
-frame_callback := wl.wl_callback_listener {
-	done = done,
 }

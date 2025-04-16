@@ -29,8 +29,8 @@ FONT :: "JetBrainsMono Nerd Font Mono"
 init :: proc(width: i32, height: i32) -> ^State {
 	state := new(State)
 	state.start_time = time.now()
-
 	state.platform_state = platform.init_platform()
+
 	state.running = true
 
 	// Load font(s)

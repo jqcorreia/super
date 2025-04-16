@@ -6,32 +6,27 @@ import "core:os"
 import "core:time"
 import gl "vendor:OpenGL"
 
-// SFT_Glyphglyph
-// SFT_GMetricsmetrics
-// sft_lookup(font, text[i], &glyph)
+import "../../platform"
 
-draw_text :: proc(text: string, x: u32, y: u32, state: ^engine.State) {
-	font := state.font
+draw_text :: proc(text: string, x: u32, y: u32, font: ^platform.SFT, shader: u32) {
 	current_x := f32(x)
 
 	for c in text {
-		glyph := new(engine.SFT_Glyph)
-		metrics := new(engine.SFT_GMetrics)
+		glyph := new(platform.SFT_Glyph)
+		metrics := new(platform.SFT_GMetrics)
 
-		engine.lookup(&font, u8(c), glyph)
-		engine.gmetrics(&font, glyph^, metrics)
+		platform.lookup(font, u8(c), glyph)
+		platform.gmetrics(font, glyph^, metrics)
 
 		// gp := make([]u8, metrics.minWidth * metrics.minHeight)
 
-		image := engine.SFT_Image {
+		image := platform.SFT_Image {
 			width  = (metrics.minWidth + 3) & ~i32(3),
 			height = metrics.minHeight,
 		}
 		gp := make([]u8, image.width * image.height)
 		image.pixels = raw_data(gp)
-		engine.render(&font, glyph^, image)
-
-		shader := state.shaders->get("Text")
+		platform.render(font, glyph^, image)
 
 		tex: u32
 
@@ -131,25 +126,4 @@ draw_text :: proc(text: string, x: u32, y: u32, state: ^engine.State) {
 
 		current_x += f32(metrics.advanceWidth)
 	}
-	// for i in gp {
-	// 	fmt.println(i)
-	// }
-	// for i in 0 ..< len(text) {
-	// 	fmt.println(font, text[i], glyph)
-	// 	engine.lookup(&font, 'a', glyph)
-	// 	fmt.println(glyph)
-	// 	engine.gmetrics(glyph^, metrics)
-	// 	fmt.println(metrics)
-	// }
-
-	// fmt.println("pixels: ", pixels)
-	// f, _ := os.open("output.pgm", os.O_CREATE | os.O_TRUNC | os.O_RDWR, os.S_IRWXU)
-	// fmt.fprintf(f, "P5\n%d %d\n255\n", image.width, image.height)
-	// for i in 0 ..< len(pixels) {
-	// 	fmt.fprintf(f, "%d ", pixels[i] > 0 ? 1 : 0)
-	// 	if i % int(image.width) == 0 {
-	// 		fmt.fprintf(f, "\n")
-	// 	}
-	// }
-	// os.close(f)
 }
