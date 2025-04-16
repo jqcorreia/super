@@ -10,7 +10,8 @@ Press &lt;super> to do stuff!
 - [x] keyboard with deadkeys and keyboard state
 - [x] Font manager (fc-list based)
 - [x] Primitive text rendering (libschrift based)
-- [x] fix WAYLAND_DEBUG crashing (prolly wayland-odin's fault)
+- [x] Use proper font metrics based on previous glyph (leftSideBearing et al)
+- [ ] fix WAYLAND_DEBUG crashing (prolly wayland-odin's fault)
 - [ ] Basic label widget
 - [ ] Keyboard repeat ! 
 - [ ] mouse input
