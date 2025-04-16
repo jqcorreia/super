@@ -1,4 +1,4 @@
-package engine
+package platform
 
 import "core:fmt"
 import gl "vendor:OpenGL"

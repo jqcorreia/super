@@ -1,4 +1,4 @@
-package render
+package platform
 
 import wl "../vendor/wayland-odin/wayland"
 import "core:c"

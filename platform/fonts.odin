@@ -1,4 +1,4 @@
-package engine
+package platform
 
 import "core:c"
 import "core:fmt"
@@ -25,7 +25,8 @@ SFT :: struct {
 	flags:   c.int,
 }
 
-SFT_Font :: struct {} // Opaque struct
+SFT_Font :: struct {
+} // Opaque struct
 
 
 SFT_Glyph :: c.uint32_t

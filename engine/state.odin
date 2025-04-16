@@ -1,6 +1,6 @@
 package engine
 
-import "../render"
+import "../platform"
 import wl "../vendor/wayland-odin/wayland"
 import "../vendor/xkbcommon"
 
@@ -19,16 +19,16 @@ State :: struct {
 	xdg_base:            ^wl.xdg_wm_base,
 	zwlr_layer_shell_v1: ^wl.zwlr_layer_shell_v1,
 	seat:                ^wl.wl_seat,
-	egl_render_context:  render.RenderContext,
+	egl_render_context:  platform.RenderContext,
 	egl_surface:         egl.Surface,
 	shader_programs:     map[string]u32,
 	start_time:          time.Time,
 	time_elapsed:        time.Duration,
-	input:               ^Input,
-	shaders:             Shaders,
+	input:               ^platform.Input,
+	shaders:             platform.Shaders,
 	running:             bool,
-	xkb:                 Xkb,
-	font:                SFT,
+	xkb:                 platform.Xkb,
+	font:                platform.SFT,
 	text:                string,
 	// widget_list:         [dynamic]widgets.Widget,
 }
@@ -104,7 +104,7 @@ init :: proc(width: i32, height: i32) -> ^State {
 
 
 	// Initialize EGL and OpenGL
-	rctx := render.init_egl(display)
+	rctx := platform.init_egl(display)
 	state.egl_render_context = rctx
 
 	//TODO(quadrado): Properly understand this and document it
@@ -112,14 +112,14 @@ init :: proc(width: i32, height: i32) -> ^State {
 	gl.load_up_to(int(3), 2, egl.gl_set_proc_address)
 
 	// Initialize input controller
-	init_input(state)
+	platform.init_input(state)
 
 	// Initialize shaders controller
-	state.shaders = create_shaders_controller()
+	state.shaders = platform.create_shaders_controller()
 	state.running = true
 
 	// Load font(s)
-	fm := new_font_manager()
+	fm := platform.new_font_manager()
 	state.font = fm->load_font(FONT, 36)
 
 	state.text = ""

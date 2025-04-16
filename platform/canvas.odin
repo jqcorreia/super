@@ -1,4 +1,4 @@
-package engine
+package platform
 
 import wl "../vendor/wayland-odin/wayland"
 import "core:fmt"

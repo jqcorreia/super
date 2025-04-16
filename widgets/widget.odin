@@ -1,9 +1,10 @@
 package widgets
 
 import "../engine"
-import p "../render/primitives"
+import "../platform"
+import p "../platform/primitives"
 
-WidgetDrawProc :: proc(canvas: ^engine.Canvas, state: ^engine.State)
+WidgetDrawProc :: proc(canvas: ^platform.Canvas, state: ^engine.State)
 
 Widget :: struct {
 	x:    u32,
@@ -16,7 +17,7 @@ Label :: struct {
 	text:         string,
 }
 
-label_draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
+label_draw :: proc(canvas: ^platform.Canvas, state: ^engine.State) {
 	p.draw_rect(0, 0, 800, 600, state.shaders->get("Basic"), state)
 }
 

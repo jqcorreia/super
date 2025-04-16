@@ -1,5 +1,6 @@
-package engine
+package platform
 
+import "../engine"
 import wl "../vendor/wayland-odin/wayland"
 import "../vendor/xkbcommon"
 import "base:runtime"
@@ -41,7 +42,7 @@ seat_listener := wl.wl_seat_listener {
 	capabilities = proc "c" (data: rawptr, wl_seat: ^wl.wl_seat, capabilities: c.uint32_t) {
 		context = runtime.default_context()
 		fmt.println("Input capabilities: ", capabilities)
-		state := cast(^State)data
+		state := cast(^engine.State)data
 		pointer := wl.wl_seat_get_pointer(state.seat)
 		wl.wl_pointer_add_listener(pointer, &pointer_listener, state)
 		keyboard := wl.wl_seat_get_keyboard(state.seat)
@@ -63,7 +64,7 @@ keyboard_listener := wl.wl_keyboard_listener {
 	) {
 		// This event contains a file descriptor for the current keymap in xkb format
 		context = runtime.default_context()
-		state := cast(^State)data
+		state := cast(^engine.State)data
 		fmt.println("Keymap: ", format, fd, size)
 		buf := posix.mmap(
 			nil,
@@ -212,7 +213,7 @@ key_handler :: proc "c" (
 	state: c.uint32_t,
 ) {
 	context = runtime.default_context()
-	_state := cast(^State)data
+	_state := cast(^engine.State)data
 
 	// This converts evdev events to xkb events 
 	keycode := key + 8
@@ -222,7 +223,7 @@ key_handler :: proc "c" (
 		event := KeyReleased {
 			key = key_sym,
 		}
-		state := cast(^State)data
+		state := cast(^engine.State)data
 		append(&_state.input.events, event)
 		xkbcommon.state_update_key(_state.xkb.state, keycode, false)
 	}
@@ -258,7 +259,7 @@ key_handler :: proc "c" (
 	}
 }
 
-init_input :: proc(state: ^State) {
+init_input :: proc(state: ^engine.State) {
 	fmt.println("Initializing input controller.")
 	input := new(Input)
 	input.events = make([dynamic]InputEvent)
