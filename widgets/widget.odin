@@ -19,7 +19,6 @@ Label :: struct {
 }
 
 label_draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
-	fmt.println("Cneas")
 	p.draw_rect(200, 200, 200, 300, state.platform_state.shaders->get("Basic"), state)
 }
 
