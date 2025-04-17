@@ -11,6 +11,9 @@ import "../../platform"
 draw_text :: proc(text: string, x: u32, y: u32, font: ^platform.SFT, shader: u32) {
 	current_x := f32(x)
 
+	x := f32(x)
+	y := f32(y)
+
 	for c in text {
 		glyph := new(platform.SFT_Glyph)
 		metrics := new(platform.SFT_GMetrics)
@@ -55,22 +58,22 @@ draw_text :: proc(text: string, x: u32, y: u32, font: ^platform.SFT, shader: u32
 		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_SWIZZLE_A, gl.RED)
 
 		vertices := [?]f32 {
-			f32(0),
-			f32(0),
-			f32(0),
-			f32(0),
-			f32(1),
-			f32(0),
-			f32(1),
-			f32(0),
-			f32(1),
-			f32(1),
-			f32(1),
-			f32(1),
-			f32(0),
-			f32(1),
-			f32(0),
-			f32(1),
+			0.0,
+			0.0,
+			0.0,
+			0.0,
+			1.0,
+			0.0,
+			1.0,
+			0.0,
+			1.0,
+			1.0,
+			1.0,
+			1.0,
+			0.0,
+			1.0,
+			0.0,
+			1.0,
 		}
 
 		vao: u32
@@ -90,6 +93,8 @@ draw_text :: proc(text: string, x: u32, y: u32, font: ^platform.SFT, shader: u32
 
 		gl.UseProgram(shader)
 
+
+		fmt.println(metrics.yOffset)
 		gl.Uniform2fv(
 			gl.GetUniformLocation(shader, cstring("position")),
 			1,

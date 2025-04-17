@@ -5,23 +5,29 @@ import "../platform"
 import p "../platform/primitives"
 import "core:fmt"
 
-WidgetDrawProc :: proc(canvas: ^engine.Canvas, state: ^engine.State)
+// WidgetDrawProc :: proc(canvas: ^engine.Canvas, state: ^engine.State)
 
-Widget :: struct {
-	x:    u32,
-	y:    u32,
-	draw: WidgetDrawProc,
-}
+// Widget :: struct {
+// 	draw: WidgetDrawProc,
+// }
 
 Label :: struct {
-	using Widget: Widget,
-	text:         string,
+	x:    u32,
+	y:    u32,
+	text: string,
 }
 
-label_draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
-	p.draw_rect(200, 200, 200, 300, state.platform_state.shaders->get("Basic"), state)
+label_draw :: proc(label: Label, canvas: ^engine.Canvas, state: ^engine.State) {
+	x := f32(label.x)
+	y := f32(label.y)
+	p.draw_rect(x, y, 50, 50, state.platform_state.shaders->get("Basic"), state)
+	p.draw_text(label.text, u32(x), u32(y), &state.font, state.platform_state.shaders->get("Text"))
 }
 
-new_label :: proc(x: u32, y: u32, text: string) -> Label {
-	return Label{x = 0, y = 0, draw = label_draw, text = text}
+WidgetType :: union {
+	Label,
+}
+
+draw :: proc {
+	label_draw,
 }
