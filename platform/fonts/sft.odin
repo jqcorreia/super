@@ -11,6 +11,8 @@ foreign sft {
 	lookup :: proc(font: ^SFT, ch: c.char, glyph: ^SFT_Glyph) ---
 	gmetrics :: proc(font: ^SFT, glyph: SFT_Glyph, metrics: ^SFT_GMetrics) ---
 	render :: proc(font: ^SFT, glyph: SFT_Glyph, image: SFT_Image) ---
+	lmetrics :: proc(font: ^SFT, metrics: ^SFT_LMetrics) ---
+	kerning :: proc(font: ^SFT, leftGlyph: SFT_Glyph, rightGlyph: SFT_Glyph, kerning: ^SFT_Kerning) ---
 }
 
 SFT :: struct {
@@ -42,3 +44,13 @@ SFT_Image :: struct {
 }
 
 SFT_DOWNWARD_Y :: 0x01
+
+SFT_LMetrics :: struct {
+	ascender:  c.double,
+	descender: c.double,
+	lineGap:   c.double,
+}
+SFT_Kerning :: struct {
+	xShift: c.double,
+	yShift: c.double,
+}

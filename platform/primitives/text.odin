@@ -9,11 +9,23 @@ import gl "vendor:OpenGL"
 import "../../platform"
 import "../../platform/fonts"
 
+RenderedGlyph :: struct {
+	metrics: ^fonts.SFT_GMetrics,
+	image:   fonts.SFT_Image,
+	kerning: ^fonts.SFT_Kerning,
+}
+
 draw_text :: proc(text: string, x: u32, y: u32, font: ^fonts.SFT, shader: u32) {
 	current_x := f32(x)
 
 	x := f32(x)
 	y := f32(y)
+
+	buffers: [dynamic]RenderedGlyph
+
+	max_height: f32 = 0.0
+
+	previous_glyph: fonts.SFT_Glyph = 0
 
 	for c in text {
 		glyph := new(fonts.SFT_Glyph)
@@ -32,6 +44,24 @@ draw_text :: proc(text: string, x: u32, y: u32, font: ^fonts.SFT, shader: u32) {
 		image.pixels = raw_data(gp)
 		fonts.render(font, glyph^, image)
 
+		kerning := new(fonts.SFT_Kerning)
+		if previous_glyph != 0 {
+			fonts.kerning(font, previous_glyph, glyph^, kerning)
+			previous_glyph = glyph^
+		} else {
+			previous_glyph = glyph^
+		}
+
+		append(&buffers, RenderedGlyph{metrics = metrics, image = image, kerning = kerning})
+
+		max_height = max(max_height, f32(metrics.minHeight))
+	}
+
+	for rg in buffers {
+		metrics := rg.metrics
+		image := rg.image
+		gp := image.pixels
+
 		tex: u32
 
 		gl.GenTextures(1, &tex)
@@ -47,7 +77,7 @@ draw_text :: proc(text: string, x: u32, y: u32, font: ^fonts.SFT, shader: u32) {
 			0,
 			gl.RED,
 			gl.UNSIGNED_BYTE,
-			raw_data(gp),
+			gp,
 		)
 
 		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
@@ -95,7 +125,6 @@ draw_text :: proc(text: string, x: u32, y: u32, font: ^fonts.SFT, shader: u32) {
 		gl.UseProgram(shader)
 
 
-		fmt.println(metrics.yOffset)
 		gl.Uniform2fv(
 			gl.GetUniformLocation(shader, cstring("position")),
 			1,
