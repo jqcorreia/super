@@ -7,29 +7,30 @@ import "core:time"
 import gl "vendor:OpenGL"
 
 import "../../platform"
+import "../../platform/fonts"
 
-draw_text :: proc(text: string, x: u32, y: u32, font: ^platform.SFT, shader: u32) {
+draw_text :: proc(text: string, x: u32, y: u32, font: ^fonts.SFT, shader: u32) {
 	current_x := f32(x)
 
 	x := f32(x)
 	y := f32(y)
 
 	for c in text {
-		glyph := new(platform.SFT_Glyph)
-		metrics := new(platform.SFT_GMetrics)
+		glyph := new(fonts.SFT_Glyph)
+		metrics := new(fonts.SFT_GMetrics)
 
-		platform.lookup(font, u8(c), glyph)
-		platform.gmetrics(font, glyph^, metrics)
+		fonts.lookup(font, u8(c), glyph)
+		fonts.gmetrics(font, glyph^, metrics)
 
 		// gp := make([]u8, metrics.minWidth * metrics.minHeight)
 
-		image := platform.SFT_Image {
+		image := fonts.SFT_Image {
 			width  = (metrics.minWidth + 3) & ~i32(3),
 			height = metrics.minHeight,
 		}
 		gp := make([]u8, image.width * image.height)
 		image.pixels = raw_data(gp)
-		platform.render(font, glyph^, image)
+		fonts.render(font, glyph^, image)
 
 		tex: u32
 

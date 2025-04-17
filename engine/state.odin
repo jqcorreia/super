@@ -9,6 +9,7 @@ import "core:time"
 
 // import "../widgets"
 import "../platform"
+import "../platform/fonts"
 import "base:runtime"
 import gl "vendor:OpenGL"
 import "vendor:egl"
@@ -20,7 +21,7 @@ State :: struct {
 	time_elapsed:   time.Duration,
 	text:           string,
 	running:        bool,
-	font:           platform.SFT,
+	font:           fonts.SFT,
 }
 
 
