@@ -15,11 +15,8 @@ RenderedGlyph :: struct {
 	kerning: ^fonts.SFT_Kerning,
 }
 
-draw_text :: proc(text: string, x: u32, y: u32, font: ^fonts.SFT, shader: u32) {
+draw_text :: proc(text: string, x: f32, y: f32, font: ^fonts.SFT, shader: u32) {
 	current_x := f32(x)
-
-	x := f32(x)
-	y := f32(y)
 
 	buffers: [dynamic]RenderedGlyph
 
@@ -51,6 +48,7 @@ draw_text :: proc(text: string, x: u32, y: u32, font: ^fonts.SFT, shader: u32) {
 		} else {
 			previous_glyph = glyph^
 		}
+		fmt.println(kerning)
 
 		append(&buffers, RenderedGlyph{metrics = metrics, image = image, kerning = kerning})
 
@@ -130,7 +128,7 @@ draw_text :: proc(text: string, x: u32, y: u32, font: ^fonts.SFT, shader: u32) {
 			1,
 			raw_data(
 				[]f32 {
-					f32(f32(current_x) + f32(metrics.leftSideBearing)),
+					f32(f32(current_x) + f32(metrics.leftSideBearing)) + f32(rg.kerning.xShift),
 					f32(f32(y) + f32(metrics.yOffset)),
 				},
 			),

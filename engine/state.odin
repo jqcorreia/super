@@ -25,7 +25,8 @@ State :: struct {
 }
 
 
-FONT :: "JetBrainsMono Nerd Font Mono"
+// FONT :: "JetBrainsMono Nerd Font Mono"
+FONT :: "FreeSerif"
 
 init :: proc(width: i32, height: i32) -> ^State {
 	state := new(State)

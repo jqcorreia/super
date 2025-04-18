@@ -3,7 +3,7 @@
 uniform vec2 resolution;
 uniform float iTime;
 
-in vec3 vPos;
+in vec3 fragCoord;
 
 void mainImage(out vec4 O, vec2 F)
 {
@@ -45,5 +45,5 @@ void mainImage(out vec4 O, vec2 F)
 }
 
 void main() {
-    mainImage(gl_FragColor, vPos.xy * resolution);
+    mainImage(gl_FragColor, fragCoord.xy * resolution);
 }
