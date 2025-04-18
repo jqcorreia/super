@@ -37,7 +37,7 @@ init :: proc(width: i32, height: i32) -> ^State {
 
 	// Load font(s)
 	fm := platform.new_font_manager()
-	state.font = fm->load_font(FONT, 72)
+	state.font = fm->load_font(FONT, 100)
 
 	state.text = ""
 

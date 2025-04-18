@@ -3,6 +3,8 @@
 in vec2 texCoord;
 uniform sampler2D fontTexture;
 
+uniform vec3 fontColor;
+
 out vec4 fragColor;
 
 void main() {
