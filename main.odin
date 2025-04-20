@@ -43,7 +43,6 @@ app_draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 		switch w in widget {
 		case widgets.Label:
 			widgets.draw(w, canvas, state)
-		// w.draw(canvas, state)
 		}
 	}
 	gl.Flush()
@@ -59,7 +58,7 @@ main :: proc() {
 	shaders->new("Text", "shaders/solid_text_vert.glsl", "shaders/solid_text_frag.glsl")
 
 
-	// append(&app.widget_list, widgets.Label{x = 10, y = 10, text = "hello"})
+	append(&app.widget_list, widgets.Label{x = 0, y = 0, text = "Hello"})
 	// append(&app.widget_list, widgets.Label{x = 10, y = 100, text = "world"})
 
 	for state.running == true {

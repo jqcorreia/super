@@ -20,9 +20,12 @@ draw_text :: proc(text: string, x: f32, y: f32, font: ^fonts.SFT, shader: u32) {
 
 	buffers: [dynamic]RenderedGlyph
 
-	max_height: f32 = 0.0
-
 	previous_glyph: fonts.SFT_Glyph = 0
+
+	lmetrics: fonts.SFT_LMetrics
+	fonts.lmetrics(font, &lmetrics)
+
+	total_line_height := f32(lmetrics.ascender + lmetrics.lineGap)
 
 	for c in text {
 		glyph := new(fonts.SFT_Glyph)
@@ -51,11 +54,10 @@ draw_text :: proc(text: string, x: f32, y: f32, font: ^fonts.SFT, shader: u32) {
 		fmt.println(kerning)
 
 		append(&buffers, RenderedGlyph{metrics = metrics, image = image, kerning = kerning})
-
-		max_height = max(max_height, f32(metrics.minHeight))
 	}
 
 	for rg in buffers {
+		fmt.println("CUrrent X:", current_x)
 		metrics := rg.metrics
 		image := rg.image
 		gp := image.pixels
@@ -129,7 +131,7 @@ draw_text :: proc(text: string, x: f32, y: f32, font: ^fonts.SFT, shader: u32) {
 			raw_data(
 				[]f32 {
 					f32(f32(current_x) + f32(metrics.leftSideBearing)) + f32(rg.kerning.xShift),
-					f32(f32(y) + f32(metrics.yOffset)),
+					f32(f32(y) + total_line_height + f32(metrics.yOffset)),
 				},
 			),
 		)

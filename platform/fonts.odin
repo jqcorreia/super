@@ -49,6 +49,9 @@ load_font :: proc(fm: ^FontManager, name: string, size: f64) -> fonts.SFT {
 
 	fm.loaded_fonts[name] = sft
 
+	lmetrics := new(fonts.SFT_LMetrics)
+	fonts.lmetrics(&sft, lmetrics)
+	fmt.println("Font metrics:", lmetrics.ascender, lmetrics.descender, lmetrics.lineGap)
 	return sft
 }
 
