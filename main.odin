@@ -1,3 +1,4 @@
+#+build linux
 package main
 
 import "base:runtime"
@@ -12,6 +13,7 @@ import p "platform/primitives"
 import wl "vendor/wayland-odin/wayland"
 import gl "vendor:OpenGL"
 import "vendor:egl"
+// import gl "vendor:wasm/WebGL
 import xlib "vendor:x11/xlib"
 import "widgets"
 

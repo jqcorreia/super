@@ -1,19 +1,9 @@
 package engine
 
-import wl "../vendor/wayland-odin/wayland"
-import "../vendor/xkbcommon"
-
-import "core:c"
-import "core:fmt"
 import "core:time"
 
-// import "../widgets"
 import "../platform"
 import "../platform/fonts"
-import "base:runtime"
-import gl "vendor:OpenGL"
-import "vendor:egl"
-
 
 State :: struct {
 	platform_state: ^platform.PlatformState,

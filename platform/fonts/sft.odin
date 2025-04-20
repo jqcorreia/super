@@ -2,7 +2,16 @@ package fonts
 
 import "core:c"
 
-foreign import sft "system:libschrift.a"
+when ODIN_OS == .JS {
+	// WebAssembly specific imports
+	// No need to import libschrift.a in WebAssembly
+	foreign import sft "libschrift.a"
+} else {
+	// For other platforms, we import the shared library
+	// This is a placeholder; adjust the path as necessary for your system
+	// foreign import sft "system:libschrift.a"
+	foreign import sft "system:libschrift.a"
+}
 
 
 @(default_calling_convention = "c", link_prefix = "sft_")

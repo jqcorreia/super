@@ -1,3 +1,4 @@
+#+build linux
 package engine
 
 import wl "../vendor/wayland-odin/wayland"

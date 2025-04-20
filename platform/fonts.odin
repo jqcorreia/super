@@ -3,7 +3,6 @@ package platform
 import "./fonts"
 import "core:c"
 import "core:fmt"
-import "core:os/os2"
 import "core:strings"
 
 FontManager :: struct {
@@ -14,7 +13,15 @@ FontManager :: struct {
 
 new_font_manager :: proc() -> FontManager {
 	loaded_fonts := make(map[string]fonts.SFT)
-	font_map := get_font_map()
+	when ODIN_OS == .JS {
+		// In WebAssembly, we can't use fc-list directly.
+		// Instead, we can use a hardcoded font map or a different method to get the font paths.
+		// For now, let's just create an empty map.
+		font_map := make(map[string]string)
+	} else {
+		font_map := get_font_map()
+	}
+
 
 	fm: FontManager
 
@@ -33,8 +40,16 @@ load_font :: proc(fm: ^FontManager, name: string, size: f64) -> fonts.SFT {
 	}
 
 	fmt.println("Loading new font:", name)
+	sft: fonts.SFT = load_font_from_file(fm, fm.font_map[name], size)
+
+	fm.loaded_fonts[name] = sft
+
+	return sft
+}
+
+load_font_from_file :: proc(fm: ^FontManager, filename: string, size: f64) -> fonts.SFT {
 	font: ^fonts.SFT_Font
-	font = fonts.loadfile(strings.clone_to_cstring(fm.font_map[name]))
+	font = fonts.loadfile(strings.clone_to_cstring(filename))
 	if (font == nil) {
 		panic("Failed to load font")
 	}
@@ -47,37 +62,5 @@ load_font :: proc(fm: ^FontManager, name: string, size: f64) -> fonts.SFT {
 	sft.yOffset = 0.0
 	sft.flags = fonts.SFT_DOWNWARD_Y
 
-	fm.loaded_fonts[name] = sft
-
-	lmetrics := new(fonts.SFT_LMetrics)
-	fonts.lmetrics(&sft, lmetrics)
-	fmt.println("Font metrics:", lmetrics.ascender, lmetrics.descender, lmetrics.lineGap)
 	return sft
-}
-
-get_font_map :: proc() -> map[string]string {
-	fonts := make(map[string]string)
-
-	_, out, _, _ := os2.process_exec({command = {"fc-list"}}, context.allocator)
-
-	for line, i in strings.split(string(out), "\n") {
-		if !strings.contains(line, "style=Regular") {
-			continue
-		}
-
-		split := strings.split(line, ":")
-		path := split[0]
-
-		// Guard against odd lines
-		if len(split) < 2 {
-			continue
-		}
-
-		family_names := split[1]
-		for fname in strings.split(family_names, ",") {
-			fonts[strings.trim_left(fname, " ")] = path
-		}
-	}
-
-	return fonts
 }
