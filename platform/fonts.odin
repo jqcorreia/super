@@ -1,6 +1,6 @@
 package platform
 
-import "./fonts"
+import fonts "../vendor/libschrift-odin/sft"
 import "core:c"
 import "core:fmt"
 import "core:os/os2"

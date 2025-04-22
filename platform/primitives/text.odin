@@ -1,13 +1,13 @@
 package primitives
 
 import "../../engine/"
+import "../../platform"
+import fonts "../../vendor/libschrift-odin/sft"
 import "core:fmt"
 import "core:os"
 import "core:time"
 import gl "vendor:OpenGL"
 
-import "../../platform"
-import "../../platform/fonts"
 
 RenderedGlyph :: struct {
 	metrics: ^fonts.SFT_GMetrics,

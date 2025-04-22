@@ -4,3 +4,6 @@
 [submodule "vendor/wayland-odin"]
 	path = vendor/wayland-odin
 	url = git@github.com:jqcorreia/wayland-odin.git
+[submodule "vendor/libschrift-odin"]
+	path = vendor/libschrift-odin
+	url = https://github.com/jqcorreia/libschrift-odin
