@@ -34,8 +34,6 @@ draw_text :: proc(text: string, x: f32, y: f32, font: ^fonts.SFT, shader: u32) {
 		fonts.lookup(font, u8(c), glyph)
 		fonts.gmetrics(font, glyph^, metrics)
 
-		// gp := make([]u8, metrics.minWidth * metrics.minHeight)
-
 		image := fonts.SFT_Image {
 			width  = (metrics.minWidth + 3) & ~i32(3),
 			height = metrics.minHeight,

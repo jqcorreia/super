@@ -234,30 +234,54 @@ key_handler :: proc "c" (
 		}
 		append(&_state.input.events, event)
 
-		if key_sym == xlib.KeySym.XK_BackSpace {
-			return
-		}
 
-		xkbcommon.compose_state_feed(_state.xkb.compose, c.uint32_t(key_sym))
-		status := xkbcommon.compose_state_get_status(_state.xkb.compose)
-		buf: []byte = make([]byte, 4)
-		if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSED {
-			size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
-			append(&_state.input.events, TextInput{text = string(buf[:size])})
-		} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_CANCELLED ||
-		   status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSING {
-			// Cancelled, do nothing
-			// fmt.println("Cancelled")
-		} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_NOTHING {
-			size := xkbcommon.state_key_get_utf8(_state.xkb.state, keycode, cstring(&buf[0]), 4)
-			append(&_state.input.events, TextInput{text = string(buf[:size])})
-		} else {
-			size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
-			append(&_state.input.events, TextInput{text = string(buf[:size])})
+		if !is_modifier(key_sym) {
+			xkbcommon.compose_state_feed(_state.xkb.compose, c.uint32_t(key_sym))
+			status := xkbcommon.compose_state_get_status(_state.xkb.compose)
+			buf: []byte = make([]byte, 4)
+			if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSED {
+				size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
+				if size > 0 {
+					append(&_state.input.events, TextInput{text = string(buf[:size])})
+				}
+			} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_CANCELLED ||
+			   status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSING {
+				// Cancelled, do nothing
+				// fmt.println("Cancelled")
+			} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_NOTHING {
+				size := xkbcommon.state_key_get_utf8(
+					_state.xkb.state,
+					keycode,
+					cstring(&buf[0]),
+					4,
+				)
+				if size > 0 {
+					append(&_state.input.events, TextInput{text = string(buf[:size])})
+				}
+			} else {
+				size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
+				if size > 0 {
+					append(&_state.input.events, TextInput{text = string(buf[:size])})
+				}
+			}
 		}
 		xkbcommon.state_update_key(_state.xkb.state, keycode, true)
 	}
 }
+
+is_modifier := proc(key_sym: xlib.KeySym) -> bool {
+	if key_sym != xlib.KeySym.XK_Control_L &&
+	   key_sym != xlib.KeySym.XK_Control_R &&
+	   key_sym != xlib.KeySym.XK_Shift_L &&
+	   key_sym != xlib.KeySym.XK_Shift_R &&
+	   key_sym != xlib.KeySym.XK_Alt_L &&
+	   key_sym != xlib.KeySym.XK_Alt_L &&
+	   key_sym != xlib.KeySym.XK_Escape {
+		return false
+	}
+	return true
+}
+
 
 init_input :: proc(state: ^PlatformState) {
 	fmt.println("Initializing input controller.")
