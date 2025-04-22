@@ -51,13 +51,11 @@ draw_text :: proc(text: string, x: f32, y: f32, font: ^fonts.SFT, shader: u32) {
 		} else {
 			previous_glyph = glyph^
 		}
-		fmt.println(kerning)
 
 		append(&buffers, RenderedGlyph{metrics = metrics, image = image, kerning = kerning})
 	}
 
 	for rg in buffers {
-		fmt.println("CUrrent X:", current_x)
 		metrics := rg.metrics
 		image := rg.image
 		gp := image.pixels
