@@ -276,6 +276,7 @@ is_modifier := proc(key_sym: xlib.KeySym) -> bool {
 	   key_sym != xlib.KeySym.XK_Shift_R &&
 	   key_sym != xlib.KeySym.XK_Alt_L &&
 	   key_sym != xlib.KeySym.XK_Alt_L &&
+	   key_sym != xlib.KeySym.XK_BackSpace &&
 	   key_sym != xlib.KeySym.XK_Escape {
 		return false
 	}
