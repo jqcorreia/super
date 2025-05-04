@@ -48,7 +48,7 @@ app_draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 
 main :: proc() {
 	state := engine.init(WIDTH, HEIGHT)
-	canvas := engine.create_canvas(state, WIDTH, HEIGHT, engine.CanvasType.Window, app_draw)
+	canvas := engine.create_canvas(state, WIDTH, HEIGHT, engine.CanvasType.Layer, app_draw)
 
 	shaders := &state.platform_state.shaders
 	shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
@@ -70,6 +70,13 @@ main :: proc() {
 				{
 					if e.key == xlib.KeySym.XK_Escape {
 						state.running = false
+					}
+					if e.key == xlib.KeySym.XK_F1 {
+						wl.zwlr_layer_surface_v1_set_size(
+							canvas.layer_surface,
+							u32(1000),
+							u32(1000),
+						)
 					}
 					if e.key == xlib.KeySym.XK_BackSpace {
 						if len(state.text) > 0 {

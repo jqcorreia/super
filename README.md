@@ -12,7 +12,8 @@ Press &lt;super> to do stuff!
 - [x] Primitive text rendering (libschrift based)
 - [x] Use proper font metrics based on previous glyph (leftSideBearing et al)
 - [x] fix WAYLAND_DEBUG crashing (prolly wayland-odin's fault)
-- [ ] Basic label widget
+- [x] Basic label widget
+- [ ] Window/Surface resize, push EGL creation to configure()
 - [ ] Keyboard repeat ! 
 - [ ] mouse input
 - [ ] organize shaders

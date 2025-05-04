@@ -10,11 +10,12 @@ import "core:c"
 CanvasDrawProc :: proc(_: ^Canvas, _: ^State)
 
 Canvas :: struct {
-	width:       i32,
-	height:      i32,
-	surface:     ^wl.wl_surface,
-	egl_surface: egl.Surface,
-	draw:        CanvasDrawProc,
+	width:         i32,
+	height:        i32,
+	surface:       ^wl.wl_surface,
+	layer_surface: ^wl.zwlr_layer_surface_v1,
+	egl_surface:   egl.Surface,
+	draw:          CanvasDrawProc,
 }
 
 CanvasType :: enum {
@@ -124,11 +125,14 @@ create_canvas :: proc(
 			wl.ZWLR_LAYER_SHELL_V1_LAYER_OVERLAY,
 			"test",
 		)
+		// Store it in canvas for resizing
+		canvas.layer_surface = layer_surface
 		wl.zwlr_layer_surface_v1_add_listener(layer_surface, &layer_listener, canvas)
 		wl.zwlr_layer_surface_v1_set_size(layer_surface, u32(width), u32(height))
 		wl.zwlr_layer_surface_v1_set_anchor(
 			layer_surface,
-			wl.ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM | wl.ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT,
+			0,
+			// wl.ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM | wl.ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT,
 		)
 		wl.zwlr_layer_surface_v1_set_keyboard_interactivity(
 			layer_surface,
