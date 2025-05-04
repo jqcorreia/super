@@ -1,8 +1,8 @@
 package widgets
 
 import "../engine"
+import "../engine/canvas"
 import "../platform"
-import p "../platform/primitives"
 import "core:fmt"
 
 
@@ -12,11 +12,11 @@ Label :: struct {
 	text: string,
 }
 
-label_draw :: proc(label: Label, canvas: ^engine.Canvas, state: ^engine.State) {
-	p.draw_text(
-		label.text,
+label_draw :: proc(label: Label, canvas: ^canvas.Canvas, state: ^engine.State) {
+	canvas->draw_text(
 		label.x,
 		label.y,
+		label.text,
 		&state.font,
 		state.platform_state.shaders->get("Text"),
 	)

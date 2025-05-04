@@ -1,4 +1,4 @@
-package primitives
+package canvas
 
 import "../../engine"
 import "core:time"
@@ -26,7 +26,7 @@ ortho :: proc(l: f32, r: f32, b: f32, t: f32) -> [16]f32 {
 	}
 }
 
-draw_rect :: proc(x, y, width, height: f32, shader: u32, state: ^engine.State) {
+draw_rect :: proc(canvas: ^Canvas, x, y, width, height: f32, shader: u32) {
 	vertices := [?]f32{f32(0), f32(0), f32(1), f32(0), f32(1), f32(1), f32(0), f32(1)}
 
 	vao: u32
@@ -45,12 +45,12 @@ draw_rect :: proc(x, y, width, height: f32, shader: u32, state: ^engine.State) {
 
 	// draw stuff
 	color := []f32{1.0, 0.0, 0.0, 1.0}
-	projectionMatrix := ortho(0, 800, 600, 0)
-	gl.Uniform1fv(
-		gl.GetUniformLocation(shader, cstring("iTime")),
-		1,
-		raw_data([]f32{f32(time.duration_seconds(state.time_elapsed))}),
-	)
+	projectionMatrix := ortho(0, f32(canvas.width), f32(canvas.height), 0)
+	// gl.Uniform1fv(
+	// 	gl.GetUniformLocation(shader, cstring("iTime")),
+	// 	1,
+	// 	raw_data([]f32{f32(time.duration_seconds(state.time_elapsed))}),
+	// )
 	gl.Uniform4fv(gl.GetUniformLocation(shader, cstring("input")), 1, raw_data(color))
 	gl.Uniform2fv(gl.GetUniformLocation(shader, cstring("position")), 1, raw_data([]f32{x, y}))
 	gl.Uniform2fv(

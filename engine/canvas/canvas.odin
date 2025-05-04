@@ -1,13 +1,17 @@
-package engine
+package canvas
 
-import wl "../vendor/wayland-odin/wayland"
+import "../../vendor/libschrift-odin/sft"
+import wl "../../vendor/wayland-odin/wayland"
 import "core:fmt"
 import "vendor:egl"
 
+import "../../platform"
 import "base:runtime"
 import "core:c"
 
-CanvasDrawProc :: proc(_: ^Canvas, _: ^State)
+import "../../engine"
+
+CanvasDrawProc :: proc(_: ^Canvas, _: ^engine.State)
 
 Canvas :: struct {
 	width:         i32,
@@ -15,7 +19,9 @@ Canvas :: struct {
 	surface:       ^wl.wl_surface,
 	layer_surface: ^wl.zwlr_layer_surface_v1,
 	egl_surface:   egl.Surface,
-	draw:          CanvasDrawProc,
+	draw_proc:     CanvasDrawProc,
+	draw_rect:     proc(canvas: ^Canvas, x, y, width, height: f32, shader: u32),
+	draw_text:     proc(canvas: ^Canvas, x, y: f32, text: string, font: ^sft.SFT, shader: u32),
 }
 
 CanvasType :: enum {
@@ -24,20 +30,87 @@ CanvasType :: enum {
 }
 
 CanvasCallback :: struct {
-	state:  ^State,
+	state:  ^engine.State,
 	canvas: ^Canvas,
 }
 
+
+recreate_egl_window :: proc(
+	canvas: ^Canvas,
+	egl_render_context: platform.RenderContext,
+	width: i32,
+	height: i32,
+) {
+	fmt.println("Recreate EGL window")
+	egl_window := wl.egl_window_create(canvas.surface, width, height)
+	egl_surface := egl.CreateWindowSurface(
+		egl_render_context.display,
+		egl_render_context.config,
+		egl.NativeWindowType(egl_window),
+		nil,
+	)
+
+	if egl_surface == egl.NO_SURFACE {
+		fmt.println("Error creating window surface")
+	}
+	if (!egl.MakeCurrent(
+			   egl_render_context.display,
+			   egl_surface,
+			   egl_surface,
+			   egl_render_context.ctx,
+		   )) {
+		fmt.println("Error making current!")
+	}
+
+	canvas.egl_surface = egl_surface
+}
 window_listener := wl.xdg_surface_listener {
 	configure = proc "c" (data: rawptr, surface: ^wl.xdg_surface, serial: c.uint32_t) {
 		context = runtime.default_context()
+		fmt.println("window configure")
 		cc := cast(^CanvasCallback)data
 		canvas := cc.canvas
+		state := cc.state.platform_state
 
 		wl.xdg_surface_ack_configure(surface, serial)
 		wl.wl_surface_damage(canvas.surface, 0, 0, c.INT32_MAX, c.INT32_MAX)
 		wl.wl_surface_commit(canvas.surface)
 	},
+}
+
+toplevel_listener := wl.xdg_toplevel_listener {
+	configure = proc "c" (
+		data: rawptr,
+		xdg_toplevel: ^wl.xdg_toplevel,
+		width: c.int32_t,
+		height: c.int32_t,
+		states: ^wl.wl_array,
+	) {
+		context = runtime.default_context()
+		fmt.println("Top level configure")
+		cc := cast(^CanvasCallback)data
+		canvas := cc.canvas
+		egl_render_context := cc.state.platform_state.egl_render_context
+		fmt.println(canvas.width, width, canvas.height, height)
+		if canvas.width != width || canvas.height != height {
+			recreate_egl_window(canvas, egl_render_context, i32(width), i32(height))
+			canvas.width = width
+			canvas.height = height
+		}
+
+	},
+	close = proc "c" (data: rawptr, xdg_toplevel: ^wl.xdg_toplevel) {},
+	configure_bounds = proc "c" (
+		data: rawptr,
+		xdg_toplevel: ^wl.xdg_toplevel,
+		width: c.int32_t,
+		height: c.int32_t,
+	) {},
+	wm_capabilities = proc "c" (
+		data: rawptr,
+		xdg_toplevel: ^wl.xdg_toplevel,
+		capabilities: ^wl.wl_array,
+	) {},
 }
 
 layer_listener := wl.zwlr_layer_surface_v1_listener {
@@ -54,28 +127,10 @@ layer_listener := wl.zwlr_layer_surface_v1_listener {
 		canvas := cc.canvas
 		state := cc.state.platform_state
 
-		egl_window := wl.egl_window_create(canvas.surface, i32(width), i32(height))
-		egl_surface := egl.CreateWindowSurface(
-			state.egl_render_context.display,
-			state.egl_render_context.config,
-			egl.NativeWindowType(egl_window),
-			nil,
-		)
+		recreate_egl_window(canvas, state.egl_render_context, i32(width), i32(height))
+		canvas.width = i32(width)
+		canvas.height = i32(height)
 
-		if egl_surface == egl.NO_SURFACE {
-			fmt.println("Error creating window surface")
-
-		}
-		if (!egl.MakeCurrent(
-				   state.egl_render_context.display,
-				   egl_surface,
-				   egl_surface,
-				   state.egl_render_context.ctx,
-			   )) {
-			fmt.println("Error making current!")
-		}
-
-		canvas.egl_surface = egl_surface
 		wl.zwlr_layer_surface_v1_ack_configure(surface, serial)
 		wl.wl_surface_damage(canvas.surface, 0, 0, c.INT32_MAX, c.INT32_MAX)
 		wl.wl_surface_commit(canvas.surface)
@@ -89,7 +144,7 @@ done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.u
 	callback := wl.wl_surface_frame(cc.canvas.surface)
 	wl.wl_callback_add_listener(callback, &frame_callback, cc)
 
-	cc.canvas.draw(cc.canvas, cc.state)
+	cc.canvas.draw_proc(cc.canvas, cc.state)
 }
 
 frame_callback := wl.wl_callback_listener {
@@ -97,7 +152,7 @@ frame_callback := wl.wl_callback_listener {
 }
 
 create_canvas :: proc(
-	engine_state: ^State,
+	engine_state: ^engine.State,
 	width: i32,
 	height: i32,
 	type: CanvasType,
@@ -109,6 +164,8 @@ create_canvas :: proc(
 	canvas.height = height
 	canvas.surface = wl.wl_compositor_create_surface(state.compositor)
 
+	canvas.draw_rect = draw_rect
+	canvas.draw_text = draw_text
 	if canvas.surface == nil {
 		fmt.println("Error creating surface")
 		return canvas
@@ -144,6 +201,7 @@ create_canvas :: proc(
 	if type == CanvasType.Window {
 		xdg_surface := wl.xdg_wm_base_get_xdg_surface(state.xdg_base, canvas.surface)
 		toplevel := wl.xdg_surface_get_toplevel(xdg_surface)
+		wl.xdg_toplevel_add_listener(toplevel, &toplevel_listener, cc)
 		wl.xdg_toplevel_set_title(toplevel, "Odin Wayland")
 		wl.xdg_surface_add_listener(xdg_surface, &window_listener, cc)
 	}
@@ -171,7 +229,7 @@ create_canvas :: proc(
 		wl.display_dispatch(state.display) // This dispatch makes sure that the layer surface is configured
 	}
 
-	canvas.draw = draw_proc
+	canvas.draw_proc = draw_proc
 
 	wl_callback := wl.wl_surface_frame(canvas.surface)
 	wl.wl_callback_add_listener(wl_callback, &frame_callback, cc)

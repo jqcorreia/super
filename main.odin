@@ -7,8 +7,8 @@ import "core:strings"
 import "core:time"
 
 import "engine"
+import "engine/canvas"
 import "platform"
-import p "platform/primitives"
 import wl "vendor/wayland-odin/wayland"
 import gl "vendor:OpenGL"
 import "vendor:egl"
@@ -26,7 +26,8 @@ App :: struct {
 
 app := App{}
 
-app_draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
+
+app_draw :: proc(canvas: ^canvas.Canvas, state: ^engine.State) {
 	shader := state.platform_state.shaders->get("Singularity")
 	shader2 := state.platform_state.shaders->get("Basic")
 	text_shader := state.platform_state.shaders->get("Text")
@@ -34,8 +35,8 @@ app_draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-	p.draw_rect(0, 0, f32(canvas.width), f32(canvas.height), shader, state)
-	p.draw_text(state.text, 50, 200, &state.font, text_shader)
+	canvas->draw_rect(0, 0, f32(canvas.width), f32(canvas.height), shader)
+	canvas->draw_text(50, 200, state.text, &state.font, text_shader)
 
 	for widget in app.widget_list {
 		switch w in widget {
@@ -48,7 +49,7 @@ app_draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 
 main :: proc() {
 	state := engine.init(WIDTH, HEIGHT)
-	canvas := engine.create_canvas(state, WIDTH, HEIGHT, engine.CanvasType.Layer, app_draw)
+	canvas := canvas.create_canvas(state, WIDTH, HEIGHT, canvas.CanvasType.Layer, app_draw)
 
 	shaders := &state.platform_state.shaders
 	shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")

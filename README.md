@@ -17,5 +17,6 @@ Press &lt;super> to do stuff!
 - [ ] Keyboard repeat ! 
 - [ ] mouse input
 - [ ] organize shaders
+- [ ] make state global ffs
 
 ! == ongoing
