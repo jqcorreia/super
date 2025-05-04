@@ -24,7 +24,6 @@ App :: struct {
 	widget_list: [dynamic]widgets.WidgetType,
 }
 
-
 app := App{}
 
 app_draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
@@ -35,8 +34,7 @@ app_draw :: proc(canvas: ^engine.Canvas, state: ^engine.State) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-	p.draw_rect(0, 0, 800, 600, shader, state)
-	// p.draw_rect(50, 50, 200, 100, shader2, state)
+	p.draw_rect(0, 0, f32(canvas.width), f32(canvas.height), shader, state)
 	p.draw_text(state.text, 50, 200, &state.font, text_shader)
 
 	for widget in app.widget_list {
@@ -59,7 +57,7 @@ main :: proc() {
 
 
 	append(&app.widget_list, widgets.Label{x = 0, y = 0, text = "Hello"})
-	// append(&app.widget_list, widgets.Label{x = 10, y = 100, text = "world"})
+	append(&app.widget_list, widgets.Label{x = 0, y = 100, text = "world"})
 
 	for state.running == true {
 		state.time_elapsed = time.diff(state.start_time, time.now())
