@@ -1,8 +1,8 @@
 package widgets
 
 import "../engine"
-import "../engine/canvas"
 import "../platform"
+import "../platform/canvas"
 import "core:fmt"
 
 

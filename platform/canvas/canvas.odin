@@ -158,6 +158,7 @@ create_canvas :: proc(
 	draw_proc: CanvasDrawProc,
 ) -> ^Canvas {
 	state := engine.state.platform_state
+
 	canvas := new(Canvas)
 	canvas.width = width
 	canvas.height = height
