@@ -47,7 +47,7 @@ app_draw :: proc(canvas: ^canvas.Canvas) {
 }
 
 main :: proc() {
-	canvas := canvas.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, app_draw)
+	canvas := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, app_draw)
 
 	shaders := engine.platform.shaders
 	shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")

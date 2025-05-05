@@ -9,6 +9,7 @@ import "core:time"
 
 // import "../widgets"
 import pl "../platform"
+import "../platform/canvas"
 import "../vendor/libschrift-odin/sft"
 import "base:runtime"
 import gl "vendor:OpenGL"
@@ -42,6 +43,15 @@ init :: proc() {
 
 	state.font = fm->load_font(FONT, 72)
 	state.text = ""
+}
+
+create_canvas :: proc(
+	width: i32,
+	height: i32,
+	type: canvas.CanvasType,
+	draw_proc: canvas.CanvasDrawProc,
+) -> ^canvas.Canvas {
+	return canvas.create_canvas(platform, width, height, type, draw_proc)
 }
 
 render :: proc() {

@@ -1,6 +1,5 @@
 package canvas
 
-import "../../engine/"
 import "../../platform"
 import fonts "../../vendor/libschrift-odin/sft"
 import "core:fmt"

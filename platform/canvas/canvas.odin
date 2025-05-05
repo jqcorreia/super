@@ -5,8 +5,7 @@ import wl "../../vendor/wayland-odin/wayland"
 import "core:fmt"
 import "vendor:egl"
 
-import "../../engine"
-import "../../platform"
+import pl "../../platform"
 import "../../utils/gmath"
 import "base:runtime"
 import "core:c"
@@ -31,7 +30,7 @@ CanvasType :: enum {
 }
 
 CanvasCallback :: struct {
-	platform_state: ^platform.PlatformState,
+	platform_state: ^pl.PlatformState,
 	canvas:         ^Canvas,
 }
 
@@ -40,7 +39,7 @@ ortho :: gmath.ortho
 
 recreate_egl_window :: proc(
 	canvas: ^Canvas,
-	egl_render_context: platform.RenderContext,
+	egl_render_context: pl.RenderContext,
 	width: i32,
 	height: i32,
 ) {
@@ -155,13 +154,12 @@ frame_callback := wl.wl_callback_listener {
 }
 
 create_canvas :: proc(
+	platform: ^pl.PlatformState,
 	width: i32,
 	height: i32,
 	type: CanvasType,
 	draw_proc: CanvasDrawProc,
 ) -> ^Canvas {
-	platform := engine.platform
-
 	canvas := new(Canvas)
 	canvas.width = width
 	canvas.height = height
