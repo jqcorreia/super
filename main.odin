@@ -26,7 +26,6 @@ App :: struct {
 
 app := App{}
 
-
 app_draw :: proc(canvas: ^canvas.Canvas, state: ^engine.State) {
 	shader := engine.state.platform_state.shaders->get("Singularity")
 	shader2 := engine.state.platform_state.shaders->get("Basic")
@@ -50,7 +49,6 @@ app_draw :: proc(canvas: ^canvas.Canvas, state: ^engine.State) {
 main :: proc() {
 	engine.init()
 	canvas := canvas.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, app_draw)
-
 
 	shaders := engine.state.platform_state.shaders
 	shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
@@ -104,12 +102,14 @@ main :: proc() {
 			}
 		}
 
-		//FIXME(quadrado): Abstract this into the platform itself
 		// this call will process all the wayland messages
 		// - drawing will be done as a result
 		// - event gathering
 		// - etc
-		wl.display_dispatch(engine.state.platform_state.display)
+		engine.render()
+
+		// Swap the buffers for the canvas
+		// TODO(quadrado): This should at the canvas level or at the engine level
 		egl.SwapBuffers(engine.state.platform_state.egl_render_context.display, canvas.egl_surface)
 	}
 }

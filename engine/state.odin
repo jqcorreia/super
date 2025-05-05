@@ -38,8 +38,11 @@ init :: proc() {
 
 	// Load font(s)
 	fm := platform.new_font_manager()
+
 	state.font = fm->load_font(FONT, 72)
-
 	state.text = ""
+}
 
+render :: proc() {
+	wl.display_dispatch(state.platform_state.display)
 }
