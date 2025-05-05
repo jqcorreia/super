@@ -40,7 +40,7 @@ app_draw :: proc(canvas: ^canvas.Canvas) {
 	for widget in app.widget_list {
 		switch w in widget {
 		case widgets.Label:
-			widgets.draw(w, canvas, engine.state)
+			widgets.draw(w, canvas)
 		}
 	}
 	gl.Flush()
@@ -55,8 +55,15 @@ main :: proc() {
 	shaders->new("Text", "shaders/solid_text_vert.glsl", "shaders/solid_text_frag.glsl")
 
 
-	append(&app.widget_list, widgets.Label{x = 0, y = 0, text = "Hello"})
-	append(&app.widget_list, widgets.Label{x = 0, y = 100, text = "world"})
+	append(
+		&app.widget_list,
+		widgets.Label{x = 0, y = 0, text = "Hello", font = &engine.state.font},
+	)
+
+	append(
+		&app.widget_list,
+		widgets.Label{x = 0, y = 100, text = "world", font = &engine.state.font},
+	)
 
 	for engine.state.running == true {
 		engine.state.time_elapsed = time.diff(engine.state.start_time, time.now())
