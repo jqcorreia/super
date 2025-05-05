@@ -97,3 +97,7 @@ init_platform :: proc() -> ^PlatformState {
 	state.shaders = create_shaders_controller()
 	return state
 }
+
+render :: proc(platform: ^PlatformState) {
+	wl.display_dispatch(platform.display)
+}

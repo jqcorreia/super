@@ -18,7 +18,7 @@ label_draw :: proc(label: Label, canvas: ^canvas.Canvas, state: ^engine.State) {
 		label.y,
 		label.text,
 		&state.font,
-		state.platform_state.shaders->get("Text"),
+		engine.platform.shaders->get("Text"),
 	)
 }
 

@@ -160,12 +160,12 @@ create_canvas :: proc(
 	type: CanvasType,
 	draw_proc: CanvasDrawProc,
 ) -> ^Canvas {
-	state := engine.state.platform_state
+	platform := engine.platform
 
 	canvas := new(Canvas)
 	canvas.width = width
 	canvas.height = height
-	canvas.surface = wl.wl_compositor_create_surface(state.compositor)
+	canvas.surface = wl.wl_compositor_create_surface(platform.compositor)
 
 	canvas.draw_rect = draw_rect
 	canvas.draw_text = draw_text
@@ -177,12 +177,12 @@ create_canvas :: proc(
 
 	cc := new(CanvasCallback, context.temp_allocator)
 	cc.canvas = canvas
-	cc.platform_state = engine.state.platform_state
+	cc.platform_state = platform
 
 	egl_window := wl.egl_window_create(canvas.surface, i32(width), i32(height))
 	egl_surface := egl.CreateWindowSurface(
-		state.egl_render_context.display,
-		state.egl_render_context.config,
+		platform.egl_render_context.display,
+		platform.egl_render_context.config,
 		egl.NativeWindowType(egl_window),
 		nil,
 	)
@@ -192,17 +192,17 @@ create_canvas :: proc(
 
 	}
 	if (!egl.MakeCurrent(
-			   state.egl_render_context.display,
+			   platform.egl_render_context.display,
 			   egl_surface,
 			   egl_surface,
-			   state.egl_render_context.ctx,
+			   platform.egl_render_context.ctx,
 		   )) {
 		fmt.println("Error making current!")
 	}
 
 	canvas.egl_surface = egl_surface
 	if type == CanvasType.Window {
-		xdg_surface := wl.xdg_wm_base_get_xdg_surface(state.xdg_base, canvas.surface)
+		xdg_surface := wl.xdg_wm_base_get_xdg_surface(platform.xdg_base, canvas.surface)
 		toplevel := wl.xdg_surface_get_toplevel(xdg_surface)
 		wl.xdg_toplevel_add_listener(toplevel, &toplevel_listener, cc)
 		wl.xdg_toplevel_set_title(toplevel, "Odin Wayland")
@@ -210,7 +210,7 @@ create_canvas :: proc(
 	}
 	if type == CanvasType.Layer {
 		layer_surface := wl.zwlr_layer_shell_v1_get_layer_surface(
-			state.zwlr_layer_shell_v1,
+			platform.zwlr_layer_shell_v1,
 			canvas.surface,
 			nil,
 			wl.ZWLR_LAYER_SHELL_V1_LAYER_OVERLAY,
@@ -229,7 +229,7 @@ create_canvas :: proc(
 			layer_surface,
 			wl.ZWLR_LAYER_SURFACE_V1_KEYBOARD_INTERACTIVITY_ON_DEMAND,
 		)
-		wl.display_dispatch(state.display) // This dispatch makes sure that the layer surface is configured
+		wl.display_dispatch(platform.display) // This dispatch makes sure that the layer surface is configured
 	}
 
 	canvas.draw_proc = draw_proc

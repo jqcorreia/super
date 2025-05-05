@@ -27,9 +27,9 @@ App :: struct {
 app := App{}
 
 app_draw :: proc(canvas: ^canvas.Canvas) {
-	shader := engine.state.platform_state.shaders->get("Singularity")
-	shader2 := engine.state.platform_state.shaders->get("Basic")
-	text_shader := engine.state.platform_state.shaders->get("Text")
+	shader := engine.platform.shaders->get("Singularity")
+	shader2 := engine.platform.shaders->get("Basic")
+	text_shader := engine.platform.shaders->get("Text")
 
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
@@ -47,10 +47,9 @@ app_draw :: proc(canvas: ^canvas.Canvas) {
 }
 
 main :: proc() {
-	engine.init()
 	canvas := canvas.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, app_draw)
 
-	shaders := engine.state.platform_state.shaders
+	shaders := engine.platform.shaders
 	shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
 	shaders->new("Singularity", "shaders/basic_vert.glsl", "shaders/singularity.glsl")
 	shaders->new("Text", "shaders/solid_text_vert.glsl", "shaders/solid_text_frag.glsl")
@@ -63,7 +62,7 @@ main :: proc() {
 		engine.state.time_elapsed = time.diff(engine.state.start_time, time.now())
 
 		// Consume all events and do eventual dispatching
-		events := engine.state.platform_state.input->consume_all_events()
+		events := engine.platform.input->consume_all_events()
 		for event in events {
 			#partial switch e in event {
 			case platform.KeyPressed:
@@ -110,6 +109,6 @@ main :: proc() {
 
 		// Swap the buffers for the canvas
 		// TODO(quadrado): This should at the canvas level or at the engine level
-		egl.SwapBuffers(engine.state.platform_state.egl_render_context.display, canvas.egl_surface)
+		egl.SwapBuffers(engine.platform.egl_render_context.display, canvas.egl_surface)
 	}
 }
