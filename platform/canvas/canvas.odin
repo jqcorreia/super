@@ -5,13 +5,13 @@ import wl "../../vendor/wayland-odin/wayland"
 import "core:fmt"
 import "vendor:egl"
 
+import "../../engine"
 import "../../platform"
 import "base:runtime"
 import "core:c"
 
-import "../../engine"
 
-CanvasDrawProc :: proc(_: ^Canvas, _: ^engine.State)
+CanvasDrawProc :: proc(_: ^Canvas)
 
 Canvas :: struct {
 	width:         i32,
@@ -30,8 +30,8 @@ CanvasType :: enum {
 }
 
 CanvasCallback :: struct {
-	state:  ^engine.State,
-	canvas: ^Canvas,
+	platform_state: ^platform.PlatformState,
+	canvas:         ^Canvas,
 }
 
 
@@ -70,7 +70,7 @@ window_listener := wl.xdg_surface_listener {
 		fmt.println("window configure")
 		cc := cast(^CanvasCallback)data
 		canvas := cc.canvas
-		state := cc.state.platform_state
+		state := cc.platform_state
 
 		wl.xdg_surface_ack_configure(surface, serial)
 		wl.wl_surface_damage(canvas.surface, 0, 0, c.INT32_MAX, c.INT32_MAX)
@@ -90,7 +90,7 @@ toplevel_listener := wl.xdg_toplevel_listener {
 		fmt.println("Top level configure")
 		cc := cast(^CanvasCallback)data
 		canvas := cc.canvas
-		egl_render_context := cc.state.platform_state.egl_render_context
+		egl_render_context := cc.platform_state.egl_render_context
 		fmt.println(canvas.width, width, canvas.height, height)
 		if canvas.width != width || canvas.height != height {
 			recreate_egl_window(canvas, egl_render_context, i32(width), i32(height))
@@ -125,7 +125,7 @@ layer_listener := wl.zwlr_layer_surface_v1_listener {
 		fmt.println("layer_configure")
 		cc := cast(^CanvasCallback)data
 		canvas := cc.canvas
-		state := cc.state.platform_state
+		state := cc.platform_state
 
 		recreate_egl_window(canvas, state.egl_render_context, i32(width), i32(height))
 		canvas.width = i32(width)
@@ -144,7 +144,7 @@ done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.u
 	callback := wl.wl_surface_frame(cc.canvas.surface)
 	wl.wl_callback_add_listener(callback, &frame_callback, cc)
 
-	cc.canvas.draw_proc(cc.canvas, cc.state)
+	cc.canvas.draw_proc(cc.canvas)
 }
 
 frame_callback := wl.wl_callback_listener {
@@ -174,7 +174,7 @@ create_canvas :: proc(
 
 	cc := new(CanvasCallback, context.temp_allocator)
 	cc.canvas = canvas
-	cc.state = engine.state
+	cc.platform_state = engine.state.platform_state
 
 	egl_window := wl.egl_window_create(canvas.surface, i32(width), i32(height))
 	egl_surface := egl.CreateWindowSurface(

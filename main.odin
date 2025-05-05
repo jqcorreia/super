@@ -26,7 +26,7 @@ App :: struct {
 
 app := App{}
 
-app_draw :: proc(canvas: ^canvas.Canvas, state: ^engine.State) {
+app_draw :: proc(canvas: ^canvas.Canvas) {
 	shader := engine.state.platform_state.shaders->get("Singularity")
 	shader2 := engine.state.platform_state.shaders->get("Basic")
 	text_shader := engine.state.platform_state.shaders->get("Text")
@@ -35,12 +35,12 @@ app_draw :: proc(canvas: ^canvas.Canvas, state: ^engine.State) {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	canvas->draw_rect(0, 0, f32(canvas.width), f32(canvas.height), shader)
-	canvas->draw_text(50, 200, state.text, &state.font, text_shader)
+	canvas->draw_text(50, 200, engine.state.text, &engine.state.font, text_shader)
 
 	for widget in app.widget_list {
 		switch w in widget {
 		case widgets.Label:
-			widgets.draw(w, canvas, state)
+			widgets.draw(w, canvas, engine.state)
 		}
 	}
 	gl.Flush()

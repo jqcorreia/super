@@ -12,7 +12,6 @@ PlatformState :: struct {
 	zwlr_layer_shell_v1: ^wl.zwlr_layer_shell_v1,
 	seat:                ^wl.wl_seat,
 	egl_render_context:  RenderContext,
-	egl_surface:         egl.Surface,
 	input:               ^Input,
 	shaders:             ^Shaders,
 	xkb:                 Xkb,
