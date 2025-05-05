@@ -152,13 +152,12 @@ frame_callback := wl.wl_callback_listener {
 }
 
 create_canvas :: proc(
-	engine_state: ^engine.State,
 	width: i32,
 	height: i32,
 	type: CanvasType,
 	draw_proc: CanvasDrawProc,
 ) -> ^Canvas {
-	state := engine_state.platform_state
+	state := engine.state.platform_state
 	canvas := new(Canvas)
 	canvas.width = width
 	canvas.height = height
@@ -174,7 +173,7 @@ create_canvas :: proc(
 
 	cc := new(CanvasCallback, context.temp_allocator)
 	cc.canvas = canvas
-	cc.state = engine_state
+	cc.state = engine.state
 
 	egl_window := wl.egl_window_create(canvas.surface, i32(width), i32(height))
 	egl_surface := egl.CreateWindowSurface(

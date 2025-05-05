@@ -14,7 +14,7 @@ PlatformState :: struct {
 	egl_render_context:  RenderContext,
 	egl_surface:         egl.Surface,
 	input:               ^Input,
-	shaders:             Shaders,
+	shaders:             ^Shaders,
 	xkb:                 Xkb,
 }
 

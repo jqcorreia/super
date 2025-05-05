@@ -25,8 +25,8 @@ load_shader :: proc(vertex_shader_path: string, fragment_shader_path: string) ->
 	return shader
 }
 
-create_shaders_controller :: proc() -> Shaders {
-	shaders: Shaders
+create_shaders_controller :: proc() -> ^Shaders {
+	shaders := new(Shaders)
 	shaders.shaders = map[string]u32{}
 	shaders.new =
 	proc(

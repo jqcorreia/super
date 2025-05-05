@@ -26,10 +26,11 @@ State :: struct {
 
 
 FONT :: "JetBrainsMono Nerd Font Mono"
-// FONT :: "FreeSerif"
 
-init :: proc(width: i32, height: i32) -> ^State {
-	state := new(State)
+state: ^State
+
+init :: proc() {
+	state = new(State)
 	state.start_time = time.now()
 	state.platform_state = platform.init_platform()
 
@@ -41,5 +42,4 @@ init :: proc(width: i32, height: i32) -> ^State {
 
 	state.text = ""
 
-	return state
 }
