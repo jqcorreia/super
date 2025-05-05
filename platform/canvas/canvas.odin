@@ -7,6 +7,7 @@ import "vendor:egl"
 
 import "../../engine"
 import "../../platform"
+import "../../utils/gmath"
 import "base:runtime"
 import "core:c"
 
@@ -34,6 +35,8 @@ CanvasCallback :: struct {
 	canvas:         ^Canvas,
 }
 
+
+ortho :: gmath.ortho
 
 recreate_egl_window :: proc(
 	canvas: ^Canvas,

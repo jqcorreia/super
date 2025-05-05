@@ -4,27 +4,7 @@ import "../../engine"
 import "core:time"
 import gl "vendor:OpenGL"
 
-// https://www.songho.ca/opengl/gl_projectionmatrix.html
-ortho :: proc(l: f32, r: f32, b: f32, t: f32) -> [16]f32 {
-	return [16]f32 {
-		2.0 / (r - l),
-		0.0,
-		0.0,
-		0.0,
-		0.0,
-		2.0 / (t - b),
-		0.0,
-		0.0,
-		0.0,
-		0.0,
-		-1.0,
-		0.0,
-		-(r + l) / (r - l),
-		-(t + b) / (t - b),
-		0.0,
-		1.0,
-	}
-}
+import "../../utils/gmath"
 
 draw_rect :: proc(canvas: ^Canvas, x, y, width, height: f32, shader: u32) {
 	vertices := [?]f32{f32(0), f32(0), f32(1), f32(0), f32(1), f32(1), f32(0), f32(1)}
