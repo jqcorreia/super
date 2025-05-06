@@ -129,7 +129,7 @@ layer_listener := wl.zwlr_layer_surface_v1_listener {
 		canvas := cc.canvas
 		state := cc.platform_state
 
-		recreate_egl_window(canvas, state.egl_render_context, i32(width), i32(height))
+		// recreate_egl_window(canvas, state.egl_render_context, i32(width), i32(height))
 		canvas.width = i32(width)
 		canvas.height = i32(height)
 
