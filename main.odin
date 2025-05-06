@@ -117,7 +117,7 @@ app_draw :: proc(canvas: ^canvas.Canvas) {
 // 	}
 // }
 
-cenas :: proc(canvas: ^canvas.Canvas) {
+draw :: proc(canvas: ^canvas.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
@@ -125,7 +125,7 @@ cenas :: proc(canvas: ^canvas.Canvas) {
 }
 
 main :: proc() {
-	c1 := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, cenas)
+	c1 := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, draw)
 
 	shaders := engine.platform.shaders
 	shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")

@@ -13,10 +13,11 @@ Press &lt;super> to do stuff!
 - [x] Use proper font metrics based on previous glyph (leftSideBearing et al)
 - [x] fix WAYLAND_DEBUG crashing (prolly wayland-odin's fault)
 - [x] Basic label widget
-- [ ] Window/Surface resize, push EGL creation to configure()
+- [x] make state global ffs
+- [ ] Window/Surface resize, push EGL creation to configure() !
 - [ ] Keyboard repeat ! 
 - [ ] mouse input
 - [ ] organize shaders
-- [ ] make state global ffs
+- [ ] Multiple canvas support. Dunno why no work...
 
 ! == ongoing
