@@ -54,6 +54,7 @@ create_canvas :: proc(
 	return canvas.create_canvas(platform, width, height, type, draw_proc)
 }
 
-render :: proc() {
+render :: proc(canvas: ^canvas.Canvas) {
 	pl.render(platform)
+	egl.SwapBuffers(platform.egl_render_context.display, canvas.egl_surface)
 }
