@@ -125,7 +125,7 @@ cenas :: proc(canvas: ^canvas.Canvas) {
 }
 
 main :: proc() {
-	canvas := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, cenas)
+	c1 := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, cenas)
 
 	shaders := engine.platform.shaders
 	shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
@@ -142,6 +142,6 @@ main :: proc() {
 				}
 			}
 		}
-		engine.render(canvas)
+		engine.render(c1)
 	}
 }

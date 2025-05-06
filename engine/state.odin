@@ -16,7 +16,7 @@ import gl "vendor:OpenGL"
 import "vendor:egl"
 
 
-State :: struct {
+EngineState :: struct {
 	start_time:   time.Time,
 	time_elapsed: time.Duration,
 	text:         string,
@@ -27,12 +27,12 @@ State :: struct {
 
 FONT :: "JetBrainsMono Nerd Font Mono"
 
-state: ^State
+state: ^EngineState
 platform: ^pl.PlatformState
 
 @(init)
 init :: proc() {
-	state = new(State)
+	state = new(EngineState)
 	platform = pl.init_platform()
 	state.start_time = time.now()
 

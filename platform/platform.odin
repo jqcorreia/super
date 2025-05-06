@@ -71,31 +71,31 @@ global_remove :: proc "c" (data: rawptr, registry: ^wl.wl_registry, name: c.uint
 }
 
 init_platform :: proc() -> ^PlatformState {
-	state := new(PlatformState)
+	platform := new(PlatformState)
 	display := wl.display_connect(nil)
-	state.display = display
+	platform.display = display
 
 	// Get registry, add a global listener and get things started
 	// Do a roundtrip in order to get registry info and populate the wayland part of state
 	registry := wl.wl_display_get_registry(display)
-	wl.wl_registry_add_listener(registry, &registry_listener, state)
+	wl.wl_registry_add_listener(registry, &registry_listener, platform)
 	wl.display_roundtrip(display)
 
 
 	// Initialize EGL and OpenGL
 	rctx := init_egl(display)
-	state.egl_render_context = rctx
+	platform.egl_render_context = rctx
 
 	//TODO(quadrado): Properly understand this and document it
 	// This somehow loads the proper function pointers or something...
 	gl.load_up_to(int(3), 2, egl.gl_set_proc_address)
 
 	// Initialize input controller
-	init_input(state)
+	init_input(platform)
 
 	// Initialize shaders controller
-	state.shaders = create_shaders_controller()
-	return state
+	platform.shaders = create_shaders_controller()
+	return platform
 }
 
 render :: proc(platform: ^PlatformState) {

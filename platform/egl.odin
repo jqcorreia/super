@@ -87,31 +87,6 @@ init_egl :: proc(display: ^wl.wl_display) -> RenderContext {
 		egl.NO_CONTEXT,
 		raw_data(context_attribs),
 	)
-
-	//     configs = calloc(count, sizeof *configs);
-
-	//	res := egl.ChooseConfig(egl_display, raw_data(config_attribs), raw_data(configs), count, &n)
-	//	fmt.printf("%x\n", GetError())
-	//	if res == egl.FALSE {
-	//	}
-	//	fmt.println(res, n)
-
-	//	for i in 0 ..< n {
-	//		egl.GetConfigAttrib(egl_display, configs[i], 12320, &size) // 12320 is EGL_BUFFER_SIZE
-	//		fmt.printf("Buffer size for config %d is %d\n", i, size)
-	//		egl.GetConfigAttrib(egl_display, configs[i], egl.RED_SIZE, &size)
-	//		fmt.printf("Red size for config %d is %d\n", i, size)
-
-	//		// just choose the first one
-	//		egl_conf = configs[i]
-	//		break
-	//	}
-
-	//	//     egl_context =
-	//	// 	eglCreateContext(egl_display,
-	//	// 			 egl_conf,
-	//	// 			 EGL_NO_CONTEXT, context_attribs);
-
 	fmt.println(egl_context)
 
 	return RenderContext{ctx = egl_context, display = egl_display, config = egl_conf}
