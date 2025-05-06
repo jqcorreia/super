@@ -6,9 +6,11 @@ import "core:fmt"
 import "core:os/os2"
 import "core:strings"
 
+Font :: fonts.SFT
+
 FontManager :: struct {
 	font_map:     map[string]string,
-	loaded_fonts: map[string]fonts.SFT,
+	loaded_fonts: map[string]Font,
 	load_font:    proc(fm: ^FontManager, filename: string, size: f64) -> fonts.SFT,
 }
 

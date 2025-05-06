@@ -3,7 +3,6 @@ package widgets
 import "../engine"
 import "../platform"
 import "../platform/canvas"
-import "../vendor/libschrift-odin/sft"
 import "core:fmt"
 
 
@@ -11,7 +10,7 @@ Label :: struct {
 	x:    f32,
 	y:    f32,
 	text: string,
-	font: ^sft.SFT,
+	font: ^platform.Font,
 }
 
 label_draw :: proc(label: Label, canvas: ^canvas.Canvas) {

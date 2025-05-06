@@ -14,7 +14,14 @@ RenderedGlyph :: struct {
 	kerning: ^fonts.SFT_Kerning,
 }
 
-draw_text :: proc(canvas: ^Canvas, x: f32, y: f32, text: string, font: ^fonts.SFT, shader: u32) {
+draw_text :: proc(
+	canvas: ^Canvas,
+	x: f32,
+	y: f32,
+	text: string,
+	font: ^platform.Font,
+	shader: u32,
+) {
 	current_x := f32(x)
 
 	buffers: [dynamic]RenderedGlyph
