@@ -27,15 +27,15 @@ App :: struct {
 app := App{}
 
 app_draw :: proc(canvas: ^canvas.Canvas) {
-	shader := engine.platform.shaders->get("Singularity")
-	shader2 := engine.platform.shaders->get("Basic")
-	text_shader := engine.platform.shaders->get("Text")
+	shader := platform.inst().shaders->get("Singularity")
+	shader2 := platform.inst().shaders->get("Basic")
+	text_shader := platform.inst().shaders->get("Text")
 
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	canvas->draw_rect(0, 0, f32(canvas.width), f32(canvas.height), shader)
-	canvas->draw_text(50, 200, engine.state.text, &engine.state.font, text_shader)
+	canvas->draw_text(50, 200, engine.state.text, &engine.state.font)
 
 	for widget in app.widget_list {
 		switch w in widget {
@@ -121,17 +121,25 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
+	canvas->draw_rect(
+		0,
+		0,
+		f32(canvas.width),
+		f32(canvas.height),
+		platform.inst().shaders->get("Singularity"),
+	)
+
+	canvas->draw_rect(10, 10, 200, 200)
+	canvas->draw_text(10, 10, "Foobar!", &engine.state.font)
 	gl.Flush()
+
 }
 
 main :: proc() {
 	c1 := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, draw)
 
-	shaders := engine.platform.shaders
-	shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
-
 	for engine.state.running == true {
-		events := engine.platform.input->consume_all_events()
+		events := platform.inst().input->consume_all_events()
 		for event in events {
 			#partial switch e in event {
 			case platform.KeyPressed:

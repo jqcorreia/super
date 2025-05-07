@@ -20,8 +20,10 @@ draw_text :: proc(
 	y: f32,
 	text: string,
 	font: ^platform.Font,
-	shader: u32,
+	_shader: u32 = 0,
 ) {
+	shader := _shader == 0 ? platform.inst().shaders->get("Text") : _shader
+
 	current_x := f32(x)
 
 	buffers: [dynamic]RenderedGlyph

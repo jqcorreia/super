@@ -14,13 +14,7 @@ Label :: struct {
 }
 
 label_draw :: proc(label: Label, canvas: ^canvas.Canvas) {
-	canvas->draw_text(
-		label.x,
-		label.y,
-		label.text,
-		label.font,
-		engine.platform.shaders->get("Text"),
-	)
+	canvas->draw_text(label.x, label.y, label.text, label.font)
 }
 
 WidgetType :: union {

@@ -28,12 +28,11 @@ EngineState :: struct {
 FONT :: "JetBrainsMono Nerd Font Mono"
 
 state: ^EngineState
-platform: ^pl.PlatformState
 
 @(init)
 init :: proc() {
 	state = new(EngineState)
-	platform = pl.init_platform()
+	pl.init_platform()
 	state.start_time = time.now()
 
 	state.running = true
@@ -51,10 +50,10 @@ create_canvas :: proc(
 	type: canvas.CanvasType,
 	draw_proc: canvas.CanvasDrawProc,
 ) -> ^canvas.Canvas {
-	return canvas.create_canvas(platform, width, height, type, draw_proc)
+	return canvas.create_canvas(pl.inst(), width, height, type, draw_proc)
 }
 
 render :: proc(canvas: ^canvas.Canvas) {
-	pl.render(platform)
-	egl.SwapBuffers(platform.egl_render_context.display, canvas.egl_surface)
+	pl.render(pl.inst())
+	egl.SwapBuffers(pl.inst().egl_render_context.display, canvas.egl_surface)
 }

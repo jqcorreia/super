@@ -2,21 +2,32 @@ package platform
 
 import wl "../vendor/wayland-odin/wayland"
 import "core:c"
+import "core:fmt"
+import "core:time"
 import gl "vendor:OpenGL"
 import "vendor:egl"
 
 PlatformState :: struct {
-	display:             ^wl.wl_display,
-	compositor:          ^wl.wl_compositor,
-	xdg_base:            ^wl.xdg_wm_base,
-	zwlr_layer_shell_v1: ^wl.zwlr_layer_shell_v1,
-	seat:                ^wl.wl_seat,
-	egl_render_context:  RenderContext,
-	input:               ^Input,
-	shaders:             ^Shaders,
-	xkb:                 Xkb,
+	display:                ^wl.wl_display,
+	compositor:             ^wl.wl_compositor,
+	xdg_base:               ^wl.xdg_wm_base,
+	zwlr_layer_shell_v1:    ^wl.zwlr_layer_shell_v1,
+	seat:                   ^wl.wl_seat,
+	egl_render_context:     RenderContext,
+	input:                  ^Input,
+	shaders:                ^Shaders,
+	xkb:                    Xkb,
+	default_shaders_loaded: bool,
+	start_time:             time.Time,
+	time_elapsed:           time.Duration,
 }
 
+@(private)
+platform: ^PlatformState
+
+inst :: proc() -> ^PlatformState {
+	return platform
+}
 registry_listener := wl.wl_registry_listener {
 	global        = global,
 	global_remove = global_remove,
@@ -70,8 +81,8 @@ global :: proc "c" (
 global_remove :: proc "c" (data: rawptr, registry: ^wl.wl_registry, name: c.uint32_t) {
 }
 
-init_platform :: proc() -> ^PlatformState {
-	platform := new(PlatformState)
+init_platform :: proc() {
+	platform = new(PlatformState)
 	display := wl.display_connect(nil)
 	platform.display = display
 
@@ -95,9 +106,14 @@ init_platform :: proc() -> ^PlatformState {
 
 	// Initialize shaders controller
 	platform.shaders = create_shaders_controller()
-	return platform
+	platform.default_shaders_loaded = false
+
+	// Start time keeping
+	platform.start_time = time.now()
 }
 
+
 render :: proc(platform: ^PlatformState) {
+	platform.time_elapsed = time.diff(platform.start_time, time.now())
 	wl.display_dispatch(platform.display)
 }

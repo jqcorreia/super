@@ -20,8 +20,8 @@ Canvas :: struct {
 	layer_surface: ^wl.zwlr_layer_surface_v1,
 	egl_surface:   egl.Surface,
 	draw_proc:     CanvasDrawProc,
-	draw_rect:     proc(canvas: ^Canvas, x, y, width, height: f32, shader: u32),
-	draw_text:     proc(canvas: ^Canvas, x, y: f32, text: string, font: ^sft.SFT, shader: u32),
+	draw_rect:     proc(canvas: ^Canvas, x, y, width, height: f32, shader: u32 = 0),
+	draw_text:     proc(canvas: ^Canvas, x, y: f32, text: string, font: ^sft.SFT, shader: u32 = 0),
 }
 
 CanvasType :: enum {
@@ -196,6 +196,11 @@ create_canvas :: proc(
 			   platform.egl_render_context.ctx,
 		   )) {
 		fmt.println("Error making current!")
+	}
+
+	if (!platform.default_shaders_loaded) {
+		pl.create_default_shaders()
+		platform.default_shaders_loaded = true
 	}
 
 	canvas.egl_surface = egl_surface
