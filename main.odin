@@ -9,10 +9,8 @@ import "core:time"
 import "engine"
 import "platform"
 import "platform/canvas"
-import wl "vendor/wayland-odin/wayland"
 import gl "vendor:OpenGL"
 import "vendor:egl"
-import xlib "vendor:x11/xlib"
 import "widgets"
 
 
@@ -144,7 +142,7 @@ main :: proc() {
 			#partial switch e in event {
 			case platform.KeyPressed:
 				{
-					if e.key == xlib.KeySym.XK_Escape {
+					if e.key == platform.KeySym.XK_Escape {
 						engine.state.running = false
 					}
 				}

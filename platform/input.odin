@@ -9,12 +9,14 @@ import "core:strings"
 import "core:sys/posix"
 import "vendor:x11/xlib"
 
+KeySym :: xlib.KeySym
+
 KeyPressed :: struct {
-	key: xlib.KeySym,
+	key: KeySym,
 }
 
 KeyReleased :: struct {
-	key: xlib.KeySym,
+	key: KeySym,
 }
 
 TextInput :: struct {
@@ -269,15 +271,15 @@ key_handler :: proc "c" (
 	}
 }
 
-is_modifier := proc(key_sym: xlib.KeySym) -> bool {
-	if key_sym != xlib.KeySym.XK_Control_L &&
-	   key_sym != xlib.KeySym.XK_Control_R &&
-	   key_sym != xlib.KeySym.XK_Shift_L &&
-	   key_sym != xlib.KeySym.XK_Shift_R &&
-	   key_sym != xlib.KeySym.XK_Alt_L &&
-	   key_sym != xlib.KeySym.XK_Alt_L &&
-	   key_sym != xlib.KeySym.XK_BackSpace &&
-	   key_sym != xlib.KeySym.XK_Escape {
+is_modifier := proc(key_sym: KeySym) -> bool {
+	if key_sym != KeySym.XK_Control_L &&
+	   key_sym != KeySym.XK_Control_R &&
+	   key_sym != KeySym.XK_Shift_L &&
+	   key_sym != KeySym.XK_Shift_R &&
+	   key_sym != KeySym.XK_Alt_L &&
+	   key_sym != KeySym.XK_Alt_L &&
+	   key_sym != KeySym.XK_BackSpace &&
+	   key_sym != KeySym.XK_Escape {
 		return false
 	}
 	return true
