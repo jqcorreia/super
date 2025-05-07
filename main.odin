@@ -116,7 +116,8 @@ app_draw :: proc(canvas: ^canvas.Canvas) {
 // }
 
 draw :: proc(canvas: ^canvas.Canvas) {
-	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
+	// gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
+	gl.ClearColor(0.0, 0.0, 0.0, 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	canvas->draw_rect(
@@ -124,7 +125,7 @@ draw :: proc(canvas: ^canvas.Canvas) {
 		0,
 		f32(canvas.width),
 		f32(canvas.height),
-		platform.inst().shaders->get("Singularity"),
+		platform.inst().shaders->get("Cosmic"),
 	)
 
 	canvas->draw_rect(10, 10, 200, 200)
@@ -136,6 +137,13 @@ draw :: proc(canvas: ^canvas.Canvas) {
 main :: proc() {
 	c1 := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, draw)
 
+	platform.inst().shaders->new(
+		"Singularity",
+		"shaders/basic_vert.glsl",
+		"shaders/singularity.glsl",
+	)
+	platform.inst().shaders->new("Starship", "shaders/basic_vert.glsl", "shaders/starship.glsl")
+	platform.inst().shaders->new("Cosmic", "shaders/basic_vert.glsl", "shaders/cosmic.glsl")
 	for engine.state.running == true {
 		events := platform.inst().input->consume_all_events()
 		for event in events {
