@@ -154,8 +154,6 @@ draw_text :: proc(
 			raw_data(&projectionMatrix),
 		)
 
-		// gl.ActiveTexture(gl.TEXTURE0)
-		// gl.BindTexture(gl.TEXTURE_2D, tex)
 
 		gl.Uniform1i(gl.GetUniformLocation(shader, cstring("fontTexture")), 0)
 		gl.BindVertexArray(vao)

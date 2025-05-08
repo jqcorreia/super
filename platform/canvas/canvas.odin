@@ -1,14 +1,15 @@
 package canvas
 
+import pl "../../platform"
+import "../../types"
+import "../../utils/gmath"
 import "../../vendor/libschrift-odin/sft"
 import wl "../../vendor/wayland-odin/wayland"
-import "core:fmt"
-import "vendor:egl"
 
-import pl "../../platform"
-import "../../utils/gmath"
 import "base:runtime"
 import "core:c"
+import "core:fmt"
+import "vendor:egl"
 
 
 CanvasDrawProc :: proc(_: ^Canvas)
@@ -20,7 +21,13 @@ Canvas :: struct {
 	layer_surface: ^wl.zwlr_layer_surface_v1,
 	egl_surface:   egl.Surface,
 	draw_proc:     CanvasDrawProc,
-	draw_rect:     proc(canvas: ^Canvas, x, y, width, height: f32, shader: u32 = 0),
+	draw_rect:     proc(
+		canvas: ^Canvas,
+		x, y, width, height: f32,
+		color: types.Color = types.Color{0.0, 0.0, 0.0, 0.0},
+		shader: u32 = 0,
+		texture: u32 = 0,
+	),
 	draw_text:     proc(canvas: ^Canvas, x, y: f32, text: string, font: ^sft.SFT, shader: u32 = 0),
 }
 

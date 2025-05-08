@@ -32,11 +32,11 @@ app_draw :: proc(canvas: ^canvas.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-	canvas->draw_rect(0, 0, f32(canvas.width), f32(canvas.height), shader)
+	canvas->draw_rect(0, 0, f32(canvas.width), f32(canvas.height), shader = shader)
 	canvas->draw_text(50, 200, engine.state.text, &engine.state.font)
 
 	for widget in app.widget_list {
-		switch w in widget {
+		#partial switch w in widget {
 		case widgets.Label:
 			widgets.draw(w, canvas)
 		}
@@ -116,20 +116,27 @@ app_draw :: proc(canvas: ^canvas.Canvas) {
 // }
 
 draw :: proc(canvas: ^canvas.Canvas) {
-	// gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
-	gl.ClearColor(0.0, 0.0, 0.0, 1.0)
+	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
+	// gl.ClearColor(0.0, 0.0, 0.0, 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-	canvas->draw_rect(
-		0,
-		0,
-		f32(canvas.width),
-		f32(canvas.height),
-		platform.inst().shaders->get("Cosmic"),
-	)
+	list := widgets.List {
+		x     = 10,
+		y     = 10,
+		items = {},
+	}
 
-	canvas->draw_rect(10, 10, 200, 200)
-	canvas->draw_text(10, 10, "Foobar!", &engine.state.font)
+	canvas->draw_rect(0, 0, 100, 100)
+	// canvas->draw_rect(
+	// 	0,
+	// 	0,
+	// 	f32(canvas.width),
+	// 	f32(canvas.height),
+	// 	shader = platform.inst().shaders->get("Cosmic"),
+	// )
+	// canvas->draw_text(200, 200, "Hello!", &engine.state.font)
+	// widgets.draw(list, canvas)
+
 	gl.Flush()
 
 }

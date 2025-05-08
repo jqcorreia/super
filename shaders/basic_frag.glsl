@@ -7,6 +7,6 @@ uniform vec4 input;
 
 void main()
 {
-    vec4 final_color = vec4(fragCoord.x, input.yz, 1.0);
+    vec4 final_color = vec4(input);
     color = final_color;
 }
