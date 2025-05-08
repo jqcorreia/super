@@ -93,11 +93,11 @@ draw_rect :: proc(
 		false,
 		raw_data(&projectionMatrix),
 	)
-	// if (texture != 0) {
-	// 	gl.ActiveTexture(gl.TEXTURE0)
-	// 	gl.BindTexture(gl.TEXTURE_2D, texture)
-	// 	gl.Uniform1i(gl.GetUniformLocation(shader, cstring("uTexture")), 0)
-	// }
+	if (texture != 0) {
+		gl.ActiveTexture(gl.TEXTURE0)
+		gl.BindTexture(gl.TEXTURE_2D, texture)
+		gl.Uniform1i(gl.GetUniformLocation(shader, cstring("uTexture")), 0)
+	}
 
 	gl.BindVertexArray(vao)
 	gl.DrawArrays(gl.TRIANGLE_FAN, 0, 4)

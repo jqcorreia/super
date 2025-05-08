@@ -126,7 +126,7 @@ draw :: proc(canvas: ^canvas.Canvas) {
 		items = {},
 	}
 
-	canvas->draw_rect(0, 0, 100, 100)
+	// canvas->draw_rect(0, 0, 100, 100)
 	// canvas->draw_rect(
 	// 	0,
 	// 	0,
@@ -135,7 +135,7 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	// 	shader = platform.inst().shaders->get("Cosmic"),
 	// )
 	// canvas->draw_text(200, 200, "Hello!", &engine.state.font)
-	// widgets.draw(list, canvas)
+	widgets.draw(list, canvas)
 
 	gl.Flush()
 
