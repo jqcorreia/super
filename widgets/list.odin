@@ -15,6 +15,9 @@ List :: struct {
 }
 
 list_draw :: proc(list: List, canvas: ^canvas.Canvas) {
+	cw: f32 = 1024.0
+	ch: f32 = 1024.0
+
 	fbo, fboTexture: u32
 	gl.GenFramebuffers(1, &fbo)
 	gl.BindFramebuffer(gl.FRAMEBUFFER, fbo)
@@ -22,7 +25,7 @@ list_draw :: proc(list: List, canvas: ^canvas.Canvas) {
 	// Create texture to render into
 	gl.GenTextures(1, &fboTexture)
 	gl.BindTexture(gl.TEXTURE_2D, fboTexture)
-	gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1024, 1024, 0, gl.RGBA, gl.UNSIGNED_BYTE, nil)
+	gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, i32(cw), i32(ch), 0, gl.RGBA, gl.UNSIGNED_BYTE, nil)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 
@@ -32,6 +35,7 @@ list_draw :: proc(list: List, canvas: ^canvas.Canvas) {
 	if (gl.CheckFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) {
 		fmt.println("FBO not complete!")
 	}
+	gl.Viewport(0, 0, i32(cw), i32(ch))
 
 	// Draw calls
 	gl.ClearColor(0.0, 0.0, 0.0, 1.0)
@@ -49,12 +53,10 @@ list_draw :: proc(list: List, canvas: ^canvas.Canvas) {
 	y: f32 = 0.0
 	width: f32 = 100.0
 	height: f32 = 100.0
-	cw: f32 = 1024.0
-	ch: f32 = 1024.0
 
 	_color := [4]f32{1.0, 1.0, 0.0, 1.0}
-
 	_shader := platform.inst().shaders->get("Basic")
+
 	vertices := [?]f32 {
 		0.0,
 		0.0,
@@ -116,11 +118,6 @@ list_draw :: proc(list: List, canvas: ^canvas.Canvas) {
 		false,
 		raw_data(&projectionMatrix),
 	)
-	// if (texture != 0) {
-	// 	gl.ActiveTexture(gl.TEXTURE0)
-	// 	gl.BindTexture(gl.TEXTURE_2D, texture)
-	// 	gl.Uniform1i(gl.GetUniformLocation(shader, cstring("uTexture")), 0)
-	// }
 
 	gl.BindVertexArray(vao)
 	gl.DrawArrays(gl.TRIANGLE_FAN, 0, 4)
@@ -132,6 +129,7 @@ list_draw :: proc(list: List, canvas: ^canvas.Canvas) {
 
 	gl.BindFramebuffer(gl.FRAMEBUFFER, 0)
 
+	gl.Viewport(0, 0, canvas.width, canvas.height)
 
 	// Draw texture in place
 	canvas->draw_rect(

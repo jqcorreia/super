@@ -116,9 +116,11 @@ app_draw :: proc(canvas: ^canvas.Canvas) {
 // }
 
 draw :: proc(canvas: ^canvas.Canvas) {
+	gl.Viewport(20, 20, 300, 300)
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	// gl.ClearColor(0.0, 0.0, 0.0, 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
+
 
 	list := widgets.List {
 		x     = 10,
@@ -127,13 +129,13 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	}
 
 	canvas->draw_rect(0, 0, 100, 100)
-	// canvas->draw_rect(
-	// 	0,
-	// 	0,
-	// 	f32(canvas.width),
-	// 	f32(canvas.height),
-	// 	shader = platform.inst().shaders->get("Cosmic"),
-	// )
+	canvas->draw_rect(
+		0,
+		0,
+		f32(canvas.width),
+		f32(canvas.height),
+		shader = platform.inst().shaders->get("Cosmic"),
+	)
 	// canvas->draw_text(200, 200, "Hello!", &engine.state.font)
 	widgets.draw(list, canvas)
 

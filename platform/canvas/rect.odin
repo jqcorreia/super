@@ -17,7 +17,6 @@ draw_rect :: proc(
 	texture: u32 = 0,
 ) {
 	_shader := (shader == 0 ? platform.inst().shaders->get("Basic") : shader)
-	fmt.println(_shader)
 	// _shader: u32
 	// if (shader == 0) {
 	// 	if (texture == 0) {
