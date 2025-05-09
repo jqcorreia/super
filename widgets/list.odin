@@ -93,7 +93,6 @@ list_draw :: proc(list: List, canvas: ^canvas.Canvas) {
 	gl.UseProgram(_shader)
 
 	// draw stuff
-
 	projectionMatrix := gmath.ortho(0, f32(cw), f32(ch), 0)
 	gl.Uniform1fv(
 		gl.GetUniformLocation(_shader, cstring("iTime")),

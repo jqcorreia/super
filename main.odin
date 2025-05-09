@@ -18,31 +18,31 @@ WIDTH :: 800
 HEIGHT :: 600
 
 
-App :: struct {
-	widget_list: [dynamic]widgets.WidgetType,
-}
+// App :: struct {
+// 	widget_list: [dynamic]widgets.WidgetType,
+// }
 
-app := App{}
+// app := App{}
 
-app_draw :: proc(canvas: ^canvas.Canvas) {
-	shader := platform.inst().shaders->get("Singularity")
-	shader2 := platform.inst().shaders->get("Basic")
-	text_shader := platform.inst().shaders->get("Text")
+// app_draw :: proc(canvas: ^canvas.Canvas) {
+// 	shader := platform.inst().shaders->get("Singularity")
+// 	shader2 := platform.inst().shaders->get("Basic")
+// 	text_shader := platform.inst().shaders->get("Text")
 
-	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
-	gl.Clear(gl.COLOR_BUFFER_BIT)
+// 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
+// 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-	canvas->draw_rect(0, 0, f32(canvas.width), f32(canvas.height), shader = shader)
-	canvas->draw_text(50, 200, engine.state.text, &engine.state.font)
+// 	canvas->draw_rect(0, 0, f32(canvas.width), f32(canvas.height), shader = shader)
+// 	canvas->draw_text(50, 200, engine.state.text, &engine.state.font)
 
-	for widget in app.widget_list {
-		#partial switch w in widget {
-		case widgets.Label:
-			widgets.draw(w, canvas)
-		}
-	}
-	gl.Flush()
-}
+// 	for widget in app.widget_list {
+// 		#partial switch w in widget {
+// 		case widgets.Label:
+// 			widgets.draw(w, canvas)
+// 		}
+// 	}
+// 	gl.Flush()
+// }
 
 // main :: proc() {
 // 	canvas := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, app_draw)
@@ -116,11 +116,9 @@ app_draw :: proc(canvas: ^canvas.Canvas) {
 // }
 
 draw :: proc(canvas: ^canvas.Canvas) {
-	gl.Viewport(20, 20, 300, 300)
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	// gl.ClearColor(0.0, 0.0, 0.0, 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
-
 
 	list := widgets.List {
 		x     = 10,
@@ -128,16 +126,16 @@ draw :: proc(canvas: ^canvas.Canvas) {
 		items = {},
 	}
 
-	canvas->draw_rect(0, 0, 100, 100)
-	canvas->draw_rect(
-		0,
-		0,
-		f32(canvas.width),
-		f32(canvas.height),
-		shader = platform.inst().shaders->get("Cosmic"),
-	)
-	// canvas->draw_text(200, 200, "Hello!", &engine.state.font)
-	widgets.draw(list, canvas)
+	canvas->draw_rect(20, 20, 100, 100, color = {1.0, 0.0, 1.0, 1.0})
+	// canvas->draw_rect(
+	// 	0,
+	// 	0,
+	// 	f32(canvas.width),
+	// 	f32(canvas.height),
+	// 	shader = platform.inst().shaders->get("Cosmic"),
+	// )
+	canvas->draw_text(0, 0, "Hello!", &engine.state.font)
+	// widgets.draw(list, canvas)
 
 	gl.Flush()
 
