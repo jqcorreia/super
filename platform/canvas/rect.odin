@@ -64,7 +64,7 @@ draw_rect :: proc(
 	gl.VertexAttribPointer(1, 2, gl.FLOAT, gl.FALSE, 4 * size_of(f32), 2 * size_of(f32))
 	gl.EnableVertexAttribArray(1)
 
-	gl.UseProgram(shader)
+	gl.UseProgram(_shader)
 
 	// draw stuff
 	_color := color
