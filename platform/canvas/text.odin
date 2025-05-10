@@ -14,14 +14,14 @@ RenderedGlyph :: struct {
 	kerning: ^fonts.SFT_Kerning,
 }
 
-draw_text :: proc(
-	canvas: ^Canvas,
+draw_text_raw :: proc(
+	resolution: [2]f32,
 	x: f32,
 	y: f32,
 	text: string,
 	font: ^platform.Font,
 	_shader: u32 = 0,
-) {
+) -> f32 {
 	shader := _shader == 0 ? platform.inst().shaders->get("Text") : _shader
 
 	current_x := f32(x)
@@ -93,7 +93,8 @@ draw_text :: proc(
 		gl.Enable(gl.BLEND)
 		gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
-		canvas->draw_rect(
+		draw_rect_raw(
+			resolution,
 			f32(f32(current_x) + f32(metrics.leftSideBearing)) + f32(rg.kerning.xShift),
 			f32(f32(y) + total_line_height + f32(metrics.yOffset)),
 			f32(image.width),
@@ -101,8 +102,22 @@ draw_text :: proc(
 			shader = platform.inst().shaders->get("Text"),
 			texture = tex,
 		)
+
 		gl.Disable(gl.BLEND)
 
 		current_x += f32(metrics.advanceWidth)
 	}
+
+	return total_line_height
+}
+
+draw_text :: proc(
+	canvas: ^Canvas,
+	x: f32,
+	y: f32,
+	text: string,
+	font: ^platform.Font,
+	_shader: u32 = 0,
+) -> f32 {
+	return draw_text_raw({f32(canvas.width), f32(canvas.height)}, x, y, text, font, _shader)
 }

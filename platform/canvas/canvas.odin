@@ -28,7 +28,13 @@ Canvas :: struct {
 		shader: u32 = 0,
 		texture: u32 = 0,
 	),
-	draw_text:     proc(canvas: ^Canvas, x, y: f32, text: string, font: ^sft.SFT, shader: u32 = 0),
+	draw_text:     proc(
+		canvas: ^Canvas,
+		x, y: f32,
+		text: string,
+		font: ^sft.SFT,
+		shader: u32 = 0,
+	) -> f32,
 }
 
 CanvasType :: enum {

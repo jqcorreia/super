@@ -11,7 +11,7 @@ import "../../utils/gmath"
 draw_rect_raw :: proc(
 	resolution: [2]f32,
 	x, y, w, h: f32,
-	color: types.Color,
+	color: types.Color = {0.0, 0.0, 0.0, 1.0},
 	shader: u32 = 0,
 	texture: u32 = 0,
 ) {

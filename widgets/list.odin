@@ -1,7 +1,8 @@
 package widgets
+import "../engine"
 import "../platform"
 
-import "../platform/canvas"
+import cv "../platform/canvas"
 
 import "../utils/gmath"
 import "core:fmt"
@@ -10,13 +11,13 @@ import gl "vendor:OpenGL"
 List :: struct {
 	x:     f32,
 	y:     f32,
-	items: [dynamic]string,
+	items: []string,
 	font:  ^platform.Font,
 }
 
-list_draw :: proc(list: List, canvas: ^canvas.Canvas) {
-	cw: f32 = 1024.0
-	ch: f32 = 1024.0
+list_draw :: proc(list: List, canvas: ^cv.Canvas) {
+	cw: f32 = 500.0
+	ch: f32 = 500.0
 
 	fbo, fboTexture: u32
 	gl.GenFramebuffers(1, &fbo)
@@ -38,9 +39,18 @@ list_draw :: proc(list: List, canvas: ^canvas.Canvas) {
 	gl.Viewport(0, 0, i32(cw), i32(ch))
 
 	// Draw calls
-	gl.ClearColor(0.0, 0.0, 0.0, 1.0)
+	// gl.ClearColor(0.0, 0.0, 0.0, 1.0)
+	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
-	// canvas->draw_rect(
+
+	y: f32 = 0
+	for item in list.items {
+		line_height := cv.draw_text_raw({cw, ch}, 2, y, item, &engine.state.font)
+		y += line_height
+	}
+
+	// cv.draw_rect_raw(
+	// 	[2]f32{cw, ch},
 	// 	0,
 	// 	0,
 	// 	100,
@@ -49,85 +59,7 @@ list_draw :: proc(list: List, canvas: ^canvas.Canvas) {
 	// 	shader = platform.inst().shaders->get("Basic"),
 	// )
 
-	x: f32 = 0.0
-	y: f32 = 0.0
-	width: f32 = 100.0
-	height: f32 = 100.0
-
-	_color := [4]f32{1.0, 1.0, 0.0, 1.0}
-	_shader := platform.inst().shaders->get("Basic")
-
-	vertices := [?]f32 {
-		0.0,
-		0.0,
-		0.0,
-		0.0,
-		1.0,
-		0.0,
-		1.0,
-		0.0,
-		1.0,
-		1.0,
-		1.0,
-		1.0,
-		0.0,
-		1.0,
-		0.0,
-		1.0,
-	}
-	vao: u32
-	gl.GenVertexArrays(1, &vao)
-	gl.BindVertexArray(vao)
-
-	vbo: u32
-	gl.GenBuffers(1, &vbo)
-	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
-	gl.BufferData(gl.ARRAY_BUFFER, size_of(vertices), &vertices[0], gl.STATIC_DRAW)
-
-	gl.EnableVertexAttribArray(0)
-	gl.VertexAttribPointer(0, 2, gl.FLOAT, gl.FALSE, 4 * size_of(f32), 0)
-
-	gl.VertexAttribPointer(1, 2, gl.FLOAT, gl.FALSE, 4 * size_of(f32), 2 * size_of(f32))
-	gl.EnableVertexAttribArray(1)
-
-	gl.UseProgram(_shader)
-
-	// draw stuff
-	projectionMatrix := gmath.ortho(0, f32(cw), f32(ch), 0)
-	gl.Uniform1fv(
-		gl.GetUniformLocation(_shader, cstring("iTime")),
-		1,
-		raw_data([]f32{f32(time.duration_seconds(platform.inst().time_elapsed))}),
-	)
-	gl.Uniform4fv(gl.GetUniformLocation(_shader, cstring("input")), 1, raw_data(&_color))
-	gl.Uniform2fv(gl.GetUniformLocation(_shader, cstring("position")), 1, raw_data([]f32{x, y}))
-	gl.Uniform2fv(
-		gl.GetUniformLocation(_shader, cstring("resolution")),
-		1,
-		raw_data([]f32{cw, ch}),
-	)
-	gl.Uniform2fv(
-		gl.GetUniformLocation(_shader, cstring("size")),
-		1,
-		raw_data([]f32{width, height}),
-	)
-	gl.UniformMatrix4fv(
-		gl.GetUniformLocation(_shader, cstring("projection")),
-		1,
-		false,
-		raw_data(&projectionMatrix),
-	)
-
-	gl.BindVertexArray(vao)
-	gl.DrawArrays(gl.TRIANGLE_FAN, 0, 4)
-
-	gl.BindVertexArray(0)
-	gl.BindBuffer(gl.ARRAY_BUFFER, 0)
-	gl.DeleteBuffers(1, &vbo)
-	gl.DeleteVertexArrays(1, &vao)
-
 	gl.BindFramebuffer(gl.FRAMEBUFFER, 0)
-
 	gl.Viewport(0, 0, canvas.width, canvas.height)
 
 	// Draw texture in place
