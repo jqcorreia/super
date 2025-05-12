@@ -124,10 +124,6 @@ list_update :: proc(list: ^List, event: platform.InputEvent) {
 			if e.key == platform.KeySym.XK_k {
 				offset = -100.0
 			}
-			if e.key == platform.KeySym.XK_l {
-				list.w = list.w + 10.0
-				list.main_texture = 0
-			}
 		}
 
 	}
