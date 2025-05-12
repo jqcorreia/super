@@ -11,6 +11,7 @@ import "../../utils/gmath"
 draw_rect_raw :: proc(
 	resolution: [2]f32,
 	x, y, w, h: f32,
+	vertices: ^[]f32 = nil,
 	color: types.Color = {0.0, 0.0, 0.0, 1.0},
 	shader: u32 = 0,
 	texture: u32 = 0,
@@ -26,7 +27,7 @@ draw_rect_raw :: proc(
 		_shader = shader
 	}
 
-	quad, vbo := get_quad()
+	quad, vbo := get_quad(vertices)
 	defer gl.DeleteBuffers(1, &vbo)
 	defer gl.DeleteVertexArrays(1, &quad)
 
@@ -67,6 +68,7 @@ draw_rect_raw :: proc(
 draw_rect :: proc(
 	canvas: ^Canvas,
 	x, y, width, height: f32,
+	vertices: ^[]f32 = nil,
 	color: types.Color,
 	shader: u32 = 0,
 	texture: u32 = 0,
@@ -77,6 +79,7 @@ draw_rect :: proc(
 		y,
 		width,
 		height,
+		vertices,
 		color,
 		shader,
 		texture,

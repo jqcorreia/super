@@ -8,8 +8,8 @@ import "core:fmt"
 import "core:time"
 
 import pl "../platform"
-import fonts "../platform/fonts"
 import "../platform/canvas"
+import fonts "../platform/fonts"
 import "../vendor/libschrift-odin/sft"
 import "base:runtime"
 import gl "vendor:OpenGL"
@@ -37,7 +37,7 @@ init :: proc() {
 
 	state.running = true
 
-    fm := fonts.new_font_manager()
+	fm := fonts.new_font_manager()
 
 	state.font = fm->load_font(FONT, 72)
 	state.text = ""

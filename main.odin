@@ -18,11 +18,11 @@ WIDTH :: 800
 HEIGHT :: 600
 
 
-// App :: struct {
-// 	widget_list: [dynamic]widgets.WidgetType,
-// }
+App :: struct {
+	widget_list: [dynamic]widgets.WidgetType,
+}
 
-// app := App{}
+app := App{}
 
 // app_draw :: proc(canvas: ^canvas.Canvas) {
 // 	shader := platform.inst().shaders->get("Singularity")
@@ -115,25 +115,6 @@ HEIGHT :: 600
 // 	}
 // }
 
-list := widgets.List {
-	x     = 10,
-	y     = 100,
-	items = {
-		"Hello World!",
-		"item2",
-		"item3",
-		"item4",
-		"item5",
-		"item5",
-		"item6",
-		"item8",
-		"item4",
-		"item5",
-		"item5",
-		"item6",
-		"item8",
-	},
-}
 
 draw :: proc(canvas: ^canvas.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
@@ -149,14 +130,45 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	// 	f32(canvas.height),
 	// 	shader = platform.inst().shaders->get("Cosmic"),
 	// )
-	canvas->draw_text(0, 0, "Hello World!", &engine.state.font)
-	widgets.draw(list, canvas)
+
+
+	for widget in app.widget_list {
+		#partial switch &w in widget {
+		case widgets.List:
+			widgets.draw(&w, canvas)
+		}
+	}
+
+	// canvas->draw_text(0, 0, "Hello World!", &engine.state.font)
 
 	gl.Flush()
 }
 
 main :: proc() {
 	c1 := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, draw)
+	list := widgets.List {
+		x     = 10,
+		y     = 100,
+		w     = 500,
+		h     = 500,
+		items = {
+			"Hello World!",
+			"item2",
+			"item3",
+			"item4",
+			"item5",
+			"item5",
+			"item6",
+			"item8",
+			"item4",
+			"item5",
+			"item5",
+			"item6",
+			"item8",
+		},
+		font  = &engine.state.font,
+	}
+	append(&app.widget_list, list)
 
 	platform.inst().shaders->new(
 		"Singularity",
@@ -174,6 +186,12 @@ main :: proc() {
 					if e.key == platform.KeySym.XK_Escape {
 						engine.state.running = false
 					}
+				}
+			}
+			for widget in app.widget_list {
+				#partial switch &w in widget {
+				case widgets.List:
+					widgets.update(&w, event)
 				}
 			}
 		}

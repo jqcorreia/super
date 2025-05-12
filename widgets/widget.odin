@@ -8,10 +8,14 @@ import "core:fmt"
 
 WidgetType :: union {
 	Label,
-    List,
+	List,
 }
 
 draw :: proc {
 	label_draw,
-    list_draw
+	list_draw,
+}
+
+update :: proc {
+	list_update,
 }
