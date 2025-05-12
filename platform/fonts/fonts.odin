@@ -145,6 +145,7 @@ render_glyph :: proc(font: ^Font, char: u8, previous_glyph: ^RenderedGlyph) -> R
 		sft.kerning(&font._font, previous_glyph.glyph^, glyph^, kerning)
 	}
 
+	// Generate texture to cache
 	tex: u32
 	gl.GenTextures(1, &tex)
 	gl.BindTexture(gl.TEXTURE_2D, tex)

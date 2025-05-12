@@ -115,30 +115,31 @@ HEIGHT :: 600
 // 	}
 // }
 
+list := widgets.List {
+	x     = 10,
+	y     = 100,
+	items = {
+		"Hello World!",
+		"item2",
+		"item3",
+		"item4",
+		"item5",
+		"item5",
+		"item6",
+		"item8",
+		"item4",
+		"item5",
+		"item5",
+		"item6",
+		"item8",
+	},
+}
+
 draw :: proc(canvas: ^canvas.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	// gl.ClearColor(0.0, 0.0, 0.0, 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-	list := widgets.List {
-		x     = 10,
-		y     = 100,
-		items = {
-			"Hello World!",
-			"item2",
-			"item3",
-			"item4",
-			"item5",
-			"item5",
-			"item6",
-			"item8",
-			"item4",
-			"item5",
-			"item5",
-			"item6",
-			"item8",
-		},
-	}
 
 	// canvas->draw_rect(20, 20, 100, 100, color = {1.0, 0.0, 1.0, 1.0})
 	// canvas->draw_rect(
@@ -148,11 +149,10 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	// 	f32(canvas.height),
 	// 	shader = platform.inst().shaders->get("Cosmic"),
 	// )
-	canvas->draw_text(0, 0, "Hello!", &engine.state.font)
-	// widgets.draw(list, canvas)
+	canvas->draw_text(0, 0, "Hello World!", &engine.state.font)
+	widgets.draw(list, canvas)
 
 	gl.Flush()
-
 }
 
 main :: proc() {
