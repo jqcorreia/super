@@ -27,7 +27,7 @@ draw_text_raw :: proc(
 	current_x := f32(x)
 	buffers: [dynamic]RenderedGlyph
 
-	previous_glyph: fonts.SFT_Glyph = 0
+	previous_glyph: ^RenderedGlyph = nil
 
 	lmetrics: fonts.SFT_LMetrics
 	fonts.lmetrics(font, &lmetrics)
@@ -35,7 +35,7 @@ draw_text_raw :: proc(
 	total_line_height := f32(lmetrics.ascender + lmetrics.lineGap)
 
 	for c in text {
-		glyph := new(fonts.SFT_Glyph)
+		glyph := render_glyph()
 		metrics := new(fonts.SFT_GMetrics)
 
 		fonts.lookup(font, u8(c), glyph)

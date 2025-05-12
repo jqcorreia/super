@@ -148,7 +148,7 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	// 	f32(canvas.height),
 	// 	shader = platform.inst().shaders->get("Cosmic"),
 	// )
-	// canvas->draw_text(0, 0, "Hello!", &engine.state.font)
+	canvas->draw_text(0, 0, "Hello!", &engine.state.font)
 	// widgets.draw(list, canvas)
 
 	gl.Flush()

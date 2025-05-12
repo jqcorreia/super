@@ -10,12 +10,21 @@ Font :: fonts.SFT
 
 FontManager :: struct {
 	font_map:     map[string]string,
+	font_atlas:   map[string]map[u8]RenderedGlyph,
 	loaded_fonts: map[string]Font,
 	load_font:    proc(fm: ^FontManager, filename: string, size: f64) -> fonts.SFT,
+	render_glyph: proc(fm: ^FontManager, char: u8, font_name: string) -> RenderedGlyph,
+}
+
+RenderedGlyph :: struct {
+	metrics: ^fonts.SFT_GMetrics,
+	image:   fonts.SFT_Image,
+	kerning: ^fonts.SFT_Kerning,
 }
 
 new_font_manager :: proc() -> FontManager {
-	loaded_fonts := make(map[string]fonts.SFT)
+	loaded_fonts := make(map[string]Font)
+	font_atlas := make(map[string]map[string]RenderedGlyph)
 	font_map := get_font_map()
 
 	fm: FontManager
@@ -23,6 +32,7 @@ new_font_manager :: proc() -> FontManager {
 	fm.font_map = font_map
 	fm.loaded_fonts = loaded_fonts
 	fm.load_font = load_font
+	fm.render_glyph = render_glyph
 
 	return fm
 }
@@ -82,4 +92,38 @@ get_font_map :: proc() -> map[string]string {
 	}
 
 	return fonts
+}
+
+render_glyph :: proc(
+	fm: ^FontManager,
+	char: u8,
+	font_name: string,
+	previous_glyph: fonts.SFT_Glyph = 0,
+) -> RenderedGlyph {
+	font := &fm.loaded_fonts[font_name]
+	rg, ok := fm.font_atlas[font_name][char]
+
+	if ok {
+		return rg
+	}
+	glyph := new(fonts.SFT_Glyph)
+	metrics := new(fonts.SFT_GMetrics)
+
+	fonts.lookup(font, char, glyph)
+	fonts.gmetrics(font, glyph^, metrics)
+
+	image := fonts.SFT_Image {
+		width  = (metrics.minWidth + 3) & ~i32(3),
+		height = metrics.minHeight,
+	}
+	gp := make([]u8, image.width * image.height)
+	image.pixels = raw_data(gp)
+	fonts.render(font, glyph^, image)
+
+	kerning := new(fonts.SFT_Kerning)
+	if previous_glyph != 0 {
+		fonts.kerning(font, previous_glyph, glyph^, kerning)
+	}
+
+	return RenderedGlyph{metrics = metrics, image = image, kerning = kerning}
 }
