@@ -6,18 +6,20 @@ import "../platform/fonts"
 
 import "../utils/gmath"
 import "core:fmt"
+import "core:math"
 import "core:time"
 import gl "vendor:OpenGL"
 
 List :: struct {
-	x:             f32,
-	y:             f32,
-	w:             f32,
-	h:             f32,
-	items:         []string,
-	font:          ^fonts.Font,
-	main_texture:  u32,
-	scroll_offset: f32,
+	x:                 f32,
+	y:                 f32,
+	w:                 f32,
+	h:                 f32,
+	items:             []string,
+	font:              ^fonts.Font,
+	main_texture:      u32,
+	scroll_offset:     f32,
+	new_scroll_offset: f32,
 }
 
 list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
@@ -71,6 +73,8 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 		list.main_texture = fboTexture
 	}
 
+	list.scroll_offset = math.lerp(list.scroll_offset, list.new_scroll_offset, f32(0.2))
+
 	top_v := list.scroll_offset / ch
 	bottom_v := (list.scroll_offset + list.h) / ch
 	vertices := []f32 {
@@ -104,5 +108,5 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 }
 
 list_update :: proc(list: ^List, event: platform.InputEvent) {
-	list.scroll_offset = list.scroll_offset + 10.0
+	list.new_scroll_offset = list.scroll_offset + 100.0
 }
