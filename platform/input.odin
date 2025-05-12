@@ -142,7 +142,7 @@ pointer_listener := wl.wl_pointer_listener {
 		surface_y: wl.wl_fixed_t,
 	) {
 		context = runtime.default_context()
-		fmt.println("Pointer enter")
+		// fmt.println("Pointer enter")
 	},
 	leave = proc "c" (
 		data: rawptr,
@@ -151,7 +151,7 @@ pointer_listener := wl.wl_pointer_listener {
 		surface: ^wl.wl_surface,
 	) {
 		context = runtime.default_context()
-		fmt.println("Pointer leave")
+		// fmt.println("Pointer leave")
 	},
 	motion = proc "c" (
 		data: rawptr,
@@ -161,7 +161,7 @@ pointer_listener := wl.wl_pointer_listener {
 		surface_y: wl.wl_fixed_t,
 	) {
 		context = runtime.default_context()
-		fmt.println("Pointer motion", (surface_x / 256.0), (surface_y / 256.0))
+		// fmt.println("Pointer motion", (surface_x / 256.0), (surface_y / 256.0))
 	},
 	button = proc "c" (
 		data: rawptr,

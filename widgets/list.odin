@@ -24,7 +24,7 @@ List :: struct {
 
 list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 	main_texture_w: f32 = list.w
-	main_texture_ch: f32 = f32(f64(len(list.items)) * list.font.line_metrics.ascender)
+	main_texture_h: f32 = f32(f64(len(list.items)) * list.font.line_metrics.ascender)
 
 	if list.main_texture == 0 {
 		fbo, fboTexture: u32
@@ -39,7 +39,7 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 			0,
 			gl.RGBA,
 			i32(main_texture_w),
-			i32(main_texture_ch),
+			i32(main_texture_h),
 			0,
 			gl.RGBA,
 			gl.UNSIGNED_BYTE,
@@ -54,7 +54,7 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 		if (gl.CheckFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) {
 			fmt.println("FBO not complete!")
 		}
-		gl.Viewport(0, 0, i32(main_texture_w), i32(main_texture_ch))
+		gl.Viewport(0, 0, i32(main_texture_w), i32(main_texture_h))
 
 		// Draw calls
 		gl.ClearColor(0.0, 0.0, 0.0, 1.0)
@@ -64,7 +64,7 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 		y: f32 = 0
 		for item in list.items {
 			line_height := cv.draw_text_raw(
-				{main_texture_w, main_texture_ch},
+				{main_texture_w, main_texture_h},
 				2,
 				y,
 				item,
@@ -79,10 +79,10 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 		list.main_texture = fboTexture
 	}
 
-	list.scroll_offset = math.lerp(list.scroll_offset, list.new_scroll_offset, f32(0.2))
+	list.scroll_offset = math.lerp(list.scroll_offset, list.new_scroll_offset, f32(0.15))
 
-	top_v := list.scroll_offset / main_texture_ch
-	bottom_v := (list.scroll_offset + list.h) / main_texture_ch
+	top_v := list.scroll_offset / main_texture_h
+	bottom_v := (list.scroll_offset + list.h) / main_texture_h
 	vertices := []f32 {
 		0.0,
 		0.0,
@@ -111,6 +111,14 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 		shader = platform.inst().shaders->get("Texture"),
 		texture = list.main_texture,
 	)
+
+	// Draw scrollbar handle
+	scroll_offset_max := main_texture_h - list.h
+	position_percent := math.clamp(list.scroll_offset / scroll_offset_max, 0, 1)
+
+	shh: f32 = 40.0
+	shy := position_percent * (list.h - shh) + list.y
+	canvas->draw_rect(list.x + list.w - 10, shy, 10, shh, color = {0.5, 0.2, 0.1, 1.0})
 }
 
 list_update :: proc(list: ^List, event: platform.InputEvent) {
