@@ -1,6 +1,7 @@
 package canvas
 
 import pl "../../platform"
+import "../../platform/fonts"
 import "../../types"
 import "../../utils/gmath"
 import "../../vendor/libschrift-odin/sft"
@@ -32,7 +33,7 @@ Canvas :: struct {
 		canvas: ^Canvas,
 		x, y: f32,
 		text: string,
-		font: ^sft.SFT,
+		font: ^fonts.Font,
 		shader: u32 = 0,
 	) -> f32,
 }

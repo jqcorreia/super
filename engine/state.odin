@@ -21,7 +21,7 @@ EngineState :: struct {
 	time_elapsed: time.Duration,
 	text:         string,
 	running:      bool,
-	font:         sft.SFT,
+	font:         fonts.Font,
 }
 
 
@@ -37,6 +37,7 @@ init :: proc() {
 
 	state.running = true
 
+    fm := fonts.new_font_manager()
 
 	state.font = fm->load_font(FONT, 72)
 	state.text = ""

@@ -23,12 +23,11 @@ draw_text_raw :: proc(
 
 	previous_glyph: ^fonts.RenderedGlyph = nil
 
-	// total_line_height := f32(lmetrics.ascender + lmetrics.lineGap)
-	total_line_height := 100
+	total_line_height := f32(font.line_metrics.ascender + font.line_metrics.lineGap)
 
 	for c in text {
-		rg := fonts.render_glyph()
-		previous_glyph = rg
+		rg := font->render_glyph(u8(c), previous_glyph)
+		previous_glyph = &rg
 
 		append(&buffers, rg)
 	}
@@ -38,30 +37,7 @@ draw_text_raw :: proc(
 		image := rg.image
 		gp := image.pixels
 
-		tex: u32
-		gl.GenTextures(1, &tex)
-		gl.ActiveTexture(gl.TEXTURE0)
-		gl.BindTexture(gl.TEXTURE_2D, tex)
-
-		gl.TexImage2D(
-			gl.TEXTURE_2D,
-			0,
-			gl.RED,
-			image.width,
-			image.height,
-			0,
-			gl.RED,
-			gl.UNSIGNED_BYTE,
-			gp,
-		)
-
-		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-
-		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_SWIZZLE_R, gl.RED)
-		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_SWIZZLE_G, gl.RED)
-		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_SWIZZLE_B, gl.RED)
-		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_SWIZZLE_A, gl.RED)
+		tex := rg.tex
 
 		gl.Enable(gl.BLEND)
 		gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
@@ -82,6 +58,7 @@ draw_text_raw :: proc(
 	}
 
 	return total_line_height
+	// return 100
 }
 
 draw_text :: proc(
@@ -89,7 +66,7 @@ draw_text :: proc(
 	x: f32,
 	y: f32,
 	text: string,
-	font: ^platform.Font,
+	font: ^fonts.Font,
 	_shader: u32 = 0,
 ) -> f32 {
 	return draw_text_raw({f32(canvas.width), f32(canvas.height)}, x, y, text, font, _shader)
