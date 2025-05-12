@@ -188,12 +188,12 @@ main :: proc() {
 					}
 				}
 			}
-			for widget in app.widget_list {
-				#partial switch &w in widget {
-				case widgets.List:
-					widgets.update(&w, event)
-				}
-			}
+			// for widget in app.widget_list {
+			// 	#partial switch &w in widget {
+			// 	case widgets.List:
+			// 		widgets.update(&w, event)
+			// 	}
+			// }
 		}
 		engine.render(c1)
 	}
