@@ -18,7 +18,7 @@ draw_text_raw :: proc(
 ) -> f32 {
 	shader := _shader == 0 ? platform.inst().shaders->get("Text") : _shader
 
-	current_x := f32(x)
+	current_x := x
 	buffers: [dynamic]fonts.RenderedGlyph
 
 	previous_glyph: ^fonts.RenderedGlyph = nil
@@ -44,8 +44,8 @@ draw_text_raw :: proc(
 
 		draw_rect_raw(
 			resolution,
-			f32(f32(current_x) + f32(metrics.leftSideBearing)) + f32(rg.kerning.xShift),
-			f32(f32(y) + total_line_height + f32(metrics.yOffset)),
+			current_x + f32(metrics.leftSideBearing) + f32(rg.kerning.xShift),
+			y + total_line_height + f32(metrics.yOffset),
 			f32(image.width),
 			f32(image.height),
 			shader = platform.inst().shaders->get("Text"),

@@ -23,8 +23,8 @@ List :: struct {
 }
 
 list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
-	cw: f32 = list.w
-	ch: f32 = f32(f64(len(list.items)) * list.font.line_metrics.ascender)
+	main_texture_w: f32 = list.w
+	main_texture_ch: f32 = f32(f64(len(list.items)) * list.font.line_metrics.ascender)
 
 	if list.main_texture == 0 {
 		fbo, fboTexture: u32
@@ -38,8 +38,8 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 			gl.TEXTURE_2D,
 			0,
 			gl.RGBA,
-			i32(cw),
-			i32(ch),
+			i32(main_texture_w),
+			i32(main_texture_ch),
 			0,
 			gl.RGBA,
 			gl.UNSIGNED_BYTE,
@@ -54,7 +54,7 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 		if (gl.CheckFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) {
 			fmt.println("FBO not complete!")
 		}
-		gl.Viewport(0, 0, i32(cw), i32(ch))
+		gl.Viewport(0, 0, i32(main_texture_w), i32(main_texture_ch))
 
 		// Draw calls
 		gl.ClearColor(0.0, 0.0, 0.0, 1.0)
@@ -63,7 +63,13 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 
 		y: f32 = 0
 		for item in list.items {
-			line_height := cv.draw_text_raw({cw, ch}, 2, y, item, list.font)
+			line_height := cv.draw_text_raw(
+				{main_texture_w, main_texture_ch},
+				2,
+				y,
+				item,
+				list.font,
+			)
 			y += line_height
 		}
 
@@ -75,8 +81,8 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 
 	list.scroll_offset = math.lerp(list.scroll_offset, list.new_scroll_offset, f32(0.2))
 
-	top_v := list.scroll_offset / ch
-	bottom_v := (list.scroll_offset + list.h) / ch
+	top_v := list.scroll_offset / main_texture_ch
+	bottom_v := (list.scroll_offset + list.h) / main_texture_ch
 	vertices := []f32 {
 		0.0,
 		0.0,
@@ -108,5 +114,28 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 }
 
 list_update :: proc(list: ^List, event: platform.InputEvent) {
-	list.new_scroll_offset = list.scroll_offset + 100.0
+	offset: f32 = 0
+	#partial switch e in event {
+	case platform.KeyPressed:
+		{
+			if e.key == platform.KeySym.XK_j {
+				offset = 100.0
+			}
+			if e.key == platform.KeySym.XK_k {
+				offset = -100.0
+			}
+			if e.key == platform.KeySym.XK_l {
+				list.w = list.w + 10.0
+				list.main_texture = 0
+			}
+		}
+
+	}
+	if offset != 0 {
+		list.new_scroll_offset = math.clamp(
+			list.scroll_offset + offset,
+			0,
+			f32(f64(len(list.items)) * list.font.line_metrics.ascender) - list.h + 10,
+		)
+	}
 }
