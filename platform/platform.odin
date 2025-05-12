@@ -1,5 +1,6 @@
 package platform
 
+import "../platform/fonts"
 import wl "../vendor/wayland-odin/wayland"
 import "core:c"
 import "core:fmt"
@@ -20,6 +21,7 @@ PlatformState :: struct {
 	default_shaders_loaded: bool,
 	start_time:             time.Time,
 	time_elapsed:           time.Duration,
+	font_manager:           fonts.FontManager,
 }
 
 @(private)
@@ -108,6 +110,8 @@ init_platform :: proc() {
 	platform.shaders = create_shaders_controller()
 	platform.default_shaders_loaded = false
 
+	// Font manager
+	platform.font_manager = fonts.new_font_manager()
 	// Start time keeping
 	platform.start_time = time.now()
 }

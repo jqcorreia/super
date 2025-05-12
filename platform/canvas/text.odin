@@ -1,63 +1,36 @@
 package canvas
 
 import "../../platform"
-import fonts "../../vendor/libschrift-odin/sft"
+import fonts "../../platform/fonts"
 import "core:fmt"
 import "core:os"
 import "core:time"
 import gl "vendor:OpenGL"
 
 
-RenderedGlyph :: struct {
-	metrics: ^fonts.SFT_GMetrics,
-	image:   fonts.SFT_Image,
-	kerning: ^fonts.SFT_Kerning,
-}
-
 draw_text_raw :: proc(
 	resolution: [2]f32,
 	x: f32,
 	y: f32,
 	text: string,
-	font: ^platform.Font,
+	font: ^fonts.Font,
 	_shader: u32 = 0,
 ) -> f32 {
 	shader := _shader == 0 ? platform.inst().shaders->get("Text") : _shader
 
 	current_x := f32(x)
-	buffers: [dynamic]RenderedGlyph
+	buffers: [dynamic]fonts.RenderedGlyph
 
-	previous_glyph: ^RenderedGlyph = nil
+	previous_glyph: ^fonts.RenderedGlyph = nil
 
-	lmetrics: fonts.SFT_LMetrics
-	fonts.lmetrics(font, &lmetrics)
-
-	total_line_height := f32(lmetrics.ascender + lmetrics.lineGap)
+	// total_line_height := f32(lmetrics.ascender + lmetrics.lineGap)
+	total_line_height := 100
 
 	for c in text {
-		glyph := render_glyph()
-		metrics := new(fonts.SFT_GMetrics)
+		rg := fonts.render_glyph()
+		previous_glyph = rg
 
-		fonts.lookup(font, u8(c), glyph)
-		fonts.gmetrics(font, glyph^, metrics)
-
-		image := fonts.SFT_Image {
-			width  = (metrics.minWidth + 3) & ~i32(3),
-			height = metrics.minHeight,
-		}
-		gp := make([]u8, image.width * image.height)
-		image.pixels = raw_data(gp)
-		fonts.render(font, glyph^, image)
-
-		kerning := new(fonts.SFT_Kerning)
-		if previous_glyph != 0 {
-			fonts.kerning(font, previous_glyph, glyph^, kerning)
-			previous_glyph = glyph^
-		} else {
-			previous_glyph = glyph^
-		}
-
-		append(&buffers, RenderedGlyph{metrics = metrics, image = image, kerning = kerning})
+		append(&buffers, rg)
 	}
 
 	for rg in buffers {

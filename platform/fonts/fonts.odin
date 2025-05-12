@@ -1,6 +1,6 @@
-package platform
+package fonts
 
-import fonts "../vendor/libschrift-odin/sft"
+import fonts "../../vendor/libschrift-odin/sft"
 import "core:c"
 import "core:fmt"
 import "core:os/os2"
@@ -13,13 +13,19 @@ FontManager :: struct {
 	font_atlas:   map[string]map[u8]RenderedGlyph,
 	loaded_fonts: map[string]Font,
 	load_font:    proc(fm: ^FontManager, filename: string, size: f64) -> fonts.SFT,
-	render_glyph: proc(fm: ^FontManager, char: u8, font_name: string) -> RenderedGlyph,
+	render_glyph: proc(
+		fm: ^FontManager,
+		char: u8,
+		font_name: string,
+		previous_glyph: ^RenderedGlyph = nil,
+	) -> RenderedGlyph,
 }
 
 RenderedGlyph :: struct {
 	metrics: ^fonts.SFT_GMetrics,
 	image:   fonts.SFT_Image,
 	kerning: ^fonts.SFT_Kerning,
+	glyph:   ^fonts.SFT_Glyph,
 }
 
 new_font_manager :: proc() -> FontManager {
@@ -98,7 +104,7 @@ render_glyph :: proc(
 	fm: ^FontManager,
 	char: u8,
 	font_name: string,
-	previous_glyph: fonts.SFT_Glyph = 0,
+	previous_glyph: ^RenderedGlyph,
 ) -> RenderedGlyph {
 	font := &fm.loaded_fonts[font_name]
 	rg, ok := fm.font_atlas[font_name][char]
@@ -121,9 +127,9 @@ render_glyph :: proc(
 	fonts.render(font, glyph^, image)
 
 	kerning := new(fonts.SFT_Kerning)
-	if previous_glyph != 0 {
-		fonts.kerning(font, previous_glyph, glyph^, kerning)
+	if previous_glyph != nil {
+		fonts.kerning(font, previous_glyph.glyph^, glyph^, kerning)
 	}
 
-	return RenderedGlyph{metrics = metrics, image = image, kerning = kerning}
+	return RenderedGlyph{metrics = metrics, image = image, kerning = kerning, glyph = glyph}
 }

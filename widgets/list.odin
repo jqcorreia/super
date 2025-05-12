@@ -3,6 +3,7 @@ import "../engine"
 import "../platform"
 
 import cv "../platform/canvas"
+import "../platform/fonts"
 
 import "../utils/gmath"
 import "core:fmt"
@@ -12,7 +13,7 @@ List :: struct {
 	x:     f32,
 	y:     f32,
 	items: []string,
-	font:  ^platform.Font,
+	font:  ^fonts.Font,
 }
 
 list_draw :: proc(list: List, canvas: ^cv.Canvas) {
