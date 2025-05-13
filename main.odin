@@ -148,7 +148,7 @@ main :: proc() {
 				}
 				l.items = new_items[:]
 			}
-			l.main_texture = 0
+			widgets.list_reset_texture(l)
 			previous_search = s.text
 		}
 

@@ -37,7 +37,6 @@ input_text_update :: proc(input: ^InputText, event: platform.InputEvent) {
 					)
 				}
 			}
-			fmt.println("Key pressed: ", e.key)
 		}
 	case platform.TextInput:
 		{

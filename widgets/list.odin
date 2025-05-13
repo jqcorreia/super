@@ -18,19 +18,33 @@ List :: struct {
 	items:             []string,
 	font:              ^fonts.Font,
 	main_texture:      u32,
+	main_fbo:          u32,
 	scroll_offset:     f32,
 	new_scroll_offset: f32,
 	selected_index:    u32,
 }
 
+list_reset_texture :: proc(list: ^List) {
+	gl.DeleteTextures(1, &list.main_texture)
+	gl.DeleteFramebuffers(1, &list.main_fbo)
+	list.main_texture = 0
+	list.scroll_offset = 0
+	list.new_scroll_offset = 0
+}
+
 list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 	main_texture_w: f32 = list.w
-	main_texture_h: f32 = f32(f64(len(list.items)) * list.font.line_metrics.ascender)
+	main_texture_h: f32 = math.max(
+		f32(f64(len(list.items)) * list.font.line_metrics.ascender),
+		list.h,
+	)
 
 	if list.main_texture == 0 {
 		fbo, fboTexture: u32
 		gl.GenFramebuffers(1, &fbo)
 		gl.BindFramebuffer(gl.FRAMEBUFFER, fbo)
+
+		list.main_fbo = fbo
 
 		// Create texture to render into
 		gl.GenTextures(1, &fboTexture)
@@ -107,7 +121,7 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 		list.x,
 		list.y,
 		list.w,
-		list.h,
+		math.min(list.h, main_texture_h),
 		vertices = &vertices,
 		shader = platform.inst().shaders->get("Texture"),
 		texture = list.main_texture,
