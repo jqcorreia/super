@@ -6,7 +6,13 @@ import "../platform/canvas"
 import "core:fmt"
 
 
-WidgetType :: union {
+WidgetType :: enum {
+	Label,
+	List,
+	InputText,
+}
+
+Widget :: union {
 	Label,
 	List,
 	InputText,
@@ -21,14 +27,4 @@ draw :: proc {
 update :: proc {
 	list_update,
 	input_text_update,
-}
-
-
-new :: proc {
-	new_list,
-}
-
-new_list :: proc(list: List, x, y: f32) -> List {
-	fmt.println(x, y)
-	return List{}
 }

@@ -41,6 +41,15 @@ List :: struct {
 	scroll_offset:     f32,
 	new_scroll_offset: f32,
 	selected_index:    u32,
+	draw_item:         proc(
+		list: List,
+		item: ListItem,
+		x, y: f32,
+		resolution: [2]f32,
+	) -> (
+		f32,
+		f32,
+	),
 }
 
 list_reset_texture :: proc(list: ^List) {
@@ -97,13 +106,7 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 
 		y: f32 = 0
 		for item, idx in list.items {
-			_, line_height := cv.draw_text_raw(
-				{main_texture_w, main_texture_h},
-				2,
-				y,
-				item.text,
-				list.font,
-			)
+			_, line_height := list->draw_item(item, 2, y, {main_texture_w, main_texture_h})
 			y += line_height
 		}
 

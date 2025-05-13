@@ -21,7 +21,7 @@ HEIGHT :: 600
 
 
 App :: struct {
-	widget_list: [dynamic]widgets.WidgetType,
+	widget_list: [dynamic]widgets.Widget,
 }
 
 app := App{}
@@ -93,7 +93,6 @@ get_applications :: proc() -> []widgets.ListItem {
 }
 
 main :: proc() {
-	foo := widgets.new(widgets.List{}, 10, 20)
 	sys_apps := get_applications()
 	fmt.println("Number of apps detected:", len(sys_apps))
 
@@ -107,12 +106,13 @@ main :: proc() {
 	}
 
 	list := widgets.List {
-		x     = 0,
-		y     = 100,
-		w     = f32(c1.width),
-		h     = f32(c1.height) - 100,
-		items = sys_apps,
-		font  = &engine.state.font,
+		x         = 0,
+		y         = 100,
+		w         = f32(c1.width),
+		h         = f32(c1.height) - 100,
+		items     = sys_apps,
+		font      = &engine.state.font,
+		draw_item = widgets.list_default_draw_item,
 	}
 
 	append(&app.widget_list, search)
