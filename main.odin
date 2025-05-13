@@ -142,7 +142,8 @@ main :: proc() {
 			} else {
 				new_items: [dynamic]string
 				for i in sys_apps {
-					if strings.contains(i, s.text) {
+					// Really simple 'search'
+					if strings.contains(strings.to_lower(i), strings.to_lower(s.text)) {
 						append(&new_items, i)
 					}
 				}
