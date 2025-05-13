@@ -19,9 +19,9 @@ Press &lt;super> to do stuff!
 - [x] Scrollable lists
 - [x] Proper text rendering with glyph caching
 - [x] Rudimentary text box input
+- [x] Fix error where number of list items is too small.
 - [ ] Implement list selected item/index mechanics
 - [ ] Implement applications source !
-- [ ] Fix error where number of list items is too small.
 - [ ] Image (PNG, JPEG) rendering
 - [ ] Layout manager, dumb, simple one, please...
 - [ ] Keyboard repeat 

@@ -20,7 +20,7 @@ InputText :: struct {
 
 input_text_draw :: proc(input: ^InputText, cv: ^canvas.Canvas) {
 	tw, th := cv->draw_text(input.x, input.y, input.text, &input.font)
-	input.cursor_x = math.lerp(input.cursor_x, input.x + tw, f32(0.5))
+	input.cursor_x = math.lerp(input.cursor_x, input.x + tw, f32(0.25))
 	cv->draw_rect(input.x + input.cursor_x, input.y, 10, th, color = {0.1, 0.2, 0.7, 1.0})
 }
 
