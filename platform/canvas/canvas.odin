@@ -36,7 +36,10 @@ Canvas :: struct {
 		text: string,
 		font: ^fonts.Font,
 		shader: u32 = 0,
-	) -> f32,
+	) -> (
+		f32,
+		f32,
+	),
 }
 
 CanvasType :: enum {

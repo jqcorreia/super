@@ -3,9 +3,11 @@ package main
 import "base:runtime"
 import "core:c"
 import "core:fmt"
+import "core:os"
 import "core:strings"
 import "core:time"
 
+import "core:encoding/ini"
 import "engine"
 import "platform"
 import "platform/canvas"
@@ -24,117 +26,16 @@ App :: struct {
 
 app := App{}
 
-// app_draw :: proc(canvas: ^canvas.Canvas) {
-// 	shader := platform.inst().shaders->get("Singularity")
-// 	shader2 := platform.inst().shaders->get("Basic")
-// 	text_shader := platform.inst().shaders->get("Text")
-
-// 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
-// 	gl.Clear(gl.COLOR_BUFFER_BIT)
-
-// 	canvas->draw_rect(0, 0, f32(canvas.width), f32(canvas.height), shader = shader)
-// 	canvas->draw_text(50, 200, engine.state.text, &engine.state.font)
-
-// 	for widget in app.widget_list {
-// 		#partial switch w in widget {
-// 		case widgets.Label:
-// 			widgets.draw(w, canvas)
-// 		}
-// 	}
-// 	gl.Flush()
-// }
-
-// main :: proc() {
-// 	canvas := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, app_draw)
-
-// 	shaders := engine.platform.shaders
-// 	shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
-// 	shaders->new("Singularity", "shaders/basic_vert.glsl", "shaders/singularity.glsl")
-// 	shaders->new("Text", "shaders/solid_text_vert.glsl", "shaders/solid_text_frag.glsl")
-
-
-// 	append(
-// 		&app.widget_list,
-// 		widgets.Label{x = 0, y = 0, text = "Hello", font = &engine.state.font},
-// 	)
-
-// 	append(
-// 		&app.widget_list,
-// 		widgets.Label{x = 0, y = 100, text = "world", font = &engine.state.font},
-// 	)
-
-// 	for engine.state.running == true {
-// 		engine.state.time_elapsed = time.diff(engine.state.start_time, time.now())
-
-// 		// Consume all events and do eventual dispatching
-// 		events := engine.platform.input->consume_all_events()
-// 		for event in events {
-// 			#partial switch e in event {
-// 			case platform.KeyPressed:
-// 				{
-// 					if e.key == xlib.KeySym.XK_Escape {
-// 						engine.state.running = false
-// 					}
-// 					if e.key == xlib.KeySym.XK_F1 {
-// 						wl.zwlr_layer_surface_v1_set_size(
-// 							canvas.layer_surface,
-// 							u32(1000),
-// 							u32(1000),
-// 						)
-// 					}
-// 					if e.key == xlib.KeySym.XK_BackSpace {
-// 						if len(engine.state.text) > 0 {
-// 							engine.state.text, _ = strings.substring(
-// 								engine.state.text,
-// 								0,
-// 								strings.rune_count(engine.state.text) - 1,
-// 							)
-// 						}
-// 					}
-// 					fmt.println("Key pressed: ", e.key)
-// 				}
-// 			case platform.KeyReleased:
-// 				{
-// 					// fmt.println("Key released: ", e.key)
-// 				}
-// 			case platform.TextInput:
-// 				{
-// 					// state.text = fmt.tprintf("%s%s", state.text, e.text)
-// 					engine.state.text = strings.concatenate([]string{engine.state.text, e.text})
-// 					fmt.println("Text input: ", e.text)
-// 				}
-// 			}
-// 		}
-
-// 		// this call will process all the wayland messages
-// 		// - drawing will be done as a result
-// 		// - event gathering
-// 		// - etc
-// 		// - Swap the buffers for the canvas
-// 		engine.render(canvas)
-// 	}
-// }
-
-
 draw :: proc(canvas: ^canvas.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	// gl.ClearColor(0.0, 0.0, 0.0, 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-
-	// canvas->draw_rect(20, 20, 100, 100, color = {1.0, 0.0, 1.0, 1.0})
-	// canvas->draw_rect(
-	// 	0,
-	// 	0,
-	// 	f32(canvas.width),
-	// 	f32(canvas.height),
-	// 	shader = platform.inst().shaders->get("Cosmic"),
-	// )
-
-
 	for &widget in app.widget_list {
 		#partial switch &w in widget {
 		case widgets.List:
+			widgets.draw(&w, canvas)
+		case widgets.InputText:
 			widgets.draw(&w, canvas)
 		}
 	}
@@ -153,36 +54,67 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	gl.Flush()
 }
 
+get_applications :: proc() -> []string {
+	applications: [dynamic]string
+	paths: [dynamic]string = {}
+	home := os.get_env("HOME")
+	xdg_data_dirs, ok := os.lookup_env("XDG_DATA_DIRS")
+
+	if ok {
+		for base_data in strings.split(xdg_data_dirs, ":") {
+			append(&paths, fmt.tprintf("%s/applications", base_data))
+		}
+	} else {
+		append(&paths, fmt.tprintf("%s/.local/share/applications", home))
+		append(&paths, "/usr/share/applications")
+	}
+
+
+	for path in paths {
+		// List dir files
+		h, _ := os.open(path)
+		fis, _ := os.read_dir(h, -1)
+
+		for fi in fis {
+			res, _, _ := ini.load_map_from_path(fi.fullpath, context.temp_allocator)
+
+			de, ok := res["Desktop Entry"]
+			if ok {
+				name, ok := de["Name"]
+
+				if ok {
+					append(&applications, name)
+				}
+			}
+		}
+	}
+
+	return applications[:]
+}
+
 main :: proc() {
+	sys_apps := get_applications()
+	fmt.println("Number of apps detected:", len(sys_apps))
+
 	c1 := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, draw)
+
+	search := widgets.InputText {
+		x    = 0,
+		y    = 0,
+		font = engine.state.font,
+		text = "",
+	}
+
 	list := widgets.List {
 		x     = 0,
-		y     = 0,
+		y     = 100,
 		w     = f32(c1.width),
-		h     = f32(c1.height),
-		items = {
-			"Hello World!",
-			"item2",
-			"item3",
-			"item4",
-			"item5",
-			"item6",
-			"item7",
-			"item8",
-			"item9",
-			"Hello World!",
-			"item2",
-			"item3",
-			"item4",
-			"item5",
-			"item6",
-			"item7",
-			"item8",
-			"item9",
-		},
+		h     = f32(c1.height) - 100,
+		items = sys_apps,
 		font  = &engine.state.font,
 	}
 
+	append(&app.widget_list, search)
 	append(&app.widget_list, list)
 
 	platform.inst().shaders->new(
@@ -197,7 +129,29 @@ main :: proc() {
 		"shaders/basic_vert.glsl",
 		"shaders/border_rect_frag.glsl",
 	)
+
+	previous_search := ""
+
 	for engine.state.running == true {
+		s := &app.widget_list[0].(widgets.InputText)
+		l := &app.widget_list[1].(widgets.List)
+
+		if s.text != previous_search {
+			if s.text == "" {
+				l.items = sys_apps
+			} else {
+				new_items: [dynamic]string
+				for i in sys_apps {
+					if strings.contains(i, s.text) {
+						append(&new_items, i)
+					}
+				}
+				l.items = new_items[:]
+			}
+			l.main_texture = 0
+			previous_search = s.text
+		}
+
 		events := platform.inst().input->consume_all_events()
 		for event in events {
 			#partial switch e in event {
@@ -207,16 +161,12 @@ main :: proc() {
 						engine.state.running = false
 					}
 				}
-			// case platform.TextInput:
-			// 	{
-			// 		// state.text = fmt.tprintf("%s%s", state.text, e.text)
-			// 		engine.state.text = strings.concatenate([]string{engine.state.text, e.text})
-			// 		fmt.println("Text input: ", e.text)
-			// 	}
 			}
 			for &widget in app.widget_list {
 				#partial switch &w in widget {
 				case widgets.List:
+					widgets.update(&w, event)
+				case widgets.InputText:
 					widgets.update(&w, event)
 				}
 			}

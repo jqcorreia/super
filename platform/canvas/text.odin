@@ -15,7 +15,10 @@ draw_text_raw :: proc(
 	text: string,
 	font: ^fonts.Font,
 	_shader: u32 = 0,
-) -> f32 {
+) -> (
+	f32,
+	f32,
+) {
 	shader := _shader == 0 ? platform.inst().shaders->get("Text") : _shader
 
 	current_x := x
@@ -57,7 +60,7 @@ draw_text_raw :: proc(
 		current_x += f32(metrics.advanceWidth)
 	}
 
-	return total_line_height
+	return current_x, total_line_height
 	// return 100
 }
 
@@ -68,6 +71,9 @@ draw_text :: proc(
 	text: string,
 	font: ^fonts.Font,
 	_shader: u32 = 0,
-) -> f32 {
+) -> (
+	f32,
+	f32,
+) {
 	return draw_text_raw({f32(canvas.width), f32(canvas.height)}, x, y, text, font, _shader)
 }

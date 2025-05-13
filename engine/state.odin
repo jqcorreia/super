@@ -39,7 +39,7 @@ init :: proc() {
 
 	fm := fonts.new_font_manager()
 
-	state.font = fm->load_font(FONT, 72)
+	state.font = fm->load_font(FONT, 36)
 	state.text = ""
 }
 

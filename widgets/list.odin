@@ -20,6 +20,7 @@ List :: struct {
 	main_texture:      u32,
 	scroll_offset:     f32,
 	new_scroll_offset: f32,
+	selected_index:    u32,
 }
 
 list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
@@ -62,8 +63,8 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 		gl.Clear(gl.COLOR_BUFFER_BIT)
 
 		y: f32 = 0
-		for item in list.items {
-			line_height := cv.draw_text_raw(
+		for item, idx in list.items {
+			_, line_height := cv.draw_text_raw(
 				{main_texture_w, main_texture_h},
 				2,
 				y,
@@ -126,10 +127,10 @@ list_update :: proc(list: ^List, event: platform.InputEvent) {
 	#partial switch e in event {
 	case platform.KeyPressed:
 		{
-			if e.key == platform.KeySym.XK_j {
+			if e.key == platform.KeySym.XK_Down {
 				offset = 100.0
 			}
-			if e.key == platform.KeySym.XK_k {
+			if e.key == platform.KeySym.XK_Up {
 				offset = -100.0
 			}
 		}
