@@ -139,7 +139,16 @@ draw :: proc(canvas: ^canvas.Canvas) {
 		}
 	}
 
-	// canvas->draw_text(0, 0, "Hello World!", &engine.state.font)
+	gl.Enable(gl.BLEND)
+	canvas->draw_rect(
+		0,
+		0,
+		f32(canvas.width),
+		f32(canvas.height),
+		color = {0.0, 0.0, 1.0, 1.0},
+		shader = platform.inst().shaders->get("Border"),
+	)
+	gl.Disable(gl.BLEND)
 
 	gl.Flush()
 }
@@ -182,6 +191,11 @@ main :: proc() {
 	)
 	platform.inst().shaders->new("Starship", "shaders/basic_vert.glsl", "shaders/starship.glsl")
 	platform.inst().shaders->new("Cosmic", "shaders/basic_vert.glsl", "shaders/cosmic.glsl")
+	platform.inst().shaders->new(
+		"Border",
+		"shaders/basic_vert.glsl",
+		"shaders/border_rect_frag.glsl",
+	)
 	for engine.state.running == true {
 		events := platform.inst().input->consume_all_events()
 		for event in events {
