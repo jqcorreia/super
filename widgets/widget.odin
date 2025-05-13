@@ -22,3 +22,13 @@ update :: proc {
 	list_update,
 	input_text_update,
 }
+
+
+new :: proc {
+	new_list,
+}
+
+new_list :: proc(list: List, x, y: f32) -> List {
+	fmt.println(x, y)
+	return List{}
+}

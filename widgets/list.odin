@@ -10,12 +10,31 @@ import "core:math"
 import "core:time"
 import gl "vendor:OpenGL"
 
+list_default_draw_item :: proc(
+	list: List,
+	item: ListItem,
+	x, y: f32,
+	resolution: [2]f32,
+) -> (
+	f32,
+	f32,
+) {
+	w, h := cv.draw_text_raw(resolution, x, y, item.text, list.font)
+
+	return w, h
+}
+
+ListItem :: struct {
+	text:     string,
+	metadata: map[string]string,
+}
+
 List :: struct {
 	x:                 f32,
 	y:                 f32,
 	w:                 f32,
 	h:                 f32,
-	items:             []string,
+	items:             []ListItem,
 	font:              ^fonts.Font,
 	main_texture:      u32,
 	main_fbo:          u32,
@@ -82,7 +101,7 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 				{main_texture_w, main_texture_h},
 				2,
 				y,
-				item,
+				item.text,
 				list.font,
 			)
 			y += line_height

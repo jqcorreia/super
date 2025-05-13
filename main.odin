@@ -54,8 +54,8 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	gl.Flush()
 }
 
-get_applications :: proc() -> []string {
-	applications: [dynamic]string
+get_applications :: proc() -> []widgets.ListItem {
+	applications: [dynamic]widgets.ListItem
 	paths: [dynamic]string = {}
 	home := os.get_env("HOME")
 	xdg_data_dirs, ok := os.lookup_env("XDG_DATA_DIRS")
@@ -83,7 +83,7 @@ get_applications :: proc() -> []string {
 				name, ok := de["Name"]
 
 				if ok {
-					append(&applications, name)
+					append(&applications, widgets.ListItem{text = name})
 				}
 			}
 		}
@@ -93,6 +93,7 @@ get_applications :: proc() -> []string {
 }
 
 main :: proc() {
+	foo := widgets.new(widgets.List{}, 10, 20)
 	sys_apps := get_applications()
 	fmt.println("Number of apps detected:", len(sys_apps))
 
@@ -136,14 +137,14 @@ main :: proc() {
 		s := &app.widget_list[0].(widgets.InputText)
 		l := &app.widget_list[1].(widgets.List)
 
+		// Really simple 'search'
 		if s.text != previous_search {
 			if s.text == "" {
 				l.items = sys_apps
 			} else {
-				new_items: [dynamic]string
+				new_items: [dynamic]widgets.ListItem
 				for i in sys_apps {
-					// Really simple 'search'
-					if strings.contains(strings.to_lower(i), strings.to_lower(s.text)) {
+					if strings.contains(strings.to_lower(i.text), strings.to_lower(s.text)) {
 						append(&new_items, i)
 					}
 				}
