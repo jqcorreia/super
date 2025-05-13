@@ -14,10 +14,17 @@ Press &lt;super> to do stuff!
 - [x] fix WAYLAND_DEBUG crashing (prolly wayland-odin's fault)
 - [x] Basic label widget
 - [x] make state global ffs
-- [ ] Window/Surface resize, push EGL creation to configure() !
-- [ ] Keyboard repeat ! 
-- [ ] mouse input
-- [ ] organize shaders
+- [x] organize shaders
+- [x] Widgets! Kinda
+- [x] Scrollable lists
+- [x] Proper text rendering with glyph caching
+- [ ] Image rendering
+- [ ] Layout manager, dumb, simple one, please...
+- [ ] Keyboard repeat 
+- [ ] Mouse input
 - [ ] Multiple canvas support. Dunno why no work...
-
+- [ ] Window/Surface resize, push EGL creation to configure() !
+- [ ] BIG GOAL: Make it as usable as `tudo` so I can daily drive this
+- [ ] Implement secrets source
+- [ ] Implement applications source
 ! == ongoing

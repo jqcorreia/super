@@ -182,6 +182,7 @@ main :: proc() {
 		},
 		font  = &engine.state.font,
 	}
+
 	append(&app.widget_list, list)
 
 	platform.inst().shaders->new(

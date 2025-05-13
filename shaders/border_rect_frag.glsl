@@ -7,6 +7,7 @@ uniform vec4 input;
 uniform vec2 resolution;
 uniform float iTime;
 
+// Really dumb border shader, probably not the best way to do this
 void main()
 {
     vec2 uv = fragCoord.xy * resolution.xy;
