@@ -118,7 +118,7 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 
 	shh: f32 = 40.0
 	shy := position_percent * (list.h - shh) + list.y
-	canvas->draw_rect(list.x + list.w - 10, shy, 10, shh, color = {0.5, 0.2, 0.1, 1.0})
+	canvas->draw_rect(list.x + list.w - 10, shy, 10, shh, color = {0.2, 0.2, 0.7, 1.0})
 }
 
 list_update :: proc(list: ^List, event: platform.InputEvent) {

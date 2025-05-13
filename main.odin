@@ -147,11 +147,20 @@ draw :: proc(canvas: ^canvas.Canvas) {
 main :: proc() {
 	c1 := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, draw)
 	list := widgets.List {
-		x     = 10,
-		y     = 100,
-		w     = 500,
-		h     = 300,
+		x     = 0,
+		y     = 0,
+		w     = f32(c1.width),
+		h     = f32(c1.height),
 		items = {
+			"Hello World!",
+			"item2",
+			"item3",
+			"item4",
+			"item5",
+			"item6",
+			"item7",
+			"item8",
+			"item9",
 			"Hello World!",
 			"item2",
 			"item3",
@@ -183,6 +192,12 @@ main :: proc() {
 						engine.state.running = false
 					}
 				}
+			// case platform.TextInput:
+			// 	{
+			// 		// state.text = fmt.tprintf("%s%s", state.text, e.text)
+			// 		engine.state.text = strings.concatenate([]string{engine.state.text, e.text})
+			// 		fmt.println("Text input: ", e.text)
+			// 	}
 			}
 			for &widget in app.widget_list {
 				#partial switch &w in widget {
