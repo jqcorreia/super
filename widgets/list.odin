@@ -10,6 +10,8 @@ import "core:math"
 import "core:time"
 import gl "vendor:OpenGL"
 
+SCROLL_SPEED :: 200
+
 list_default_draw_item :: proc(
 	list: List(string),
 	item: string,
@@ -129,6 +131,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 			y += line_height
 		}
 
+		// Unbind framebuffer and reset viewport
 		gl.BindFramebuffer(gl.FRAMEBUFFER, 0)
 		gl.Viewport(0, 0, canvas.width, canvas.height)
 
@@ -178,7 +181,6 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 	canvas->draw_rect(list.x + list.w - 10, shy, 10, shh, color = {0.2, 0.2, 0.7, 1.0})
 }
 
-SCROLL_SPEED :: 200
 list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 	offset: f32 = 0
 	#partial switch e in event {
@@ -199,14 +201,18 @@ list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 				list_free_fbo_and_texture(list)
 			}
 		}
-
 	}
 	if offset != 0 {
-		list.new_scroll_offset = math.clamp(
-			list.scroll_offset + offset,
-			0,
-			f32(f64(len(list.items)) * list.font.line_metrics.ascender) - list.h + 10,
-		)
-		fmt.println(list.new_scroll_offset)
+		rendered_height := f32(len(list.items)) * f32(list.font.line_height)
+
+		if rendered_height < list.h {
+			// Do not scroll
+			list.new_scroll_offset = 0
+			return
+		}
+		// This is the number of lines minus line height - the height of the list 'container'
+		// The abs here is to account for the actual list be smaller than the container
+		max_scroll_offset := math.abs(rendered_height - list.h) + 10
+		list.new_scroll_offset = math.clamp(list.scroll_offset + offset, 0, max_scroll_offset)
 	}
 }
