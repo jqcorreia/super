@@ -48,12 +48,17 @@ List :: struct($item_type: typeid) {
 }
 
 list_reset :: proc(list: ^$L/List) {
-	gl.DeleteTextures(1, &list.main_texture)
-	gl.DeleteFramebuffers(1, &list.main_fbo)
-	list.main_texture = 0
+	list_free_fbo_and_texture(list)
 	list.scroll_offset = 0
 	list.new_scroll_offset = 0
 	list.selected_index = 0
+}
+
+@(private)
+list_free_fbo_and_texture :: proc(list: ^$L/List) {
+	gl.DeleteTextures(1, &list.main_texture)
+	gl.DeleteFramebuffers(1, &list.main_fbo)
+	list.main_texture = 0
 }
 
 list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
@@ -191,7 +196,7 @@ list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 			}
 			if e.key == platform.KeySym.XK_Page_Up {
 				list.selected_index -= 1
-				list.main_texture = 0
+				list_free_fbo_and_texture(list)
 			}
 		}
 
