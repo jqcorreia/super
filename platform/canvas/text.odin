@@ -26,7 +26,7 @@ draw_text_raw :: proc(
 
 	previous_glyph: ^fonts.RenderedGlyph = nil
 
-	total_line_height := f32(font.line_metrics.ascender + font.line_metrics.lineGap)
+	total_line_height := font.line_height
 
 	for c in text {
 		rg := font->render_glyph(u8(c), previous_glyph)

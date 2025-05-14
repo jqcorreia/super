@@ -12,6 +12,7 @@ Font :: struct {
 	_font:        sft.SFT,
 	cache:        map[u8]RenderedGlyph,
 	line_metrics: ^FontLineMetrics,
+	line_height:  f32,
 	render_glyph: proc(font: ^Font, char: u8, previous_glyph: ^RenderedGlyph) -> RenderedGlyph,
 }
 
@@ -77,6 +78,7 @@ load_font :: proc(fm: ^FontManager, name: string, size: f64) -> Font {
 		cache        = make(map[u8]RenderedGlyph),
 		line_metrics = lmetrics,
 		render_glyph = render_glyph,
+		line_height  = f32(lmetrics.ascender + lmetrics.lineGap),
 	}
 
 	fm.loaded_fonts[name] = _font

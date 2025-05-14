@@ -107,9 +107,9 @@ main :: proc() {
 
 	list := widgets.List(string) {
 		x         = 0,
-		y         = 100,
+		y         = 200,
 		w         = f32(c1.width),
-		h         = f32(c1.height) - 100,
+		h         = f32(c1.height) - 200,
 		items     = sys_apps,
 		font      = &engine.state.font,
 		draw_item = widgets.list_default_draw_item,
@@ -150,7 +150,7 @@ main :: proc() {
 				}
 				l.items = new_items[:]
 			}
-			widgets.list_reset_texture(l)
+			widgets.list_reset(l)
 			previous_search = s.text
 		}
 

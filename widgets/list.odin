@@ -35,7 +35,7 @@ List :: struct($item_type: typeid) {
 	main_fbo:          u32,
 	scroll_offset:     f32,
 	new_scroll_offset: f32,
-	selected_index:    u32,
+	selected_index:    int,
 	draw_item:         proc(
 		list: List(item_type),
 		item: item_type,
@@ -47,12 +47,13 @@ List :: struct($item_type: typeid) {
 	),
 }
 
-list_reset_texture :: proc(list: ^$L/List) {
+list_reset :: proc(list: ^$L/List) {
 	gl.DeleteTextures(1, &list.main_texture)
 	gl.DeleteFramebuffers(1, &list.main_fbo)
 	list.main_texture = 0
 	list.scroll_offset = 0
 	list.new_scroll_offset = 0
+	list.selected_index = 0
 }
 
 list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
@@ -101,6 +102,24 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 
 		y: f32 = 0
 		for item, idx in list.items {
+			if idx == list.selected_index {
+				cv.draw_rect_raw(
+					{main_texture_w, main_texture_h},
+					0,
+					y,
+					100,
+					list.font.line_height,
+					color = {0.0, 0.0, 1.0, 1.0},
+				)
+				cv.draw_rect_raw(
+					{main_texture_w, main_texture_h},
+					0,
+					y,
+					main_texture_w,
+					list.font.line_height,
+					color = {0.2, 0.2, 0.2, 1.0},
+				)
+			}
 			_, line_height := list->draw_item(item, 2, y, {main_texture_w, main_texture_h})
 			y += line_height
 		}
@@ -113,8 +132,8 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 
 	list.scroll_offset = math.lerp(list.scroll_offset, list.new_scroll_offset, f32(0.15))
 
-	top_v := list.scroll_offset / main_texture_h
-	bottom_v := (list.scroll_offset + list.h) / main_texture_h
+	top_v := math.clamp(list.scroll_offset / main_texture_h, 0, 1)
+	bottom_v := math.clamp((list.scroll_offset + list.h) / main_texture_h, 0, 1)
 	vertices := []f32 {
 		0.0,
 		0.0,
@@ -154,16 +173,25 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 	canvas->draw_rect(list.x + list.w - 10, shy, 10, shh, color = {0.2, 0.2, 0.7, 1.0})
 }
 
+SCROLL_SPEED :: 200
 list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 	offset: f32 = 0
 	#partial switch e in event {
 	case platform.KeyPressed:
 		{
 			if e.key == platform.KeySym.XK_Down {
-				offset = 100.0
+				offset = SCROLL_SPEED
 			}
 			if e.key == platform.KeySym.XK_Up {
-				offset = -100.0
+				offset = -SCROLL_SPEED
+			}
+			if e.key == platform.KeySym.XK_Page_Down {
+				list.selected_index += 1
+				list.main_texture = 0
+			}
+			if e.key == platform.KeySym.XK_Page_Up {
+				list.selected_index -= 1
+				list.main_texture = 0
 			}
 		}
 
@@ -174,5 +202,6 @@ list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 			0,
 			f32(f64(len(list.items)) * list.font.line_metrics.ascender) - list.h + 10,
 		)
+		fmt.println(list.new_scroll_offset)
 	}
 }
