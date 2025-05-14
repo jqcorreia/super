@@ -1,6 +1,15 @@
 # super
 Press &lt;super> to do stuff!
 
+## Build Instructions
+
+```
+git submodule init`
+git submodule update`
+odin build -
+./super
+```
+
 ## Devlog
 - [x] working layer and window surfaces
 - [x] semblance of an engine with abstracted canvas creation
@@ -20,8 +29,9 @@ Press &lt;super> to do stuff!
 - [x] Proper text rendering with glyph caching
 - [x] Rudimentary text box input
 - [x] Fix error where number of list items is too small.
-- [ ] Implement list selected item/index mechanics
+- [ ] Implement list selected item/index mechanics !
 - [ ] Implement applications source !
+- [ ] Implement secrets source
 - [ ] Image (PNG, JPEG) rendering
 - [ ] Layout manager, dumb, simple one, please...
 - [ ] Keyboard repeat 
@@ -29,5 +39,4 @@ Press &lt;super> to do stuff!
 - [ ] Multiple canvas support. Dunno why no work...
 - [ ] Window/Surface resize, push EGL creation to configure()
 - [ ] BIG GOAL: Make it as usable as `tudo` so I can daily drive this
-- [ ] Implement secrets source
 ! == ongoing
