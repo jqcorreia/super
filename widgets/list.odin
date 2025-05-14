@@ -10,9 +10,10 @@ import "core:math"
 import "core:time"
 import gl "vendor:OpenGL"
 
+import "../actions"
 SCROLL_SPEED :: 200
 
-list_default_draw_item :: proc(
+list_draw_string :: proc(
 	list: List(string),
 	item: string,
 	x, y: f32,
@@ -24,6 +25,25 @@ list_default_draw_item :: proc(
 	w, h := cv.draw_text_raw(resolution, x, y, item, list.font)
 
 	return w, h
+}
+
+list_draw_action :: proc(
+	list: List(actions.Action),
+	item: actions.Action,
+	x, y: f32,
+	resolution: [2]f32,
+) -> (
+	f32,
+	f32,
+) {
+	w, h := cv.draw_text_raw(resolution, x, y, item.name, list.font)
+
+	return w, h
+}
+
+list_draw_item :: proc {
+	list_draw_string,
+	list_draw_action,
 }
 
 List :: struct($item_type: typeid) {
@@ -127,7 +147,8 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 					color = {0.2, 0.2, 0.2, 1.0},
 				)
 			}
-			_, line_height := list->draw_item(item, 2, y, {main_texture_w, main_texture_h})
+			draw_func := list.draw_item != nil ? list.draw_item : list_draw_item
+			_, line_height := draw_func(list^, item, 2, y, {main_texture_w, main_texture_h})
 			y += line_height
 		}
 

@@ -1,5 +1,6 @@
 package widgets
 
+import "../actions"
 import "../engine"
 import "../platform"
 import "../platform/canvas"
@@ -15,6 +16,7 @@ WidgetType :: enum {
 Widget :: union {
 	Label,
 	List(string),
+	List(actions.Action),
 	InputText,
 }
 

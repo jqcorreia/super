@@ -7,6 +7,7 @@ import "core:os"
 import "core:strings"
 import "core:time"
 
+import "actions"
 import "core:encoding/ini"
 import "engine"
 import "platform"
@@ -34,6 +35,8 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	for &widget in app.widget_list {
 		#partial switch &w in widget {
 		case widgets.List(string):
+			widgets.draw(&w, canvas)
+		case widgets.List(actions.Action):
 			widgets.draw(&w, canvas)
 		case widgets.InputText:
 			widgets.draw(&w, canvas)
@@ -92,8 +95,10 @@ get_applications :: proc() -> []string {
 	return applications[:]
 }
 
+import "core:os/os2"
+
 main :: proc() {
-	sys_apps := get_applications()
+	sys_apps := actions.get_actions()
 	fmt.println("Number of apps detected:", len(sys_apps))
 
 	c1 := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, draw)
@@ -105,14 +110,14 @@ main :: proc() {
 		text = "",
 	}
 
-	list := widgets.List(string) {
-		x         = 0,
-		y         = 200,
-		w         = f32(c1.width),
-		h         = f32(c1.height) - 200,
-		items     = sys_apps,
-		font      = &engine.state.font,
-		draw_item = widgets.list_default_draw_item,
+	list := widgets.List(actions.Action) {
+		x     = 0,
+		y     = 200,
+		w     = f32(c1.width),
+		h     = f32(c1.height) - 200,
+		items = sys_apps,
+		font  = &engine.state.font,
+		// draw_item = widgets.list_draw_action,
 	}
 
 	append(&app.widget_list, search)
@@ -135,16 +140,16 @@ main :: proc() {
 
 	for engine.state.running == true {
 		s := &app.widget_list[0].(widgets.InputText)
-		l := &app.widget_list[1].(widgets.List(string))
+		l := &app.widget_list[1].(widgets.List(actions.Action))
 
 		// Really simple 'search'
 		if s.text != previous_search {
 			if s.text == "" {
 				l.items = sys_apps
 			} else {
-				new_items: [dynamic]string
+				new_items: [dynamic]actions.Action
 				for i in sys_apps {
-					if strings.contains(strings.to_lower(i), strings.to_lower(s.text)) {
+					if strings.contains(strings.to_lower(i.name), strings.to_lower(s.text)) {
 						append(&new_items, i)
 					}
 				}
@@ -162,10 +167,21 @@ main :: proc() {
 					if e.key == platform.KeySym.XK_Escape {
 						engine.state.running = false
 					}
+					if e.key == platform.KeySym.XK_Return {
+						selected_action := l.items[l.selected_index]
+						fmt.println(selected_action)
+						p, e := os2.process_start(
+							{command = {strings.split(selected_action.command, " ")[0]}},
+						)
+						fmt.println(p, e)
+						engine.state.running = false
+					}
 				}
 			}
 			for &widget in app.widget_list {
 				#partial switch &w in widget {
+				case widgets.List(actions.Action):
+					widgets.update(&w, event)
 				case widgets.List(string):
 					widgets.update(&w, event)
 				case widgets.InputText:
