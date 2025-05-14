@@ -14,7 +14,7 @@ WidgetType :: enum {
 
 Widget :: union {
 	Label,
-	List,
+	List(string),
 	InputText,
 }
 

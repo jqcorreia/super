@@ -11,15 +11,15 @@ import "core:time"
 import gl "vendor:OpenGL"
 
 list_default_draw_item :: proc(
-	list: List,
-	item: ListItem,
+	list: List(string),
+	item: string,
 	x, y: f32,
 	resolution: [2]f32,
 ) -> (
 	f32,
 	f32,
 ) {
-	w, h := cv.draw_text_raw(resolution, x, y, item.text, list.font)
+	w, h := cv.draw_text_raw(resolution, x, y, item, list.font)
 
 	return w, h
 }
@@ -29,12 +29,12 @@ ListItem :: struct {
 	metadata: map[string]string,
 }
 
-List :: struct {
+List :: struct($item_type: typeid) {
 	x:                 f32,
 	y:                 f32,
 	w:                 f32,
 	h:                 f32,
-	items:             []ListItem,
+	items:             []item_type,
 	font:              ^fonts.Font,
 	main_texture:      u32,
 	main_fbo:          u32,
@@ -42,8 +42,8 @@ List :: struct {
 	new_scroll_offset: f32,
 	selected_index:    u32,
 	draw_item:         proc(
-		list: List,
-		item: ListItem,
+		list: List(item_type),
+		item: item_type,
 		x, y: f32,
 		resolution: [2]f32,
 	) -> (
@@ -52,7 +52,7 @@ List :: struct {
 	),
 }
 
-list_reset_texture :: proc(list: ^List) {
+list_reset_texture :: proc(list: ^$L/List) {
 	gl.DeleteTextures(1, &list.main_texture)
 	gl.DeleteFramebuffers(1, &list.main_fbo)
 	list.main_texture = 0
@@ -60,7 +60,7 @@ list_reset_texture :: proc(list: ^List) {
 	list.new_scroll_offset = 0
 }
 
-list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
+list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 	main_texture_w: f32 = list.w
 	main_texture_h: f32 = math.max(
 		f32(f64(len(list.items)) * list.font.line_metrics.ascender),
@@ -138,6 +138,7 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 		0.0,
 		bottom_v,
 	}
+
 	// Draw texture in place
 	canvas->draw_rect(
 		list.x,
@@ -158,7 +159,7 @@ list_draw :: proc(list: ^List, canvas: ^cv.Canvas) {
 	canvas->draw_rect(list.x + list.w - 10, shy, 10, shh, color = {0.2, 0.2, 0.7, 1.0})
 }
 
-list_update :: proc(list: ^List, event: platform.InputEvent) {
+list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 	offset: f32 = 0
 	#partial switch e in event {
 	case platform.KeyPressed:

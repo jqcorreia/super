@@ -33,7 +33,7 @@ draw :: proc(canvas: ^canvas.Canvas) {
 
 	for &widget in app.widget_list {
 		#partial switch &w in widget {
-		case widgets.List:
+		case widgets.List(string):
 			widgets.draw(&w, canvas)
 		case widgets.InputText:
 			widgets.draw(&w, canvas)
@@ -105,12 +105,12 @@ main :: proc() {
 		text = "",
 	}
 
-	list := widgets.List {
+	list := widgets.List(string) {
 		x         = 0,
 		y         = 100,
 		w         = f32(c1.width),
 		h         = f32(c1.height) - 100,
-		items     = sys_apps,
+		items     = []string{"a", "b", "c", "d"},
 		font      = &engine.state.font,
 		draw_item = widgets.list_default_draw_item,
 	}
@@ -135,24 +135,24 @@ main :: proc() {
 
 	for engine.state.running == true {
 		s := &app.widget_list[0].(widgets.InputText)
-		l := &app.widget_list[1].(widgets.List)
+		l := &app.widget_list[1].(widgets.List(string))
 
 		// Really simple 'search'
-		if s.text != previous_search {
-			if s.text == "" {
-				l.items = sys_apps
-			} else {
-				new_items: [dynamic]widgets.ListItem
-				for i in sys_apps {
-					if strings.contains(strings.to_lower(i.text), strings.to_lower(s.text)) {
-						append(&new_items, i)
-					}
-				}
-				l.items = new_items[:]
-			}
-			widgets.list_reset_texture(l)
-			previous_search = s.text
-		}
+		// if s.text != previous_search {
+		// 	if s.text == "" {
+		// 		l.items = sys_apps
+		// 	} else {
+		// 		new_items: [dynamic]widgets.ListItem
+		// 		for i in sys_apps {
+		// 			if strings.contains(strings.to_lower(i.text), strings.to_lower(s.text)) {
+		// 				append(&new_items, i)
+		// 			}
+		// 		}
+		// 		l.items = new_items[:]
+		// 	}
+		// 	widgets.list_reset_texture(l)
+		// 	previous_search = s.text
+		// }
 
 		events := platform.inst().input->consume_all_events()
 		for event in events {
@@ -166,7 +166,7 @@ main :: proc() {
 			}
 			for &widget in app.widget_list {
 				#partial switch &w in widget {
-				case widgets.List:
+				case widgets.List(string):
 					widgets.update(&w, event)
 				case widgets.InputText:
 					widgets.update(&w, event)
