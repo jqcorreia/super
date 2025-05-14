@@ -24,11 +24,6 @@ list_default_draw_item :: proc(
 	return w, h
 }
 
-ListItem :: struct {
-	text:     string,
-	metadata: map[string]string,
-}
-
 List :: struct($item_type: typeid) {
 	x:                 f32,
 	y:                 f32,

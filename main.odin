@@ -54,8 +54,8 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	gl.Flush()
 }
 
-get_applications :: proc() -> []widgets.ListItem {
-	applications: [dynamic]widgets.ListItem
+get_applications :: proc() -> []string {
+	applications: [dynamic]string
 	paths: [dynamic]string = {}
 	home := os.get_env("HOME")
 	xdg_data_dirs, ok := os.lookup_env("XDG_DATA_DIRS")
@@ -83,7 +83,7 @@ get_applications :: proc() -> []widgets.ListItem {
 				name, ok := de["Name"]
 
 				if ok {
-					append(&applications, widgets.ListItem{text = name})
+					append(&applications, name)
 				}
 			}
 		}
@@ -110,7 +110,7 @@ main :: proc() {
 		y         = 100,
 		w         = f32(c1.width),
 		h         = f32(c1.height) - 100,
-		items     = []string{"a", "b", "c", "d"},
+		items     = sys_apps,
 		font      = &engine.state.font,
 		draw_item = widgets.list_default_draw_item,
 	}
@@ -138,21 +138,21 @@ main :: proc() {
 		l := &app.widget_list[1].(widgets.List(string))
 
 		// Really simple 'search'
-		// if s.text != previous_search {
-		// 	if s.text == "" {
-		// 		l.items = sys_apps
-		// 	} else {
-		// 		new_items: [dynamic]widgets.ListItem
-		// 		for i in sys_apps {
-		// 			if strings.contains(strings.to_lower(i.text), strings.to_lower(s.text)) {
-		// 				append(&new_items, i)
-		// 			}
-		// 		}
-		// 		l.items = new_items[:]
-		// 	}
-		// 	widgets.list_reset_texture(l)
-		// 	previous_search = s.text
-		// }
+		if s.text != previous_search {
+			if s.text == "" {
+				l.items = sys_apps
+			} else {
+				new_items: [dynamic]string
+				for i in sys_apps {
+					if strings.contains(strings.to_lower(i), strings.to_lower(s.text)) {
+						append(&new_items, i)
+					}
+				}
+				l.items = new_items[:]
+			}
+			widgets.list_reset_texture(l)
+			previous_search = s.text
+		}
 
 		events := platform.inst().input->consume_all_events()
 		for event in events {
