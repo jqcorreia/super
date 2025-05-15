@@ -18,7 +18,8 @@ in vec3 fragCoord;
 void mainImage(out vec4 O, vec2 I)
 {
     //Clear fragcolor (hacky)
-    O *= 0.;
+    O = vec4(0.0, 0.0, 0.0, 1.0); // Setting alpha to 1.0 so it doesn't get blended with the background
+
     //Initialize resolution for scaling
     vec2 r = resolution.xy,
     //Save centered pixel coordinates

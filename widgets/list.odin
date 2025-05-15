@@ -133,7 +133,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 		gl.Viewport(0, 0, i32(main_texture_w), i32(main_texture_h))
 
 		// Draw calls
-		gl.ClearColor(0.0, 0.0, 0.0, 1.0)
+		gl.ClearColor(0.0, 0.0, 0.0, 0.5)
 		// gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 		gl.Clear(gl.COLOR_BUFFER_BIT)
 
@@ -208,8 +208,9 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 	position_percent := math.clamp(list.scroll_offset / scroll_offset_max, 0, 1)
 
 	shh: f32 = 40.0
+	shw: f32 = 5.0
 	shy := position_percent * (list.h - shh) + list.y
-	canvas->draw_rect(list.x + list.w - 10, shy, 10, shh, color = {0.2, 0.2, 0.7, 1.0})
+	canvas->draw_rect(list.x + list.w - shw, shy, shw, shh, color = {0.2, 0.2, 0.7, 1.0})
 }
 
 list_update :: proc(list: ^$L/List, event: platform.InputEvent) {

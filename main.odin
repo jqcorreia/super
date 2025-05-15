@@ -33,6 +33,16 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	// gl.ClearColor(0.0, 0.0, 0.0, 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
+	gl.Enable(gl.BLEND)
+
+	canvas->draw_rect(
+		0,
+		0,
+		f32(canvas.width),
+		f32(canvas.height),
+		color = {0.0, 0.0, 1.0, 1.0},
+		shader = platform.inst().shaders->get("Cosmic"),
+	)
 
 	for &widget in app.widget_list {
 		#partial switch &w in widget {
@@ -45,15 +55,14 @@ draw :: proc(canvas: ^canvas.Canvas) {
 		}
 	}
 
-	gl.Enable(gl.BLEND)
-	canvas->draw_rect(
-		0,
-		0,
-		f32(canvas.width),
-		f32(canvas.height),
-		color = {0.0, 0.0, 1.0, 1.0},
-		shader = platform.inst().shaders->get("Border"),
-	)
+	// canvas->draw_rect(
+	// 	0,
+	// 	0,
+	// 	f32(canvas.width),
+	// 	f32(canvas.height),
+	// 	color = {0.0, 0.0, 1.0, 1.0},
+	// 	shader = platform.inst().shaders->get("Border"),
+	// )
 	gl.Disable(gl.BLEND)
 
 	gl.Flush()
@@ -80,15 +89,17 @@ main :: proc() {
 	search := widgets.InputText {
 		x    = 0,
 		y    = 0,
+		w    = f32(c1.width),
+		h    = 50,
 		font = engine.state.font,
 		text = "",
 	}
 
 	list := widgets.List(actions.Action) {
 		x     = 0,
-		y     = 100,
+		y     = 50,
 		w     = f32(c1.width),
-		h     = f32(c1.height) - 100,
+		h     = f32(c1.height) - 50,
 		items = action_items[:],
 		font  = &engine.state.font,
 		// draw_item = widgets.list_draw_action,
