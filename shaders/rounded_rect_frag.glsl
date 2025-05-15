@@ -16,12 +16,12 @@ float roundedBoxSDF(vec2 p, vec2 size, float r) {
 }
 
 void main() {
-    vec2 localPos = fragCoord.xy * resolution.xy;
+    vec2 localPos = fragCoord.xy * size;
 
     vec4 borderColor = input;
-    vec4 backgroundColor = vec4(0.0, 0.0, 0.0, 0.0); // Background color
+    vec4 backgroundColor = vec4(0.0, 0.0, 0.0, 0.8); // Background color
 
-    float borderWidth = 4; // Thickness of the border in UV units
+    float borderWidth = 2; // Thickness of the border in UV units
     float radius = 16; // Corner radius in UV units
 
     // Compute distance from edge of rounded rectangle

@@ -133,8 +133,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 		gl.Viewport(0, 0, i32(main_texture_w), i32(main_texture_h))
 
 		// Draw calls
-		gl.ClearColor(0.0, 0.0, 0.0, 0.5)
-		// gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
+		gl.ClearColor(0.0, 0.0, 0.0, 0.8)
 		gl.Clear(gl.COLOR_BUFFER_BIT)
 
 		y: f32 = 0
@@ -162,6 +161,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 			y += line_height
 		}
 
+		gl.Finish()
 		// Unbind framebuffer and reset viewport
 		gl.BindFramebuffer(gl.FRAMEBUFFER, 0)
 		gl.Viewport(0, 0, canvas.width, canvas.height)

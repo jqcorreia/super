@@ -33,16 +33,18 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	// gl.ClearColor(0.0, 0.0, 0.0, 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
-	gl.Enable(gl.BLEND)
 
 	canvas->draw_rect(
 		0,
 		0,
 		f32(canvas.width),
 		f32(canvas.height),
-		color = {0.0, 0.0, 1.0, 1.0},
+		color = {0.0, 0.0, 0.0, 1.0},
 		shader = platform.inst().shaders->get("Cosmic"),
 	)
+
+	gl.Enable(gl.BLEND)
+	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
 	for &widget in app.widget_list {
 		#partial switch &w in widget {
@@ -61,7 +63,7 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	// 	f32(canvas.width),
 	// 	f32(canvas.height),
 	// 	color = {0.0, 0.0, 1.0, 1.0},
-	// 	shader = platform.inst().shaders->get("Border"),
+	// 	shader = platform.inst().shaders->get("Rounded"),
 	// )
 	gl.Disable(gl.BLEND)
 

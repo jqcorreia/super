@@ -45,6 +45,7 @@ Canvas :: struct {
 CanvasType :: enum {
 	Layer,
 	Window,
+	Modal,
 }
 
 CanvasCallback :: struct {

@@ -21,14 +21,13 @@ InputText :: struct {
 }
 
 input_text_draw :: proc(input: ^InputText, cv: ^canvas.Canvas) {
-	gl.Enable(gl.SCISSOR_TEST)
 	cv->draw_rect(
 		input.x,
-		input.y + 5,
+		input.y,
 		input.w,
-		input.h - 5,
-		color = {1.0, 1.0, 0.0, 1.0},
-		shader = platform.inst().shaders->get("Border"),
+		input.h,
+		color = {0.5, 0.5, 0.5, 1.0},
+		shader = platform.inst().shaders->get("Rounded"),
 	)
 	rect: []i32 = {
 		i32(input.x),
@@ -36,13 +35,15 @@ input_text_draw :: proc(input: ^InputText, cv: ^canvas.Canvas) {
 		i32(input.w),
 		i32(input.h),
 	}
+	gl.Enable(gl.SCISSOR_TEST)
 	gl.Scissor(rect[0], rect[1], rect[2], rect[3])
-	tw, th := cv->draw_text(input.x, input.y, input.text, &input.font)
+	x := input.x + 4
+	tw, th := cv->draw_text(x, input.y, input.text, &input.font)
 
 
-	// Draw cursor
+	// // Draw cursor
 	input.cursor_x = math.lerp(input.cursor_x, input.x + tw, f32(0.25))
-	cv->draw_rect(input.x + input.cursor_x, input.y, 10, th, color = {0.1, 0.2, 0.7, 1.0})
+	cv->draw_rect(x + input.cursor_x, input.y, 10, th, color = {0.1, 0.2, 0.7, 1.0})
 
 	gl.Scissor(0, 0, cv.width, cv.height)
 	gl.Disable(gl.SCISSOR_TEST)

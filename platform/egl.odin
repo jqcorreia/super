@@ -47,7 +47,7 @@ init_egl :: proc(display: ^wl.wl_display) -> RenderContext {
 		egl.BLUE_SIZE,
 		8,
 		egl.ALPHA_SIZE,
-		8,
+		0, // Disable surface alpha for now
 		egl.RENDERABLE_TYPE,
 		egl.OPENGL_ES2_BIT,
 		egl.NONE,
