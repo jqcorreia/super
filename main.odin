@@ -4,6 +4,8 @@ import "base:runtime"
 import "core:c"
 import "core:fmt"
 import "core:os"
+import "core:os/os2"
+import "core:slice"
 import "core:strings"
 import "core:time"
 
@@ -57,49 +59,21 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	gl.Flush()
 }
 
-get_applications :: proc() -> []string {
-	applications: [dynamic]string
-	paths: [dynamic]string = {}
-	home := os.get_env("HOME")
-	xdg_data_dirs, ok := os.lookup_env("XDG_DATA_DIRS")
-
-	if ok {
-		for base_data in strings.split(xdg_data_dirs, ":") {
-			append(&paths, fmt.tprintf("%s/applications", base_data))
-		}
-	} else {
-		append(&paths, fmt.tprintf("%s/.local/share/applications", home))
-		append(&paths, "/usr/share/applications")
-	}
-
-
-	for path in paths {
-		// List dir files
-		h, _ := os.open(path)
-		fis, _ := os.read_dir(h, -1)
-
-		for fi in fis {
-			res, _, _ := ini.load_map_from_path(fi.fullpath, context.temp_allocator)
-
-			de, ok := res["Desktop Entry"]
-			if ok {
-				name, ok := de["Name"]
-
-				if ok {
-					append(&applications, name)
-				}
-			}
-		}
-	}
-
-	return applications[:]
-}
-
-import "core:os/os2"
 
 main :: proc() {
-	sys_apps := actions.get_actions()
-	fmt.println("Number of apps detected:", len(sys_apps))
+	action_items: [dynamic]actions.Action
+
+	app_items := actions.get_application_actions()
+	secrets_items := actions.get_secret_actions()
+	for i in app_items {
+		append(&action_items, i)
+	}
+	for i in secrets_items {
+		append(&action_items, i)
+	}
+
+	// action_items += actions.get_secret_actions()
+	fmt.println("Number of apps detected:", len(action_items))
 
 	c1 := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, draw)
 
@@ -112,10 +86,10 @@ main :: proc() {
 
 	list := widgets.List(actions.Action) {
 		x     = 0,
-		y     = 200,
+		y     = 100,
 		w     = f32(c1.width),
-		h     = f32(c1.height) - 200,
-		items = sys_apps,
+		h     = f32(c1.height) - 100,
+		items = action_items[:],
 		font  = &engine.state.font,
 		// draw_item = widgets.list_draw_action,
 	}
@@ -145,12 +119,29 @@ main :: proc() {
 		// Really simple 'search'
 		if s.text != previous_search {
 			if s.text == "" {
-				l.items = sys_apps
+				l.items = action_items[:]
 			} else {
 				new_items: [dynamic]actions.Action
-				for i in sys_apps {
-					if strings.contains(strings.to_lower(i.name), strings.to_lower(s.text)) {
-						append(&new_items, i)
+				for i in action_items {
+					#partial switch i in i {
+					case actions.ApplicationAction:
+						{
+							if strings.contains(
+								strings.to_lower(i.name),
+								strings.to_lower(s.text),
+							) {
+								append(&new_items, i)
+							}
+						}
+					case actions.SecretAction:
+						{
+							if strings.contains(
+								strings.to_lower(i.name),
+								strings.to_lower(s.text),
+							) {
+								append(&new_items, i)
+							}
+						}
 					}
 				}
 				l.items = new_items[:]
@@ -169,12 +160,7 @@ main :: proc() {
 					}
 					if e.key == platform.KeySym.XK_Return {
 						selected_action := l.items[l.selected_index]
-						fmt.println(selected_action)
-						p, e := os2.process_start(
-							{command = {strings.split(selected_action.command, " ")[0]}},
-						)
-						fmt.println(p, e)
-						engine.state.running = false
+						actions.do_action(selected_action)
 					}
 				}
 			}

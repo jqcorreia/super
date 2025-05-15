@@ -36,7 +36,17 @@ list_draw_action :: proc(
 	f32,
 	f32,
 ) {
-	w, h := cv.draw_text_raw(resolution, x, y, item.name, list.font)
+	w, h: f32 = 0, 0
+	#partial switch i in item {
+	case actions.ApplicationAction:
+		{
+			w, h = cv.draw_text_raw(resolution, x, y, i.name, list.font)
+		}
+	case actions.SecretAction:
+		{
+			w, h = cv.draw_text_raw(resolution, x, y, i.name, list.font)
+		}
+	}
 
 	return w, h
 }
