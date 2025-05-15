@@ -47,6 +47,7 @@ create_shaders_controller :: proc() -> ^Shaders {
 
 create_default_shaders :: proc() {
 	platform.shaders->new("Basic", "shaders/basic_vert.glsl", "shaders/basic_frag.glsl")
+	platform.shaders->new("Rounded", "shaders/basic_vert.glsl", "shaders/rounded_rect_frag.glsl")
 	platform.shaders->new("Text", "shaders/solid_text_vert.glsl", "shaders/solid_text_frag.glsl")
 	platform.shaders->new("Texture", "shaders/solid_text_vert.glsl", "shaders/texture_frag.glsl")
 }
