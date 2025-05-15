@@ -29,9 +29,9 @@ odin build -
 - [x] Proper text rendering with glyph caching
 - [x] Rudimentary text box input
 - [x] Fix error where number of list items is too small.
-- [ ] Implement list selected item/index mechanics !
-- [ ] Implement applications source !
-- [ ] Implement secrets source
+- [x] Implement list selected item/index mechanics - !
+- [x] Implement applications source 
+- [x] Implement secrets source
 - [ ] Image (PNG, JPEG) rendering
 - [ ] Layout manager, dumb, simple one, please...
 - [ ] Keyboard repeat 
@@ -39,4 +39,5 @@ odin build -
 - [ ] Multiple canvas support. Dunno why no work...
 - [ ] Window/Surface resize, push EGL creation to configure()
 - [ ] BIG GOAL: Make it as usable as `tudo` so I can daily drive this
+
 ! == ongoing
