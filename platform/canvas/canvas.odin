@@ -114,7 +114,7 @@ toplevel_listener := wl.xdg_toplevel_listener {
 		egl_render_context := cc.platform_state.egl_render_context
 		// fmt.println(canvas.width, width, canvas.height, height)
 		if canvas.width != width || canvas.height != height {
-			recreate_egl_window(canvas, egl_render_context, i32(width), i32(height))
+			// recreate_egl_window(canvas, egl_render_context, i32(width), i32(height))
 			canvas.width = width
 			canvas.height = height
 		}

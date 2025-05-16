@@ -122,7 +122,7 @@ init_platform :: proc() {
 	init_input(platform)
 
 	// Initialize clipboard controller
-	init_clipboard(platform)
+	// init_clipboard(platform)
 
 	// Initialize shaders controller
 	platform.shaders = create_shaders_controller()
