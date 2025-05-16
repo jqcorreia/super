@@ -62,7 +62,11 @@ get_application_actions :: proc() -> []Action {
 }
 
 do_application_action :: proc(action: ApplicationAction) {
-	p, e := os2.process_start({command = strings.split(action.command, " ")})
+	// This removes the XDG placeholders like %F and %U and all that crap that we dont care
+	// At least we don't care right now...
+	clean_command := strings.trim(strings.split(action.command, "%")[0], " \n")
+	p, e := os2.process_start({command = strings.split(clean_command, " ")})
+
 	fmt.println(p, e)
 
 	engine.state.running = false

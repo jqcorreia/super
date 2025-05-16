@@ -56,14 +56,6 @@ draw :: proc(canvas: ^canvas.Canvas) {
 		}
 	}
 
-	// canvas->draw_rect(
-	// 	0,
-	// 	0,
-	// 	f32(canvas.width),
-	// 	f32(canvas.height),
-	// 	color = {0.0, 0.0, 1.0, 1.0},
-	// 	shader = platform.get_shader("Rounded"),
-	// )
 	gl.Disable(gl.BLEND)
 
 	gl.Flush()
@@ -76,6 +68,7 @@ main :: proc() {
 
 	app_items := actions.get_application_actions()
 	secrets_items := actions.get_secret_actions()
+
 	for i in app_items {
 		append(&action_items, i)
 	}
