@@ -27,7 +27,7 @@ input_text_draw :: proc(input: ^InputText, cv: ^canvas.Canvas) {
 		input.w,
 		input.h,
 		color = {0.5, 0.5, 0.5, 1.0},
-		shader = platform.inst().shaders->get("Rounded"),
+		shader = platform.get_shader("Rounded"),
 	)
 	rect: []i32 = {
 		i32(input.x),

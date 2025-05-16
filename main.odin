@@ -31,7 +31,6 @@ app := App{}
 
 draw :: proc(canvas: ^canvas.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
-	// gl.ClearColor(0.0, 0.0, 0.0, 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	canvas->draw_rect(
@@ -40,7 +39,7 @@ draw :: proc(canvas: ^canvas.Canvas) {
 		f32(canvas.width),
 		f32(canvas.height),
 		color = {0.0, 0.0, 0.0, 1.0},
-		shader = platform.inst().shaders->get("Cosmic"),
+		shader = platform.get_shader("Cosmic"),
 	)
 
 	gl.Enable(gl.BLEND)
@@ -63,7 +62,7 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	// 	f32(canvas.width),
 	// 	f32(canvas.height),
 	// 	color = {0.0, 0.0, 1.0, 1.0},
-	// 	shader = platform.inst().shaders->get("Rounded"),
+	// 	shader = platform.get_shader("Rounded"),
 	// )
 	gl.Disable(gl.BLEND)
 
@@ -110,18 +109,17 @@ main :: proc() {
 	append(&app.widget_list, search)
 	append(&app.widget_list, list)
 
-	platform.inst().shaders->new(
+	platform.new_shader(
 		"Singularity",
-		"shaders/basic_vert.glsl",
-		"shaders/singularity.glsl",
+		#load("shaders/basic_vert.glsl"),
+		#load("shaders/singularity.glsl"),
 	)
-	platform.inst().shaders->new("Starship", "shaders/basic_vert.glsl", "shaders/starship.glsl")
-	platform.inst().shaders->new("Cosmic", "shaders/basic_vert.glsl", "shaders/cosmic.glsl")
-	platform.inst().shaders->new(
-		"Border",
-		"shaders/basic_vert.glsl",
-		"shaders/border_rect_frag.glsl",
+	platform.new_shader(
+		"Starship",
+		#load("shaders/basic_vert.glsl"),
+		#load("shaders/starship.glsl"),
 	)
+	platform.new_shader("Cosmic", #load("shaders/basic_vert.glsl"), #load("shaders/cosmic.glsl"))
 
 	previous_search := ""
 

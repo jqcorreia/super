@@ -19,7 +19,7 @@ draw_text_raw :: proc(
 	f32,
 	f32,
 ) {
-	shader := _shader == 0 ? platform.inst().shaders->get("Text") : _shader
+	shader := _shader == 0 ? platform.get_shader("Text") : _shader
 
 	current_x := x
 	buffers: [dynamic]fonts.RenderedGlyph
@@ -51,7 +51,7 @@ draw_text_raw :: proc(
 			y + total_line_height + f32(metrics.yOffset),
 			f32(image.width),
 			f32(image.height),
-			shader = platform.inst().shaders->get("Text"),
+			shader = shader,
 			texture = tex,
 		)
 

@@ -19,9 +19,9 @@ draw_rect_raw :: proc(
 	_shader: u32
 	if (shader == 0) {
 		if (texture == 0) {
-			_shader = platform.inst().shaders->get("Basic")
+			_shader = platform.get_shader("Basic")
 		} else {
-			_shader = platform.inst().shaders->get("Texture")
+			_shader = platform.get_shader("Texture")
 		}
 	} else {
 		_shader = shader

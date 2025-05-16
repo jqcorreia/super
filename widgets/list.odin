@@ -199,7 +199,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 		list.w,
 		math.min(list.h, main_texture_h),
 		vertices = &vertices,
-		shader = platform.inst().shaders->get("Texture"),
+		shader = platform.get_shader("Texture"),
 		texture = list.main_texture,
 	)
 

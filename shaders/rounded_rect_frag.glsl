@@ -19,7 +19,7 @@ void main() {
     vec2 localPos = fragCoord.xy * size;
 
     vec4 borderColor = input;
-    vec4 backgroundColor = vec4(0.0, 0.0, 0.0, 0.8); // Background color
+    vec4 backgroundColor = vec4(0.0, 0.0, 0.0, 0.6); // Background color
 
     float borderWidth = 2; // Thickness of the border in UV units
     float radius = 16; // Corner radius in UV units

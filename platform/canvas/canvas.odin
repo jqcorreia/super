@@ -192,10 +192,12 @@ create_canvas :: proc(
 	}
 
 
+	fmt.println("Create canvas 1")
 	cc := new(CanvasCallback, context.temp_allocator)
 	cc.canvas = canvas
 	cc.platform_state = platform
 
+	fmt.println("Create canvas")
 	egl_window := wl.egl_window_create(canvas.surface, i32(width), i32(height))
 	egl_surface := egl.CreateWindowSurface(
 		platform.egl_render_context.display,
@@ -204,6 +206,7 @@ create_canvas :: proc(
 		nil,
 	)
 
+	fmt.println("Create canvas 2")
 	if egl_surface == egl.NO_SURFACE {
 		fmt.println("Error creating window surface")
 
@@ -217,11 +220,13 @@ create_canvas :: proc(
 		fmt.println("Error making current!")
 	}
 
+	fmt.println("Create canvas 3")
 	if (!platform.default_shaders_loaded) {
 		pl.create_default_shaders()
 		platform.default_shaders_loaded = true
 	}
 
+	fmt.println("Create canvas 4")
 	canvas.egl_surface = egl_surface
 	if type == CanvasType.Window {
 		xdg_surface := wl.xdg_wm_base_get_xdg_surface(platform.xdg_base, canvas.surface)
