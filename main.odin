@@ -64,6 +64,10 @@ draw :: proc(canvas: ^canvas.Canvas) {
 
 
 main :: proc() {
+	pass_command := []string{"sh", "-c", fmt.tprintf("wl-copy %s --foreground", "worten-o365")}
+	// _, out, _, e := os2.process_exec({command = pass_command}, context.allocator)
+	p, e := os2.process_start({command = pass_command})
+
 	action_items: [dynamic]actions.Action
 
 	app_items := actions.get_application_actions()

@@ -73,51 +73,21 @@ do_application_action :: proc(action: ApplicationAction) {
 }
 
 do_secret_action :: proc(action: SecretAction) {
-	// fn execute(&self, ctx: &mut App) {
-	//     let pass_args = vec![
-	//         "-c".to_string(),
-	//         format!("pass {}", self.secret_name.to_string()),
-	//     ];
-	//     let pass_otp_args = vec![
-	//         "-c".to_string(),
-	//         format!("pass otp {}", self.secret_name.to_string()),
-	//     ];
-
-	//     let output = Command::new("sh").args(pass_args.clone()).output();
-	//     let ot = String::from_utf8(output.unwrap().stdout).unwrap();
-
-	//     if ot.starts_with("otpauth://") {
-	//         let otp_output = Command::new("sh").args(pass_otp_args.clone()).output();
-	//         let oot = String::from_utf8(otp_output.unwrap().stdout).unwrap();
-	//         ctx.clipboard = Some(oot.clone());
-	//     } else {
-	//         ctx.clipboard = Some(ot);
-	//     }
-	//     ctx.should_hide = true;
-	// }
-
-	pass_command := []string{"sh", "-c", fmt.tprintf("pass -c %s", action.name)}
+	// This weird dance is needed for 2 reasons
+	// - There is no way of knowing if a pass secret is otp unless you decode it first and check
+	// - If you call process_exec with wl-copy, given that it is a process that doesn't exit, we just hang
+	// - Do the check and call the process_start() that doesn't hang and let wl-copy do it's thing
+	pass_command := []string{"sh", "-c", fmt.tprintf("pass %s", action.name)}
 	_, out, _, e := os2.process_exec({command = pass_command}, context.allocator)
 
-	// out_s := string(out)
-	// if strings.starts_with(out_s, "otpauth://") {
-	// 	pass_command := []string{"sh", "-c", fmt.tprintf("pass otp -c %s", action.name)}
-	// 	_, out, _, e := os2.process_exec({command = pass_command}, context.allocator)
-	// } else {
-	// 	// 	fmt.println(
-	// 	// 		"no otp",
-	// 	// 		out_s,
-	// 	// 		fmt.tprintf("echo \"%s\" | wl-copy", strings.trim(out_s, "\n")),
-	// 	// 	)
-	// 	// 	_, _, _, e = os2.process_exec(
-	// 	// 		{command = {"sh", "-c", fmt.tprintf("echo %s | wl-copy", string(out))}},
-	// 	// 		context.allocator,
-	// 	// 	)
-	// 	// 	fmt.println(e)
-	// }
-	// _, out, _, e := os2.process_exec({command = pass_command}, context.allocator)
-	// p, e := os2.process_start({command = pass_command})
-	// _, _ = os2.process_wait(p)
+	out_s := string(out)
+	if strings.starts_with(out_s, "otpauth://") {
+		pass_command := []string{"sh", "-c", fmt.tprintf("pass otp %s", action.name)}
+		_, out, _, e := os2.process_exec({command = pass_command}, context.allocator)
+		_, _ = os2.process_start({command = {"wl-copy", strings.trim(string(out), "\n")}})
+	} else {
+		_, _ = os2.process_start({command = {"wl-copy", strings.trim(string(out_s), "\n")}})
+	}
 
 	engine.state.running = false
 }
