@@ -67,6 +67,7 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	gl.Disable(gl.BLEND)
 
 	gl.Flush()
+	egl.SwapBuffers(platform.inst().egl_render_context.display, canvas.egl_surface)
 }
 
 

@@ -54,5 +54,4 @@ create_canvas :: proc(
 
 render :: proc(canvas: ^canvas.Canvas) {
 	pl.render(pl.inst())
-	egl.SwapBuffers(pl.inst().egl_render_context.display, canvas.egl_surface)
 }
