@@ -38,12 +38,16 @@ input_text_draw :: proc(input: ^InputText, cv: ^canvas.Canvas) {
 	gl.Enable(gl.SCISSOR_TEST)
 	gl.Scissor(rect[0], rect[1], rect[2], rect[3])
 	x := input.x + 4
-	tw, th := cv->draw_text(x, input.y, input.text, &input.font)
+	text_y := input.y + ((input.h - input.font.line_height) / 2)
+
+	tw, th := cv->draw_text(x, text_y, input.text, &input.font)
 
 
 	// // Draw cursor
 	input.cursor_x = math.lerp(input.cursor_x, input.x + tw, f32(0.25))
-	cv->draw_rect(x + input.cursor_x, input.y, 10, th, color = {0.1, 0.2, 0.7, 1.0})
+
+	// Draw the cursor at the text_y in the cursos x position with a tenth of the text height
+	cv->draw_rect(x + input.cursor_x, text_y, th / 10, th, color = {0.1, 0.2, 0.7, 1.0})
 
 	gl.Scissor(0, 0, cv.width, cv.height)
 	gl.Disable(gl.SCISSOR_TEST)
