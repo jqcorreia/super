@@ -86,7 +86,7 @@ main :: proc() {
 	// action_items += actions.get_secret_actions()
 	fmt.println("Number of apps detected:", len(action_items))
 
-	c1 := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Layer, draw)
+	c1 := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Window, draw)
 
 	search := widgets.InputText {
 		x    = 0,

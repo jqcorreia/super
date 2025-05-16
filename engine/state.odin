@@ -25,7 +25,7 @@ EngineState :: struct {
 }
 
 
-FONT :: "JetBrainsMono Nerd Font Mono"
+FONT :: "JetBrainsMono Nerd Font"
 
 state: ^EngineState
 
@@ -39,7 +39,7 @@ init :: proc() {
 
 	fm := fonts.new_font_manager()
 
-	state.font = fm->load_font(FONT, 36)
+	state.font = fm->load_font(FONT, 20)
 	state.text = ""
 }
 

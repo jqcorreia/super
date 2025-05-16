@@ -88,7 +88,7 @@ recreate_egl_window :: proc(
 window_listener := wl.xdg_surface_listener {
 	configure = proc "c" (data: rawptr, surface: ^wl.xdg_surface, serial: c.uint32_t) {
 		context = runtime.default_context()
-		fmt.println("window configure")
+		// fmt.println("window configure")
 		cc := cast(^CanvasCallback)data
 		canvas := cc.canvas
 		state := cc.platform_state
@@ -108,11 +108,11 @@ toplevel_listener := wl.xdg_toplevel_listener {
 		states: ^wl.wl_array,
 	) {
 		context = runtime.default_context()
-		fmt.println("Top level configure")
+		// fmt.println("Top level configure")
 		cc := cast(^CanvasCallback)data
 		canvas := cc.canvas
 		egl_render_context := cc.platform_state.egl_render_context
-		fmt.println(canvas.width, width, canvas.height, height)
+		// fmt.println(canvas.width, width, canvas.height, height)
 		if canvas.width != width || canvas.height != height {
 			recreate_egl_window(canvas, egl_render_context, i32(width), i32(height))
 			canvas.width = width

@@ -12,11 +12,13 @@ import "vendor:x11/xlib"
 KeySym :: xlib.KeySym
 
 KeyPressed :: struct {
-	key: KeySym,
+	key:    KeySym,
+	serial: u32,
 }
 
 KeyReleased :: struct {
-	key: KeySym,
+	key:    KeySym,
+	serial: u32,
 }
 
 TextInput :: struct {

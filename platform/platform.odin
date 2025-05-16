@@ -2,6 +2,7 @@ package platform
 
 import "../platform/fonts"
 import wl "../vendor/wayland-odin/wayland"
+import "base:runtime"
 import "core:c"
 import "core:fmt"
 import "core:time"
@@ -14,6 +15,7 @@ PlatformState :: struct {
 	xdg_base:               ^wl.xdg_wm_base,
 	zwlr_layer_shell_v1:    ^wl.zwlr_layer_shell_v1,
 	seat:                   ^wl.wl_seat,
+	data_device_manager:    ^wl.wl_data_device_manager,
 	egl_render_context:     RenderContext,
 	input:                  ^Input,
 	shaders:                ^Shaders,
@@ -42,6 +44,8 @@ global :: proc "c" (
 	interface: cstring,
 	version: c.uint32_t,
 ) {
+	// context = runtime.default_context()
+	// fmt.println(interface)
 	if interface == wl.wl_compositor_interface.name {
 		state: ^PlatformState = cast(^PlatformState)data
 		state.compositor =
@@ -78,6 +82,17 @@ global :: proc "c" (
 		state.seat =
 		cast(^wl.wl_seat)(wl.wl_registry_bind(registry, name, &wl.wl_seat_interface, version))
 	}
+
+	if interface == wl.wl_data_device_manager_interface.name {
+		state: ^PlatformState = cast(^PlatformState)data
+		state.data_device_manager =
+		cast(^wl.wl_data_device_manager)(wl.wl_registry_bind(
+				registry,
+				name,
+				&wl.wl_data_device_manager_interface,
+				version,
+			))
+	}
 }
 
 global_remove :: proc "c" (data: rawptr, registry: ^wl.wl_registry, name: c.uint32_t) {
@@ -105,6 +120,9 @@ init_platform :: proc() {
 
 	// Initialize input controller
 	init_input(platform)
+
+	// Initialize clipboard controller
+	init_clipboard(platform)
 
 	// Initialize shaders controller
 	platform.shaders = create_shaders_controller()

@@ -29,9 +29,13 @@ odin build -
 - [x] Proper text rendering with glyph caching
 - [x] Rudimentary text box input
 - [x] Fix error where number of list items is too small.
-- [x] Implement list selected item/index mechanics - !
 - [x] Implement applications source 
 - [x] Implement secrets source
+- [ ] Add clipboard support
+- [ ] Implement list selected item/index mechanics - !
+- [ ] Fix list flickering and weird alpha
+- [ ] Fix window layer
+- [ ] Investigate modal vs layer
 - [ ] Image (PNG, JPEG) rendering
 - [ ] Layout manager, dumb, simple one, please...
 - [ ] Keyboard repeat 

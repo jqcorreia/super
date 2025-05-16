@@ -93,10 +93,32 @@ do_secret_action :: proc(action: SecretAction) {
 	// }
 
 	pass_command := []string{"sh", "-c", fmt.tprintf("pass %s | wl-copy", action.name)}
+	// _, out, _, e := os2.process_exec({command = pass_command}, context.allocator)
 
-	fmt.println("shhhhhhh", action.name)
+	// out_s := string(out)
+	// if strings.starts_with(out_s, "otpauth://") {
+	// 	pass_command := []string{"sh", "-c", fmt.tprintf("pass otp %s", action.name)}
+	// 	_, out, _, e := os2.process_exec({command = pass_command}, context.allocator)
+	// 	fmt.println("otp", string(out), fmt.tprintf("echo %s | wl-copy", string(out)))
+	// 	_, _, _, _ = os2.process_exec(
+	// 		{command = {"sh", "-c", fmt.tprintf("echo %s | wl-copy", string(out))}},
+	// 		context.allocator,
+	// 	)
+	// } else {
+	// 	fmt.println(
+	// 		"no otp",
+	// 		out_s,
+	// 		fmt.tprintf("echo \"%s\" | wl-copy", strings.trim(out_s, "\n")),
+	// 	)
+	// 	_, _, _, e = os2.process_exec(
+	// 		{command = {"sh", "-c", fmt.tprintf("echo %s | wl-copy", string(out))}},
+	// 		context.allocator,
+	// 	)
+	// 	fmt.println(e)
+	// }
 	// _, out, _, e := os2.process_exec({command = pass_command}, context.allocator)
 	p, e := os2.process_start({command = pass_command})
+	// _, _ = os2.process_wait(p)
 
 	engine.state.running = false
 }
