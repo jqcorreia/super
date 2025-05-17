@@ -54,7 +54,7 @@ seat_listener := wl.wl_seat_listener {
 	},
 	name = proc "c" (data: rawptr, wl_seat: ^wl.wl_seat, name: cstring) {
 		context = runtime.default_context()
-		fmt.println("Name: ", name)
+		fmt.println("Seat Name: ", name)
 	},
 }
 

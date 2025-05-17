@@ -44,8 +44,8 @@ init :: proc() {
 }
 
 create_canvas :: proc(
-	width: i32,
-	height: i32,
+	width: u32,
+	height: u32,
 	type: canvas.CanvasType,
 	draw_proc: canvas.CanvasDrawProc,
 ) -> ^canvas.Canvas {

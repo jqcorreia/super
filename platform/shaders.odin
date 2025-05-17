@@ -12,7 +12,11 @@ load_shader_from_paths :: proc(vertex_shader_path: string, fragment_shader_path:
 
 	assert(
 		result,
-		fmt.tprintf("Failed to load shader: %s %s", vertex_shader_path, fragment_shader_path),
+		fmt.tprintf(
+			"Failed to load shader from paths: %s %s",
+			vertex_shader_path,
+			fragment_shader_path,
+		),
 	)
 
 	return shader
@@ -26,7 +30,11 @@ load_shader_from_strings :: proc(vertex_shader_source: []u8, fragment_shader_sou
 
 	assert(
 		result,
-		fmt.tprintf("Failed to load shader: %s %s", vertex_shader_source, fragment_shader_source),
+		fmt.tprintf(
+			"Failed to load shader from sources: %s %s",
+			vertex_shader_source,
+			fragment_shader_source,
+		),
 	)
 
 	return shader

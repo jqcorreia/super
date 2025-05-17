@@ -96,12 +96,12 @@ main :: proc() {
 		h     = f32(c1.height) - 50,
 		items = action_items[:],
 		font  = &engine.state.font,
-		// draw_item = widgets.list_draw_action,
 	}
 
 	append(&app.widget_list, search)
 	append(&app.widget_list, list)
 
+	fmt.println("LOOOOAD")
 	platform.new_shader(
 		"Singularity",
 		#load("shaders/basic_vert.glsl"),
