@@ -66,6 +66,8 @@ resize_egl_window :: proc(
 ) {
 	fmt.println("Resize EGL window")
 	wl.egl_window_resize(canvas.egl_window, c.int(width), c.int(height), 0, 0)
+	canvas.width = width
+	canvas.height = height
 }
 create_egl_window :: proc(
 	canvas: ^Canvas,
@@ -74,7 +76,7 @@ create_egl_window :: proc(
 	height: i32,
 ) {
 	fmt.println("Recreate EGL window")
-	egl_window := wl.egl_window_create(canvas.surface, width, height)
+	egl_window := wl.egl_window_create(canvas.surface, canvas.width, canvas.height)
 	egl_surface := egl.CreateWindowSurface(
 		egl_render_context.display,
 		egl_render_context.config,
