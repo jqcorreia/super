@@ -47,13 +47,11 @@ get_application_actions :: proc() -> []Action {
 		for fi in fis {
 			res, _, _ := ini.load_map_from_path(fi.fullpath, context.temp_allocator)
 
-			de, ok := res["Desktop Entry"]
-			if ok {
+			de, ok_entry := res["Desktop Entry"]
+			if ok_entry {
 				name, _ := de["Name"]
 				exec, _ := de["Exec"]
-				if ok {
-					append(&applications, ApplicationAction{name = name, command = exec})
-				}
+				append(&applications, ApplicationAction{name = name, command = exec})
 			}
 		}
 	}
@@ -78,13 +76,13 @@ do_secret_action :: proc(action: SecretAction) {
 	// - If you call process_exec with wl-copy, given that it is a process that doesn't exit, we just hang
 	// - Do the check and call the process_start() that doesn't hang and let wl-copy do it's thing
 	pass_command := []string{"sh", "-c", fmt.tprintf("pass %s", action.name)}
-	_, out, _, e := os2.process_exec({command = pass_command}, context.allocator)
+	_, out, _, _ := os2.process_exec({command = pass_command}, context.allocator)
 
 	out_s := string(out)
 	if strings.starts_with(out_s, "otpauth://") {
-		pass_command := []string{"sh", "-c", fmt.tprintf("pass otp %s", action.name)}
-		_, out, _, e := os2.process_exec({command = pass_command}, context.allocator)
-		_, _ = os2.process_start({command = {"wl-copy", strings.trim(string(out), "\n")}})
+		pass_command_otp := []string{"sh", "-c", fmt.tprintf("pass otp %s", action.name)}
+		_, out_otp, _, _ := os2.process_exec({command = pass_command_otp}, context.allocator)
+		_, _ = os2.process_start({command = {"wl-copy", strings.trim(string(out_otp), "\n")}})
 	} else {
 		_, _ = os2.process_start({command = {"wl-copy", strings.trim(string(out_s), "\n")}})
 	}

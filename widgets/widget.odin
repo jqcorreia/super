@@ -1,10 +1,6 @@
 package widgets
 
 import "../actions"
-import "../engine"
-import "../platform"
-import "../platform/canvas"
-import "core:fmt"
 
 
 WidgetType :: enum {

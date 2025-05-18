@@ -1,21 +1,13 @@
 package main
 
-import "base:runtime"
-import "core:c"
 import "core:fmt"
-import "core:os"
-import "core:os/os2"
-import "core:slice"
 import "core:strings"
-import "core:time"
 
 import "actions"
-import "core:encoding/ini"
 import "engine"
 import "platform"
 import "platform/canvas"
 import gl "vendor:OpenGL"
-import "vendor:egl"
 import "widgets"
 
 

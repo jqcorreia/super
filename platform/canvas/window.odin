@@ -12,7 +12,6 @@ window_listener := wl.xdg_surface_listener {
 		fmt.println("window configure")
 		cc := cast(^CanvasCallback)data
 		canvas := cc.canvas
-		state := cc.platform_state
 
 		wl.xdg_surface_ack_configure(surface, serial)
 		wl.wl_surface_damage(canvas.surface, 0, 0, canvas.width, canvas.height)
@@ -32,7 +31,7 @@ toplevel_listener := wl.xdg_toplevel_listener {
 		fmt.println("Top level configure", width, height, states)
 		cc := cast(^CanvasCallback)data
 		canvas := cc.canvas
-		egl_render_context := cc.platform_state.egl_render_context
+		// egl_render_context := cc.platform_state.egl_render_context
 		// if canvas.width != width ||
 		//    canvas.height != height && (canvas.width > 0 && canvas.height > 0) {
 		// 	resize_egl_window(canvas, egl_render_context, i32(width), i32(height))

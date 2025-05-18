@@ -2,9 +2,6 @@ package canvas
 
 import "../../platform"
 import fonts "../../platform/fonts"
-import "core:fmt"
-import "core:os"
-import "core:time"
 import gl "vendor:OpenGL"
 
 
@@ -38,7 +35,6 @@ draw_text_raw :: proc(
 	for rg in buffers {
 		metrics := rg.metrics
 		image := rg.image
-		gp := image.pixels
 
 		tex := rg.tex
 

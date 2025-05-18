@@ -4,10 +4,8 @@ import "../platform"
 import cv "../platform/canvas"
 import "../platform/fonts"
 
-import "../utils/gmath"
 import "core:fmt"
 import "core:math"
-import "core:time"
 import gl "vendor:OpenGL"
 
 import "../actions"

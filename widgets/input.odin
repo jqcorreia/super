@@ -4,7 +4,6 @@ import "../platform"
 import "../platform/canvas"
 import "../platform/fonts"
 
-import "core:fmt"
 import "core:math"
 import "core:strings"
 

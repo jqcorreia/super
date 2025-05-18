@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/DanielGavin/ols/master/misc/ols.schema.json",
+  "profile": "default",
+  "profiles": [
+    {
+      "name": "default",
+      "checker_path": [
+        "."
+      ]
+    }
+  ],
+  "checker_args": "-vet"
+}

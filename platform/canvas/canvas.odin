@@ -4,7 +4,6 @@ import pl "../../platform"
 import "../../platform/fonts"
 import "../../types"
 import "../../utils/gmath"
-import "../../vendor/libschrift-odin/sft"
 import wl "../../vendor/wayland-odin/wayland"
 
 import "base:runtime"

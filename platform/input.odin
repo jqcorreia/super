@@ -5,7 +5,6 @@ import "../vendor/xkbcommon"
 import "base:runtime"
 import "core:c"
 import "core:fmt"
-import "core:strings"
 import "core:sys/posix"
 import "vendor:x11/xlib"
 
@@ -227,7 +226,6 @@ key_handler :: proc "c" (
 		event := KeyReleased {
 			key = key_sym,
 		}
-		state := cast(^PlatformState)data
 		append(&_state.input.events, event)
 		xkbcommon.state_update_key(_state.xkb.state, keycode, false)
 	}

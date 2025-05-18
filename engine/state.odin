@@ -1,18 +1,10 @@
 package engine
 
-import wl "../vendor/wayland-odin/wayland"
-import "../vendor/xkbcommon"
-
-import "core:c"
-import "core:fmt"
 import "core:time"
 
 import pl "../platform"
 import "../platform/canvas"
 import fonts "../platform/fonts"
-import "../vendor/libschrift-odin/sft"
-import "base:runtime"
-import gl "vendor:OpenGL"
 import "vendor:egl"
 
 

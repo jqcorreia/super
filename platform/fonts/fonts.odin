@@ -1,7 +1,6 @@
 package fonts
 
 import "../../vendor/libschrift-odin/sft"
-import "core:c"
 import "core:fmt"
 import "core:os/os2"
 import "core:strings"
@@ -99,7 +98,7 @@ get_font_map :: proc() -> map[string]string {
 
 	_, out, _, _ := os2.process_exec({command = {"fc-list"}}, context.allocator)
 
-	for line, i in strings.split(string(out), "\n") {
+	for line in strings.split(string(out), "\n") {
 		if !strings.contains(line, "style=Regular") {
 			continue
 		}

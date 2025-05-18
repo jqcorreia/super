@@ -1,6 +1,5 @@
 package widgets
 
-import "../platform"
 import "../platform/canvas"
 import "../platform/fonts"
 

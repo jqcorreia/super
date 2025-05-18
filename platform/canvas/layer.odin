@@ -18,7 +18,7 @@ layer_listener := wl.zwlr_layer_surface_v1_listener {
 		fmt.println("layer_configure")
 		cc := cast(^CanvasCallback)data
 		canvas := cc.canvas
-		state := cc.platform_state
+		// state := cc.platform_state
 
 		width := i32(width)
 		height := i32(height)

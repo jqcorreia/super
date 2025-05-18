@@ -1,6 +1,5 @@
 package canvas
 
-import "core:fmt"
 import "core:time"
 import gl "vendor:OpenGL"
 

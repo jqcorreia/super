@@ -2,9 +2,7 @@ package platform
 
 import "../platform/fonts"
 import wl "../vendor/wayland-odin/wayland"
-import "base:runtime"
 import "core:c"
-import "core:fmt"
 import "core:time"
 import gl "vendor:OpenGL"
 import "vendor:egl"

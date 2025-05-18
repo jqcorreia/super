@@ -32,11 +32,10 @@ EGL_PLATFORM_GBM_KHR :: 0x31D7
 EGL_PLATFORM_WAYLAND_KHR :: 0x31D8
 
 init_egl :: proc(display: ^wl.wl_display) -> RenderContext {
-	major, minor, n, size: i32
+	major, minor, n: i32
 	count: i32 = 0
 	configs: [^]egl.Config
 	egl_conf: egl.Config
-	i: int
 	config_attribs: []i32 = {
 		egl.SURFACE_TYPE,
 		egl.WINDOW_BIT,
