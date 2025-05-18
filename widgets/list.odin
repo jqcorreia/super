@@ -159,10 +159,11 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 			y += line_height
 		}
 
-		gl.Finish()
 		// Unbind framebuffer and reset viewport
 		gl.BindFramebuffer(gl.FRAMEBUFFER, 0)
 		gl.Viewport(0, 0, canvas.width, canvas.height)
+
+		gl.Flush()
 
 		list.main_texture = fboTexture
 	}

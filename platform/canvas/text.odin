@@ -38,9 +38,6 @@ draw_text_raw :: proc(
 
 		tex := rg.tex
 
-		gl.Enable(gl.BLEND)
-		gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-
 		draw_rect_raw(
 			resolution,
 			current_x + f32(metrics.leftSideBearing) + f32(rg.kerning.xShift),
@@ -51,13 +48,11 @@ draw_text_raw :: proc(
 			texture = tex,
 		)
 
-		gl.Disable(gl.BLEND)
 
 		current_x += f32(metrics.advanceWidth)
 	}
 
 	return current_x, total_line_height
-	// return 100
 }
 
 draw_text :: proc(
