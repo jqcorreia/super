@@ -26,7 +26,7 @@ draw :: proc(cv: ^canvas.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-	img := engine.state.images->load(xdg.icon_map["blueman-pair-symbolic"].path)
+	img := engine.state.images->load(xdg.icon_map["zen"].path)
 	// canvas.draw_image(cv, 10, 10, img)
 	cv->draw_rect(
 		0,
@@ -52,7 +52,7 @@ draw :: proc(cv: ^canvas.Canvas) {
 	}
 	gl.Disable(gl.BLEND)
 
-	canvas.draw_image(cv, 10, 10, img)
+	canvas.draw_image(cv, 10, 10, img, w = 24, h = 24)
 	gl.Flush()
 }
 

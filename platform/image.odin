@@ -36,10 +36,7 @@ load_image :: proc(manager: ^ImageManager, path: string) -> Image {
 			isize := resvg.get_image_size(tree)
 			w = i32(isize.w)
 			h = i32(isize.h)
-			fmt.println(w, h)
 			c = 4
-
-			fmt.println(isize)
 
 			buf = make([]byte, int(isize.w * isize.h * f32(c)))
 			fmt.println(isize.w, isize.h)
