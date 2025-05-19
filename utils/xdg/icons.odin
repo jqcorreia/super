@@ -1,16 +1,63 @@
 package xdg
 
+import "core:encoding/ini"
+import "core:fmt"
 import "core:os"
+import "core:path/filepath"
+import "core:strconv"
+import "core:strings"
 
-icon_map := map[string]Icon
-
-Icon :: struct {}
-
+Icon :: struct {
+	path: string,
+}
+icon_map := make(map[string]Icon)
 
 @(init)
 generate_icon_map :: proc() {
 	home := os.get_env("HOME")
-	xdg_data_dirs := os.lookup_env("XDG_DATA_DIRS") or_else fmt.tprintf("%s/.local/share", home)
+	xdg_data_dirs :=
+		os.lookup_env("XDG_DATA_DIRS") or_else fmt.tprintf("/usr/share:%s/.local/share", home)
+
+	base_folders := strings.split(xdg_data_dirs, ":")
+	themes: []string = {"hicolor"}
+	for theme in themes {
+		for base_folder in base_folders {
+			path := fmt.tprintf("%s/icons/%s/index.theme", base_folder, theme)
+			res, _, _ := ini.load_map_from_path(path, context.temp_allocator)
+			dirs: []string
+			if it, ok := res["Icon Theme"]; ok {
+				if _dirs, ok2 := it["Directories"]; ok2 {
+					dirs = strings.split(_dirs, ",")
+				}
+			}
+
+			// fmt.println(dirs)
+			for base_folder2 in base_folders {
+				for dir in dirs {
+					if section, ok3 := res[dir]; ok3 {
+						// size := section["Size"]
+						scale, _ := strconv.parse_int(section["Scale"] or_else "1")
+						// fmt.println(section, size, scale)
+						if scale > 1 {
+							// Ignore scaled icon for now
+							continue
+						}
+						d := fmt.tprintf("%s/icons/%s/%s", base_folder2, theme, dir)
+						h, _ := os.open(d)
+						fis, _ := os.read_dir(h, -1)
+						for fi in fis {
+							stem := filepath.stem(fi.name)
+							icon_map[stem] = Icon {
+								path = fi.fullpath,
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	fmt.println(icon_map)
 	//let home = std::env::var("HOME").unwrap();
 	//let mut map: HashMap<IconConfig, String> = HashMap::new();
 	//let mut sizes: HashSet<u32> = HashSet::new();
