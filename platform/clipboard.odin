@@ -5,6 +5,7 @@ import "base:runtime"
 import "core:c"
 import "core:fmt"
 
+// THIS IS VERY WIP, actually not working.
 data_source_listener := wl.wl_data_source_listener {
 	target = proc "c" (data: rawptr, wl_data_source: ^wl.wl_data_source, mime_type: cstring) {
 		context = runtime.default_context()

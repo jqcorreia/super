@@ -31,12 +31,12 @@ odin build -
 - [x] Fix error where number of list items is too small.
 - [x] Implement applications source 
 - [x] Implement secrets source
-- [ ] Add clipboard support
+- [x] Add clipboard support (used wl-copy)
+- [x] Fix list flickering and weird alpha (disabled blend toggling)
+- [x] Fix window layer - fixed, and setup max and min sized, now it's proper modal
+- [x] Investigate modal vs layer
 - [ ] Implement list selected item/index mechanics - !
-- [ ] Fix list flickering and weird alpha
-- [ ] Fix window layer
-- [ ] Investigate modal vs layer
-- [ ] Image (PNG, JPEG) rendering
+- [x] Image (PNG, JPEG) rendering
 - [ ] Layout manager, dumb, simple one, please...
 - [ ] Keyboard repeat 
 - [ ] Mouse input

@@ -21,15 +21,18 @@ App :: struct {
 
 app := App{}
 
-draw :: proc(canvas: ^canvas.Canvas) {
+draw :: proc(cv: ^canvas.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-	canvas->draw_rect(
+	img := engine.state.images->load(
+		"/home/jqcorreia/.local/share/icons/hicolor/128x128/apps/vivaldi-cifhbcnohmdccbgoicgdjpfamggdegmo-Default.png",
+	)
+	cv->draw_rect(
 		0,
 		0,
-		f32(canvas.width),
-		f32(canvas.height),
+		f32(cv.width),
+		f32(cv.height),
 		color = {0.0, 0.0, 0.0, 1.0},
 		shader = platform.get_shader("Cosmic"),
 	)
@@ -40,16 +43,16 @@ draw :: proc(canvas: ^canvas.Canvas) {
 	for &widget in app.widget_list {
 		#partial switch &w in widget {
 		case widgets.List(string):
-			widgets.draw(&w, canvas)
+			widgets.draw(&w, cv)
 		case widgets.List(actions.Action):
-			widgets.draw(&w, canvas)
+			widgets.draw(&w, cv)
 		case widgets.InputText:
-			widgets.draw(&w, canvas)
+			widgets.draw(&w, cv)
 		}
 	}
-
 	gl.Disable(gl.BLEND)
 
+	canvas.draw_image(cv, 10, 10, img)
 	gl.Flush()
 }
 

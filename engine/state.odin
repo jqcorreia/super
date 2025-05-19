@@ -11,9 +11,9 @@ import "vendor:egl"
 EngineState :: struct {
 	start_time:   time.Time,
 	time_elapsed: time.Duration,
-	text:         string,
 	running:      bool,
 	font:         fonts.Font,
+	images:       pl.ImageManager,
 }
 
 
@@ -32,7 +32,8 @@ init :: proc() {
 	fm := fonts.new_font_manager()
 
 	state.font = fm->load_font(FONT, 30)
-	state.text = ""
+
+	state.images = pl.new_image_manager()
 }
 
 create_canvas :: proc(
