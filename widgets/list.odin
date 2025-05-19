@@ -217,17 +217,17 @@ list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 	#partial switch e in event {
 	case platform.KeyPressed:
 		{
-			if e.key == platform.KeySym.XK_Down {
+			if e.key == platform.KeySym.XK_Page_Down {
 				offset = SCROLL_SPEED
 			}
-			if e.key == platform.KeySym.XK_Up {
+			if e.key == platform.KeySym.XK_Page_Up {
 				offset = -SCROLL_SPEED
 			}
-			if e.key == platform.KeySym.XK_Page_Down {
+			if e.key == platform.KeySym.XK_Down {
 				list.selected_index += 1
 				list.main_texture = 0
 			}
-			if e.key == platform.KeySym.XK_Page_Up {
+			if e.key == platform.KeySym.XK_Up {
 				list.selected_index -= 1
 				list_free_fbo_and_texture(list)
 			}
