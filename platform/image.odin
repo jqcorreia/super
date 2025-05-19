@@ -1,6 +1,6 @@
 package platform
 
-// import "../vendor/resvg"
+import "../vendor/resvg"
 import "core:c"
 import "core:fmt"
 import "core:strings"
@@ -21,29 +21,56 @@ ImageManager :: struct {
 
 @(private)
 load_image :: proc(manager: ^ImageManager, path: string) -> Image {
-	// opts := resvg.options_create()
-	// tree := new(resvg.render_tree)
-
-	// resvg.init_log()
-	// resvg.parse_tree_from_file("/usr/share/icons/hicolor/scalable/apps/firefox.svg", opts, &tree)
-	// isize := resvg.get_image_size(&tree)
-	// fmt.println(isize)
-
 	img, ok := manager.images[path]
 
 	if !ok {
 		w, h, c: c.int
+		buf: []u8
 
-		buf := image.load(strings.clone_to_cstring(path), &w, &h, &c, 0)
-		// image.set_flip_vertically_on_write(true)
+		if strings.ends_with(path, ".svg") {
+			opts := resvg.options_create()
+			tree := new(resvg.render_tree)
 
+			// resvg.init_log()
+			resvg.parse_tree_from_file(strings.clone_to_cstring(path), opts, &tree)
+			isize := resvg.get_image_size(tree)
+			w = i32(isize.w)
+			h = i32(isize.h)
+			fmt.println(w, h)
+			c = 4
+
+			fmt.println(isize)
+
+			buf = make([]byte, int(isize.w * isize.h * f32(c)))
+			fmt.println(isize.w, isize.h)
+			resvg.render(
+				tree,
+				resvg.transform_identity(),
+				u32(isize.w),
+				u32(isize.h),
+				raw_data(buf),
+			)
+		} else {
+			lbuf := image.load(strings.clone_to_cstring(path), &w, &h, &c, 0)
+			buf = lbuf[0:w * h * c]
+		}
 
 		texture: u32
 		gl.GenTextures(1, &texture)
 		fmt.println(texture)
 
 		gl.BindTexture(gl.TEXTURE_2D, texture)
-		gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, i32(w), i32(h), 0, gl.RGBA, gl.UNSIGNED_BYTE, buf)
+		gl.TexImage2D(
+			gl.TEXTURE_2D,
+			0,
+			gl.RGBA,
+			i32(w),
+			i32(h),
+			0,
+			gl.RGBA,
+			gl.UNSIGNED_BYTE,
+			raw_data(buf),
+		)
 		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
 		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
 

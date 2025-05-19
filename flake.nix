@@ -34,6 +34,7 @@
           valgrind
           libxkbcommon
           libschrift
+          resvg
         ];
         shellHook = "zsh";
         name = "super dev shell";
