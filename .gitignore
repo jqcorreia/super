@@ -4,4 +4,5 @@ super
 vgcore.*
 libwayland*
 scanner
+*.a
 
