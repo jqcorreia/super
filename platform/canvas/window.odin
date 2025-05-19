@@ -75,7 +75,7 @@ init_window_canvas :: proc(cc: ^CanvasCallback) {
 	wl.xdg_toplevel_set_parent(toplevel, nil)
 	wl.xdg_surface_add_listener(xdg_surface, &window_listener, cc)
 	wl.xdg_toplevel_set_max_size(toplevel, 800, 600)
-	wl.xdg_toplevel_set_min_size(toplevel, 800, 600)
+	// wl.xdg_toplevel_set_min_size(toplevel, 800, 600)
 
 	// wl.xdg_surface_set_window_geometry(xdg_surface, 100, 100, 100, 100)
 }

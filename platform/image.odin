@@ -1,5 +1,6 @@
 package platform
 
+// import "../vendor/resvg"
 import "core:c"
 import "core:fmt"
 import "core:strings"
@@ -20,12 +21,21 @@ ImageManager :: struct {
 
 @(private)
 load_image :: proc(manager: ^ImageManager, path: string) -> Image {
+	// opts := resvg.options_create()
+	// tree := new(resvg.render_tree)
+
+	// resvg.init_log()
+	// resvg.parse_tree_from_file("/usr/share/icons/hicolor/scalable/apps/firefox.svg", opts, &tree)
+	// isize := resvg.get_image_size(&tree)
+	// fmt.println(isize)
+
 	img, ok := manager.images[path]
 
 	if !ok {
 		w, h, c: c.int
 
 		buf := image.load(strings.clone_to_cstring(path), &w, &h, &c, 0)
+		// image.set_flip_vertically_on_write(true)
 
 
 		texture: u32

@@ -7,6 +7,7 @@ import "actions"
 import "engine"
 import "platform"
 import "platform/canvas"
+import "utils/xdg"
 import gl "vendor:OpenGL"
 import "widgets"
 
@@ -25,9 +26,8 @@ draw :: proc(cv: ^canvas.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-	img := engine.state.images->load(
-		"/home/jqcorreia/.local/share/icons/hicolor/128x128/apps/vivaldi-cifhbcnohmdccbgoicgdjpfamggdegmo-Default.png",
-	)
+	img := engine.state.images->load(xdg.icon_map["nm-signal-25-secure"].path)
+	// canvas.draw_image(cv, 10, 10, img)
 	cv->draw_rect(
 		0,
 		0,
