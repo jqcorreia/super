@@ -2,13 +2,18 @@
 Press &lt;super> to do stuff!
 
 ## Build Instructions
-
 ```
 git submodule init`
 git submodule update`
 odin build -
 ./super
 ```
+
+## Dependencies
+- `libschrift` - font rendering 
+- `resvg` - svg rendering 
+- `libwayland` - wayland support
+- `libxkbcomp` - keyboard state handling (some day we will remove this)
 
 ## Devlog
 - [x] working layer and window surfaces
@@ -35,13 +40,14 @@ odin build -
 - [x] Fix list flickering and weird alpha (disabled blend toggling)
 - [x] Fix window layer - fixed, and setup max and min sized, now it's proper modal
 - [x] Investigate modal vs layer
-- [ ] Implement list selected item/index mechanics - !
 - [x] Image (PNG, JPEG) rendering
+- [x] Image (SVG) rendering
+- [x] BIG GOAL: Make it as usable as `tudo` so I can daily drive this
+- [ ] Implement list selected item/index mechanics - !
 - [ ] Layout manager, dumb, simple one, please...
 - [ ] Keyboard repeat 
 - [ ] Mouse input
 - [ ] Multiple canvas support. Dunno why no work...
 - [ ] Window/Surface resize, push EGL creation to configure()
-- [ ] BIG GOAL: Make it as usable as `tudo` so I can daily drive this
 
 ! == ongoing
