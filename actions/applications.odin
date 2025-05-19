@@ -7,6 +7,8 @@ import "core:os"
 import "core:os/os2"
 import "core:strings"
 
+import "../platform"
+
 ApplicationAction :: struct {
 	name:    string,
 	icon:    u32,
@@ -58,6 +60,18 @@ do_application_action :: proc(action: ApplicationAction) {
 
 	engine.state.running = false
 }
+
+get_icon :: proc(name: string) -> platform.Image {
+	path: string
+	if strings.starts_with(name, "/") {
+		path = name
+	} else {
+
+	}
+
+	return engine.state.images->load(path)
+}
+
 // impl IconFinder {
 
 //     pub fn new() -> IconFinder {
