@@ -10,8 +10,10 @@ import gl "vendor:OpenGL"
 
 import "../actions"
 import "../engine"
-import "../utils/xdg"
+
 SCROLL_SPEED :: 200
+MARGIN_SIZE :: 5
+ICON_SIZE :: 24
 
 list_draw_string :: proc(
 	list: List(string),
@@ -27,6 +29,7 @@ list_draw_string :: proc(
 	return w, h
 }
 
+
 list_draw_action :: proc(
 	list: List(actions.Action),
 	item: actions.Action,
@@ -37,20 +40,36 @@ list_draw_action :: proc(
 	f32,
 ) {
 	w, h: f32 = 0, 0
-	#partial switch i in item {
+	switch i in item {
 	case actions.ApplicationAction:
 		{
-			// img := engine.state.images->load(i.icon.path)
-			// cv.draw_image_raw(resolution, x, y, img, w = 24, h = 24)
-			w, h = cv.draw_text_raw(resolution, x + 25, y, i.name, list.font)
+			fh := list.font.line_height
+			item_size := fh + 2 * MARGIN_SIZE
+			img := engine.state.images->load(i.icon.path)
+			cv.draw_image_raw(
+				resolution,
+				x,
+				y + (item_size - ICON_SIZE) / 2,
+				img,
+				w = ICON_SIZE,
+				h = ICON_SIZE,
+			)
+			w, h = cv.draw_text_raw(
+				resolution,
+				x + ICON_SIZE + 5,
+				y + MARGIN_SIZE,
+				i.name,
+				list.font,
+			)
+			return w, item_size
 		}
 	case actions.SecretAction:
 		{
 			w, h = cv.draw_text_raw(resolution, x, y, i.name, list.font)
+			return w, h
 		}
 	}
-
-	return w, h
+	return 0, 0
 }
 
 list_draw_item :: proc {
@@ -154,8 +173,8 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 					0,
 					y,
 					main_texture_w,
-					list.font.line_height,
-					color = {0.2, 0.2, 0.2, 1.0},
+					list.font.line_height + 2 * MARGIN_SIZE,
+					color = {0.2, 0.2, 0.4, 1.0},
 				)
 			}
 			draw_func := list.draw_item != nil ? list.draw_item : list_draw_item

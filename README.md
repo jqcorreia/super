@@ -43,6 +43,7 @@ odin build -
 - [x] Image (PNG, JPEG) rendering
 - [x] Image (SVG) rendering
 - [x] BIG GOAL: Make it as usable as `tudo` so I can daily drive this
+- [ ] Load correct sized icons with load hints
 - [ ] Implement list selected item/index mechanics - !
 - [ ] Layout manager, dumb, simple one, please...
 - [ ] Keyboard repeat 

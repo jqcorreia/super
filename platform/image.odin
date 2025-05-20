@@ -2,7 +2,6 @@ package platform
 
 import "../vendor/resvg"
 import "core:c"
-import "core:fmt"
 import "core:strings"
 import gl "vendor:OpenGL"
 import "vendor:stb/image"
@@ -39,7 +38,6 @@ load_image :: proc(manager: ^ImageManager, path: string) -> Image {
 			c = 4
 
 			buf = make([]byte, int(isize.w * isize.h * f32(c)))
-			fmt.println(isize.w, isize.h)
 			resvg.render(
 				tree,
 				resvg.transform_identity(),
@@ -54,7 +52,6 @@ load_image :: proc(manager: ^ImageManager, path: string) -> Image {
 
 		texture: u32
 		gl.GenTextures(1, &texture)
-		fmt.println(texture)
 
 		gl.BindTexture(gl.TEXTURE_2D, texture)
 		gl.TexImage2D(
