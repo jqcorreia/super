@@ -6,7 +6,7 @@ import "core:strings"
 import "actions"
 import "engine"
 import "platform"
-import "platform/canvas"
+import cv "platform/canvas"
 import "utils/xdg"
 import gl "vendor:OpenGL"
 import "widgets"
@@ -22,17 +22,18 @@ App :: struct {
 
 app := App{}
 
-draw :: proc(cv: ^canvas.Canvas) {
+draw :: proc(canvas: ^cv.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	// img := engine.state.images->load(xdg.icon_map["zen"].path)
-	// canvas.draw_image(cv, 10, 10, img)
-	cv->draw_rect(
+	// canvas.draw_image(canvas, 10, 10, img)
+	cv.draw_rect(
+		canvas,
 		0,
 		0,
-		f32(cv.width),
-		f32(cv.height),
+		f32(canvas.width),
+		f32(canvas.height),
 		color = {0.0, 0.0, 0.0, 1.0},
 		shader = platform.get_shader("Cosmic"),
 	)
@@ -43,11 +44,11 @@ draw :: proc(cv: ^canvas.Canvas) {
 	for &widget in app.widget_list {
 		#partial switch &w in widget {
 		case widgets.List(string):
-			widgets.draw(&w, cv)
+			widgets.draw(&w, canvas)
 		case widgets.List(actions.Action):
-			widgets.draw(&w, cv)
+			widgets.draw(&w, canvas)
 		case widgets.InputText:
-			widgets.draw(&w, cv)
+			widgets.draw(&w, canvas)
 		}
 	}
 	gl.Disable(gl.BLEND)
@@ -73,7 +74,7 @@ main :: proc() {
 	// action_items += actions.get_secret_actions()
 	fmt.println("Number of apps detected:", len(action_items))
 
-	c1 := engine.create_canvas(WIDTH, HEIGHT, canvas.CanvasType.Window, draw)
+	c1 := engine.create_canvas(WIDTH, HEIGHT, cv.CanvasType.Window, draw)
 
 	search := widgets.InputText {
 		x    = 0,

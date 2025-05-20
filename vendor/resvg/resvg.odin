@@ -1,8 +1,10 @@
 package resvg
 import "core:c"
 
-options :: struct {}
-render_tree :: struct {}
+options :: struct {
+}
+render_tree :: struct {
+}
 
 size :: struct {
 	w: c.float,
@@ -13,7 +15,7 @@ transform :: struct {
 	a, b, c, d, e, f: c.float,
 }
 
-foreign import resvg "system:libresvg.so"
+foreign import resvg "system:libresvg.a"
 
 @(default_calling_convention = "c", link_prefix = "resvg_")
 foreign resvg {

@@ -1,7 +1,7 @@
 package widgets
 
 import "../platform"
-import "../platform/canvas"
+import cv "../platform/canvas"
 import "../platform/fonts"
 
 import "core:math"
@@ -19,8 +19,9 @@ InputText :: struct {
 	cursor_x: f32,
 }
 
-input_text_draw :: proc(input: ^InputText, cv: ^canvas.Canvas) {
-	cv->draw_rect(
+input_text_draw :: proc(input: ^InputText, canvas: ^cv.Canvas) {
+	cv.draw_rect(
+		canvas,
 		input.x,
 		input.y,
 		input.w,
@@ -30,7 +31,7 @@ input_text_draw :: proc(input: ^InputText, cv: ^canvas.Canvas) {
 	)
 	rect: []i32 = {
 		i32(input.x),
-		i32(f32(cv.height) - input.y - input.h),
+		i32(f32(canvas.height) - input.y - input.h),
 		i32(input.w),
 		i32(input.h),
 	}
@@ -39,16 +40,16 @@ input_text_draw :: proc(input: ^InputText, cv: ^canvas.Canvas) {
 	x := input.x + 4
 	text_y := input.y + ((input.h - input.font.line_height) / 2)
 
-	tw, th := cv->draw_text(x, text_y, input.text, &input.font)
+	tw, th := cv.draw_text(canvas, x, text_y, input.text, &input.font)
 
 
 	// Draw cursor
 	input.cursor_x = math.lerp(input.cursor_x, input.x + tw, f32(0.25))
 
 	// Draw;the;cursor;at;the;text_y in the;cursos;x;position;with;a;tenth;of;the;text;height
-	cv->draw_rect(x + input.cursor_x, text_y, th / 10, th, color = {0.1, 0.2, 0.7, 1.0})
+	cv.draw_rect(canvas, x + input.cursor_x, text_y, th / 10, th, color = {0.1, 0.2, 0.7, 1.0})
 
-	gl.Scissor(0, 0, cv.width, cv.height)
+	gl.Scissor(0, 0, canvas.width, canvas.height)
 	gl.Disable(gl.SCISSOR_TEST)
 }
 

@@ -1,8 +1,6 @@
 package canvas
 
 import pl "../../platform"
-import "../../platform/fonts"
-import "../../types"
 import "../../utils/gmath"
 import wl "../../vendor/wayland-odin/wayland"
 
@@ -22,24 +20,6 @@ Canvas :: struct {
 	egl_surface:   egl.Surface,
 	egl_window:    ^wl.egl_window,
 	draw_proc:     CanvasDrawProc,
-	draw_rect:     proc(
-		canvas: ^Canvas,
-		x, y, width, height: f32,
-		vertices: ^[]f32 = nil,
-		color: types.Color = types.Color{0.0, 0.0, 0.0, 0.0},
-		shader: u32 = 0,
-		texture: u32 = 0,
-	),
-	draw_text:     proc(
-		canvas: ^Canvas,
-		x, y: f32,
-		text: string,
-		font: ^fonts.Font,
-		shader: u32 = 0,
-	) -> (
-		f32,
-		f32,
-	),
 	ready:         bool,
 }
 
@@ -128,8 +108,6 @@ create_canvas :: proc(
 	canvas.height = i32(height)
 	canvas.surface = wl.wl_compositor_create_surface(platform.compositor)
 
-	canvas.draw_rect = draw_rect
-	canvas.draw_text = draw_text
 	if canvas.surface == nil {
 		fmt.println("Error creating surface")
 		return canvas

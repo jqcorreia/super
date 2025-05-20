@@ -1,6 +1,6 @@
 package widgets
 
-import "../platform/canvas"
+import cv "../platform/canvas"
 import "../platform/fonts"
 
 Label :: struct {
@@ -10,6 +10,6 @@ Label :: struct {
 	font: ^fonts.Font,
 }
 
-label_draw :: proc(label: Label, canvas: ^canvas.Canvas) {
-	canvas->draw_text(label.x, label.y, label.text, label.font)
+label_draw :: proc(label: Label, canvas: ^cv.Canvas) {
+	cv.draw_text(canvas, label.x, label.y, label.text, label.font)
 }

@@ -68,7 +68,7 @@ draw_rect :: proc(
 	canvas: ^Canvas,
 	x, y, width, height: f32,
 	vertices: ^[]f32 = nil,
-	color: types.Color,
+	color: types.Color = {0.0, 0.0, 0.0, 1.0},
 	shader: u32 = 0,
 	texture: u32 = 0,
 ) {

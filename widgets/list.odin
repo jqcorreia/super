@@ -214,7 +214,8 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 		bottom_v,
 	}
 	// Draw texture in place
-	canvas->draw_rect(
+	cv.draw_rect(
+		canvas,
 		list.x,
 		list.y,
 		list.w,
@@ -231,7 +232,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 	shh: f32 = 40.0
 	shw: f32 = 5.0
 	shy := position_percent * (list.h - shh) + list.y
-	canvas->draw_rect(list.x + list.w - shw, shy, shw, shh, color = {0.2, 0.2, 0.7, 1.0})
+	cv.draw_rect(canvas, list.x + list.w - shw, shy, shw, shh, color = {0.2, 0.2, 0.7, 1.0})
 }
 
 list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
