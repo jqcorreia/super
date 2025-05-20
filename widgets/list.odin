@@ -9,6 +9,8 @@ import "core:math"
 import gl "vendor:OpenGL"
 
 import "../actions"
+import "../engine"
+import "../utils/xdg"
 SCROLL_SPEED :: 200
 
 list_draw_string :: proc(
@@ -38,7 +40,9 @@ list_draw_action :: proc(
 	#partial switch i in item {
 	case actions.ApplicationAction:
 		{
-			w, h = cv.draw_text_raw(resolution, x, y, i.name, list.font)
+			// img := engine.state.images->load(i.icon.path)
+			// cv.draw_image_raw(resolution, x, y, img, w = 24, h = 24)
+			w, h = cv.draw_text_raw(resolution, x + 25, y, i.name, list.font)
 		}
 	case actions.SecretAction:
 		{
