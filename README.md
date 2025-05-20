@@ -44,11 +44,13 @@ odin build -
 - [x] Image (SVG) rendering
 - [x] BIG GOAL: Make it as usable as `tudo` so I can daily drive this
 - [ ] Load correct sized icons with load hints
+- [ ] Check why egl.CreateContext() allocates so much memory! 
 - [ ] Implement list selected item/index mechanics - !
 - [ ] Layout manager, dumb, simple one, please...
 - [ ] Keyboard repeat 
 - [ ] Mouse input
 - [ ] Multiple canvas support. Dunno why no work...
 - [ ] Window/Surface resize, push EGL creation to configure()
+- [ ] Port platform and renderer to Vulkan
 
 ! == ongoing

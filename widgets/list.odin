@@ -213,7 +213,6 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 		0.0,
 		bottom_v,
 	}
-
 	// Draw texture in place
 	canvas->draw_rect(
 		list.x,
