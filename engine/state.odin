@@ -31,7 +31,7 @@ init :: proc() {
 
 	fm := fonts.new_font_manager()
 
-	state.font = fm->load_font(FONT, 30)
+	state.font = fm->load_font(FONT, 24)
 
 	state.images = pl.new_image_manager()
 }
