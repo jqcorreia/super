@@ -4,6 +4,7 @@ import "core:encoding/ini"
 import "core:fmt"
 import "core:os"
 import "core:path/filepath"
+import "core:slice"
 import "core:strconv"
 import "core:strings"
 
@@ -18,14 +19,73 @@ IconLookup :: struct {
 
 IconManager :: struct {
 	icon_map: map[IconLookup]Icon,
-	sizes:    [dynamic]u32,
+	sizes:    map[u32]bool, // Use this as a set
 }
 
 icon_manager: IconManager
 
+icon_manager_get_icon :: proc(il: IconLookup) -> (Icon, bool) {
+	if icon, ok := icon_manager.icon_map[il]; ok {
+		return icon, ok
+	}
+
+	sizes, _ := slice.map_keys(icon_manager.sizes)
+	slice.reverse_sort(sizes)
+
+	for size in sizes {
+		if icon, size_ok := icon_manager.icon_map[IconLookup{name = il.name, size = size}];
+		   size_ok {
+			return icon, size_ok
+		}
+	}
+	return Icon{}, false
+}
+
+//     pub fn get_icon_with_size(&self, name: String, size: u32) -> Option<String> {
+//         fn check_file(path: String) -> Option<String> {
+//             match std::fs::read(&path) {
+//                 Ok(_) => Some(path),
+//                 Err(_) => None,
+//             }
+//         }
+
+//         // First check if icon identifier is a path
+//         if name.starts_with("/") && fs::metadata(name.clone()).is_ok() {
+//             return check_file(name);
+//         }
+
+//         // Check for exact match
+//         if let Some(path) = self.map.get(&IconConfig {
+//             name: name.clone(),
+//             size,
+//         }) {
+//             return check_file(path.to_string());
+//         }
+
+//         // Scan different sizes until one appears
+//         // In this case we are going from largest to smallest
+//         // FIXME(quadrado): We can do better here to try and find the closest match
+//         let mut _sizes: Vec<u32> = self.sizes.clone().into_iter().collect::<Vec<u32>>();
+//         _sizes.sort();
+//         _sizes.reverse();
+
+//         for _size in _sizes {
+//             let icon_config = IconConfig {
+//                 name: name.clone(),
+//                 size: _size,
+//             };
+//             if let Some(path) = self.map.get(&icon_config) {
+//                 return check_file(path.to_string());
+//             }
+//         }
+//         None
+//     }
+// }
 @(init)
 generate_icon_map :: proc() {
 	icon_manager.icon_map = make(map[IconLookup]Icon)
+	icon_manager.sizes = make(map[u32]bool)
+
 	home := os.get_env("HOME")
 	xdg_data_dirs :=
 		os.lookup_env("XDG_DATA_DIRS") or_else fmt.tprintf("/usr/share:%s/.local/share", home)
@@ -64,6 +124,7 @@ generate_icon_map :: proc() {
 									path = fi.fullpath,
 								}
 						}
+						icon_manager.sizes[u32(size)] = true
 					}
 				}
 			}
