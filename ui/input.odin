@@ -1,4 +1,4 @@
-package widgets
+package ui
 
 import "../platform"
 import cv "../platform/canvas"
@@ -26,8 +26,7 @@ input_text_draw :: proc(input: ^InputText, canvas: ^cv.Canvas) {
 		input.y,
 		input.w,
 		input.h,
-		color = {0.5, 0.5, 0.5, 1.0},
-		shader = platform.get_shader("Rounded"),
+		{color = {0.5, 0.5, 0.5, 1.0}, shader = platform.get_shader("Rounded")},
 	)
 	rect: []i32 = {
 		i32(input.x),
@@ -47,7 +46,7 @@ input_text_draw :: proc(input: ^InputText, canvas: ^cv.Canvas) {
 	input.cursor_x = math.lerp(input.cursor_x, input.x + tw, f32(0.25))
 
 	// Draw;the;cursor;at;the;text_y in the;cursos;x;position;with;a;tenth;of;the;text;height
-	cv.draw_rect(canvas, x + input.cursor_x, text_y, th / 10, th, color = {0.1, 0.2, 0.7, 1.0})
+	cv.draw_rect(canvas, x + input.cursor_x, text_y, th / 10, th, {color = {0.1, 0.2, 0.7, 1.0}})
 
 	gl.Scissor(0, 0, canvas.width, canvas.height)
 	gl.Disable(gl.SCISSOR_TEST)

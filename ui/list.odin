@@ -1,4 +1,4 @@
-package widgets
+package ui
 import "../platform"
 
 import cv "../platform/canvas"
@@ -46,7 +46,7 @@ list_draw_action :: proc(
 			fh := list.font.line_height
 			item_size := fh + 2 * MARGIN_SIZE
 			img := engine.state.images->load(i.icon.path)
-			cv.draw_image_raw(
+			cv.draw_image(
 				resolution,
 				x,
 				y + (item_size - ICON_SIZE) / 2,
@@ -54,18 +54,12 @@ list_draw_action :: proc(
 				w = ICON_SIZE,
 				h = ICON_SIZE,
 			)
-			w, h = cv.draw_text_raw(
-				resolution,
-				x + ICON_SIZE + 5,
-				y + MARGIN_SIZE,
-				i.name,
-				list.font,
-			)
+			w, h = cv.draw_text(resolution, x + ICON_SIZE + 5, y + MARGIN_SIZE, i.name, list.font)
 			return w, item_size
 		}
 	case actions.SecretAction:
 		{
-			w, h = cv.draw_text_raw(resolution, x, y, i.name, list.font)
+			w, h = cv.draw_text(resolution, x, y, i.name, list.font)
 			return w, h
 		}
 	}
@@ -166,7 +160,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 					y,
 					100,
 					list.font.line_height,
-					color = {0.0, 0.0, 1.0, 1.0},
+					{color = {0.0, 0.0, 1.0, 1.0}},
 				)
 				cv.draw_rect_raw(
 					{main_texture_w, main_texture_h},
@@ -174,7 +168,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 					y,
 					main_texture_w,
 					list.font.line_height + 2 * MARGIN_SIZE,
-					color = {0.2, 0.2, 0.4, 1.0},
+					{color = {0.2, 0.2, 0.4, 1.0}},
 				)
 			}
 			draw_func := list.draw_item != nil ? list.draw_item : list_draw_item
@@ -220,9 +214,13 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 		list.y,
 		list.w,
 		math.min(list.h, main_texture_h),
-		vertices = &vertices,
-		shader = platform.get_shader("Texture"),
-		texture = list.main_texture,
+		{
+			vertices = &vertices,
+			shader   = platform.get_shader("Texture"), //FIXME: Cleanup?
+			texture  = list.main_texture,
+			flip_y   = true,
+			tag      = "list",
+		},
 	)
 
 	// Draw scrollbar handle
@@ -232,7 +230,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 	shh: f32 = 40.0
 	shw: f32 = 5.0
 	shy := position_percent * (list.h - shh) + list.y
-	cv.draw_rect(canvas, list.x + list.w - shw, shy, shw, shh, color = {0.2, 0.2, 0.7, 1.0})
+	cv.draw_rect(canvas, list.x + list.w - shw, shy, shw, shh, {color = {0.2, 0.2, 0.7, 1.0}})
 }
 
 list_update :: proc(list: ^$L/List, event: platform.InputEvent) {

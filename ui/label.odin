@@ -1,4 +1,4 @@
-package widgets
+package ui
 
 import cv "../platform/canvas"
 import "../platform/fonts"

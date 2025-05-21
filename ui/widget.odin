@@ -1,4 +1,4 @@
-package widgets
+package ui
 
 import "../actions"
 
@@ -25,4 +25,9 @@ draw :: proc {
 update :: proc {
 	list_update,
 	input_text_update,
+}
+
+draw_widget :: proc(widget: $S/Widget) {
+	w := widget.(S)
+	draw(w)
 }
