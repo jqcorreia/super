@@ -8,11 +8,10 @@ import "core:os/os2"
 import "core:strings"
 
 import "../platform"
-import "../utils/xdg"
 
 ApplicationAction :: struct {
 	name:    string,
-	icon:    xdg.Icon,
+	icon:    string,
 	command: string,
 }
 get_application_actions :: proc() -> []Action {
@@ -44,10 +43,7 @@ get_application_actions :: proc() -> []Action {
 				name, _ := de["Name"]
 				exec, _ := de["Exec"]
 				icon, _ := de["Icon"]
-				append(
-					&applications,
-					ApplicationAction{name = name, command = exec, icon = xdg.icon_map[icon]},
-				)
+				append(&applications, ApplicationAction{name = name, command = exec, icon = icon})
 			}
 		}
 	}

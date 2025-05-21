@@ -3,6 +3,7 @@ import "../platform"
 
 import cv "../platform/canvas"
 import "../platform/fonts"
+import "../utils/xdg"
 
 import "core:fmt"
 import "core:math"
@@ -13,7 +14,7 @@ import "../engine"
 
 SCROLL_SPEED :: 200
 MARGIN_SIZE :: 5
-ICON_SIZE :: 24
+ICON_SIZE :: 32
 
 list_draw_string :: proc(
 	list: List(string),
@@ -45,7 +46,9 @@ list_draw_action :: proc(
 	switch i in item {
 	case actions.ApplicationAction:
 		{
-			img := engine.state.images->load(i.icon.path)
+			icon := xdg.icon_manager.icon_map[xdg.IconLookup{name = i.icon, size = 32}]
+			fmt.println(icon)
+			img := engine.state.images->load(icon.path)
 			cv.draw_image(
 				resolution,
 				x,
@@ -147,7 +150,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 		gl.Viewport(0, 0, i32(main_texture_w), i32(main_texture_h))
 
 		// Draw calls
-		gl.ClearColor(0.0, 0.0, 0.0, 0.8)
+		gl.ClearColor(0.0, 0.0, 0.0, 0.6)
 		gl.Clear(gl.COLOR_BUFFER_BIT)
 
 		y: f32 = 0

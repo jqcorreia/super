@@ -10,10 +10,22 @@ import "core:strings"
 Icon :: struct {
 	path: string,
 }
-icon_map := make(map[string]Icon)
+
+IconLookup :: struct {
+	name: string,
+	size: u32,
+}
+
+IconManager :: struct {
+	icon_map: map[IconLookup]Icon,
+	sizes:    [dynamic]u32,
+}
+
+icon_manager: IconManager
 
 @(init)
 generate_icon_map :: proc() {
+	icon_manager.icon_map = make(map[IconLookup]Icon)
 	home := os.get_env("HOME")
 	xdg_data_dirs :=
 		os.lookup_env("XDG_DATA_DIRS") or_else fmt.tprintf("/usr/share:%s/.local/share", home)
@@ -35,7 +47,7 @@ generate_icon_map :: proc() {
 			for base_folder2 in base_folders {
 				for dir in dirs {
 					if section, ok3 := res[dir]; ok3 {
-						// size := section["Size"]
+						size, _ := strconv.parse_int(section["Size"] or_else "1")
 						scale, _ := strconv.parse_int(section["Scale"] or_else "1")
 						// fmt.println(section, size, scale)
 						if scale > 1 {
@@ -47,9 +59,10 @@ generate_icon_map :: proc() {
 						fis, _ := os.read_dir(h, -1)
 						for fi in fis {
 							stem := filepath.stem(fi.name)
-							icon_map[stem] = Icon {
-								path = fi.fullpath,
-							}
+							icon_manager.icon_map[IconLookup{name = stem, size = u32(size)}] =
+								Icon {
+									path = fi.fullpath,
+								}
 						}
 					}
 				}

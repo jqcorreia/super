@@ -48,8 +48,6 @@ draw :: proc(canvas: ^cv.Canvas) {
 		}
 	}
 	gl.Disable(gl.BLEND)
-
-	// canvas.draw_image(cv, 10, 10, img, w = 24, h = 24)
 	gl.Flush()
 }
 

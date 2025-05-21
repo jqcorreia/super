@@ -50,7 +50,7 @@ draw_text_raw :: proc(
 		current_x += f32(metrics.advanceWidth)
 	}
 
-	return current_x, total_line_height
+	return current_x - x, total_line_height // current_x - x is equal to total_line_width
 }
 
 draw_text_canvas :: proc(

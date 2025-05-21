@@ -44,6 +44,7 @@ odin build -
 - [x] Image (SVG) rendering
 - [x] BIG GOAL: Make it as usable as `tudo` so I can daily drive this
 - [ ] Load correct sized icons with load hints
+- [ ] Make a UI package properly usable
 - [ ] Check why egl.CreateContext() allocates so much memory! 
 - [ ] Implement list selected item/index mechanics - !
 - [ ] Layout manager, dumb, simple one, please...

@@ -7,6 +7,7 @@ import "../platform/fonts"
 import "core:math"
 import "core:strings"
 
+import "core:fmt"
 import gl "vendor:OpenGL"
 
 InputText :: struct {
@@ -36,17 +37,18 @@ input_text_draw :: proc(input: ^InputText, canvas: ^cv.Canvas) {
 	}
 	gl.Enable(gl.SCISSOR_TEST)
 	gl.Scissor(rect[0], rect[1], rect[2], rect[3])
-	x := input.x + 4
+	x := input.x + 5
 	text_y := input.y + ((input.h - input.font.line_height) / 2)
 
 	tw, th := cv.draw_text(canvas, x, text_y, input.text, &input.font)
 
+	fmt.println(input.cursor_x, tw)
 
 	// Draw cursor
-	input.cursor_x = math.lerp(input.cursor_x, input.x + tw, f32(0.25))
+	input.cursor_x = math.lerp(input.cursor_x, tw, f32(0.25))
 
-	// Draw;the;cursor;at;the;text_y in the;cursos;x;position;with;a;tenth;of;the;text;height
-	cv.draw_rect(canvas, x + input.cursor_x, text_y, th / 10, th, {color = {0.1, 0.2, 0.7, 1.0}})
+	// Draw the cursor at the text_y in the cursos x position with a fifth of the text height
+	cv.draw_rect(canvas, x + input.cursor_x, text_y, th / 5, th, {color = {0.1, 0.2, 0.7, 1.0}})
 
 	gl.Scissor(0, 0, canvas.width, canvas.height)
 	gl.Disable(gl.SCISSOR_TEST)
