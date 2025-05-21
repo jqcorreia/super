@@ -25,6 +25,11 @@ IconManager :: struct {
 icon_manager: IconManager
 
 icon_manager_get_icon :: proc(il: IconLookup) -> (Icon, bool) {
+	if il.name != "" && il.name[0] == '/' {
+		// This means that this is a file just the Icon with this path
+		return Icon{path = il.name}, true
+	}
+
 	if icon, ok := icon_manager.icon_map[il]; ok {
 		return icon, ok
 	}
@@ -32,6 +37,9 @@ icon_manager_get_icon :: proc(il: IconLookup) -> (Icon, bool) {
 	sizes, _ := slice.map_keys(icon_manager.sizes)
 	slice.reverse_sort(sizes)
 
+	// Scan different sizes until one appears
+	// In this case we are going from largest to smallest
+	// FIXME(quadrado): We can do better here to try and find the closest match
 	for size in sizes {
 		if icon, size_ok := icon_manager.icon_map[IconLookup{name = il.name, size = size}];
 		   size_ok {
