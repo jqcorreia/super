@@ -109,11 +109,10 @@ list_free_fbo_and_texture :: proc(list: ^$L/List) {
 }
 
 list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
+	item_size := list.font.line_height + 2 * MARGIN_SIZE
+
 	main_texture_w: f32 = list.w
-	main_texture_h: f32 = math.max(
-		f32(f64(len(list.items)) * list.font.line_metrics.ascender),
-		list.h,
-	)
+	main_texture_h: f32 = math.max(f32(len(list.items)) * f32(item_size), list.h)
 
 	if list.main_texture == 0 {
 		fbo, fboTexture: u32
@@ -250,7 +249,8 @@ list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 		}
 	}
 	if offset != 0 {
-		rendered_height := f32(len(list.items)) * f32(list.font.line_height)
+		item_size := list.font.line_height + 2 * MARGIN_SIZE
+		rendered_height := f32(len(list.items)) * f32(item_size)
 
 		if rendered_height < list.h {
 			// Do not scroll
@@ -259,7 +259,7 @@ list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 		}
 		// This is the number of lines minus line height - the height of the list 'container'
 		// The abs here is to account for the actual list be smaller than the container
-		max_scroll_offset := math.abs(rendered_height - list.h) + 10
+		max_scroll_offset := math.abs(rendered_height - list.h)
 		list.new_scroll_offset = math.clamp(list.scroll_offset + offset, 0, max_scroll_offset)
 	}
 }
