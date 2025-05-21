@@ -40,11 +40,11 @@ list_draw_action :: proc(
 	f32,
 ) {
 	w, h: f32 = 0, 0
+	fh := list.font.line_height
+	item_size := fh + 2 * MARGIN_SIZE
 	switch i in item {
 	case actions.ApplicationAction:
 		{
-			fh := list.font.line_height
-			item_size := fh + 2 * MARGIN_SIZE
 			img := engine.state.images->load(i.icon.path)
 			cv.draw_image(
 				resolution,
@@ -59,8 +59,8 @@ list_draw_action :: proc(
 		}
 	case actions.SecretAction:
 		{
-			w, h = cv.draw_text(resolution, x, y, i.name, list.font)
-			return w, h
+			w, h = cv.draw_text(resolution, x + ICON_SIZE + 5, y + MARGIN_SIZE, i.name, list.font)
+			return w, item_size
 		}
 	}
 	return 0, 0
