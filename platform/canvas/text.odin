@@ -2,7 +2,6 @@ package canvas
 
 import "../../platform"
 import fonts "../../platform/fonts"
-import gl "vendor:OpenGL"
 
 
 draw_text_raw :: proc(
@@ -44,8 +43,7 @@ draw_text_raw :: proc(
 			y + total_line_height + f32(metrics.yOffset),
 			f32(image.width),
 			f32(image.height),
-			shader = shader,
-			texture = tex,
+			{shader = shader, texture = tex},
 		)
 
 
@@ -55,7 +53,7 @@ draw_text_raw :: proc(
 	return current_x, total_line_height
 }
 
-draw_text :: proc(
+draw_text_canvas :: proc(
 	canvas: ^Canvas,
 	x: f32,
 	y: f32,
@@ -67,4 +65,9 @@ draw_text :: proc(
 	f32,
 ) {
 	return draw_text_raw({f32(canvas.width), f32(canvas.height)}, x, y, text, font, _shader)
+}
+
+draw_text :: proc {
+	draw_text_canvas,
+	draw_text_raw,
 }

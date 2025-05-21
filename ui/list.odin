@@ -179,6 +179,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 		// Unbind framebuffer and reset viewport
 		gl.BindFramebuffer(gl.FRAMEBUFFER, 0)
 		gl.Viewport(0, 0, canvas.width, canvas.height)
+		gl.BindTexture(gl.TEXTURE_2D, 0)
 
 		gl.Flush()
 
@@ -214,13 +215,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 		list.y,
 		list.w,
 		math.min(list.h, main_texture_h),
-		{
-			vertices = &vertices,
-			shader   = platform.get_shader("Texture"), //FIXME: Cleanup?
-			texture  = list.main_texture,
-			flip_y   = true,
-			tag      = "list",
-		},
+		{vertices = &vertices, texture = list.main_texture, flip_texture_y = true, tag = "list"},
 	)
 
 	// Draw scrollbar handle

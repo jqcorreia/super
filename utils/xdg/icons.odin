@@ -57,7 +57,6 @@ generate_icon_map :: proc() {
 		}
 	}
 
-	fmt.println(icon_map)
 	//let home = std::env::var("HOME").unwrap();
 	//let mut map: HashMap<IconConfig, String> = HashMap::new();
 	//let mut sizes: HashSet<u32> = HashSet::new();
