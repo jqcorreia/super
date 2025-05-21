@@ -62,12 +62,7 @@ draw_rect_raw :: proc(
 		gl.ActiveTexture(gl.TEXTURE0)
 		gl.BindTexture(gl.TEXTURE_2D, params.texture)
 		gl.Uniform1i(gl.GetUniformLocation(shader, cstring("uTexture")), 0)
-		if params.flip_texture_y {
-			gl.Uniform1i(
-				gl.GetUniformLocation(shader, cstring("flipped")),
-				i32(params.flip_texture_y),
-			)
-		}
+		gl.Uniform1i(gl.GetUniformLocation(shader, cstring("flipped")), i32(params.flip_texture_y))
 	}
 
 	gl.BindVertexArray(quad)
