@@ -77,10 +77,7 @@ list_draw_item :: proc {
 }
 
 List :: struct($item_type: typeid) {
-	x:                 f32,
-	y:                 f32,
-	w:                 f32,
-	h:                 f32,
+	using base:        WidgetBase,
 	items:             []item_type,
 	font:              ^fonts.Font,
 	main_texture:      u32,

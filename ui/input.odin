@@ -7,17 +7,13 @@ import "../platform/fonts"
 import "core:math"
 import "core:strings"
 
-import "core:fmt"
 import gl "vendor:OpenGL"
 
 InputText :: struct {
-	x:        f32,
-	y:        f32,
-	w:        f32,
-	h:        f32,
-	text:     string,
-	font:     fonts.Font,
-	cursor_x: f32,
+	using base: WidgetBase,
+	text:       string,
+	font:       fonts.Font,
+	cursor_x:   f32,
 }
 
 input_text_draw :: proc(input: ^InputText, canvas: ^cv.Canvas) {
