@@ -50,14 +50,16 @@ list_draw_action :: proc(
 			// fmt.println(icon)
 			img := engine.state.images->load(icon.path)
 			if ok_icon {
-				cv.draw_image(
-					resolution,
-					x,
-					y + (item_size - ICON_SIZE) / 2,
-					img,
-					w = ICON_SIZE,
-					h = ICON_SIZE,
-				)
+				if img.texture != 0 {
+					cv.draw_image(
+						resolution,
+						x,
+						y + (item_size - ICON_SIZE) / 2,
+						img,
+						w = ICON_SIZE,
+						h = ICON_SIZE,
+					)
+				}
 			}
 			w, h = cv.draw_text(resolution, x + ICON_SIZE + 5, y + MARGIN_SIZE, i.name, list.font)
 			return w, item_size

@@ -2,6 +2,7 @@ package platform
 
 import "../vendor/resvg"
 import "core:c"
+import "core:fmt"
 import "core:strings"
 import gl "vendor:OpenGL"
 import "vendor:stb/image"
@@ -20,6 +21,7 @@ ImageManager :: struct {
 
 @(private)
 load_image :: proc(manager: ^ImageManager, path: string) -> Image {
+	fmt.println("----------", path)
 	img, ok := manager.images[path]
 
 	if !ok {
@@ -32,6 +34,11 @@ load_image :: proc(manager: ^ImageManager, path: string) -> Image {
 
 			// resvg.init_log()
 			resvg.parse_tree_from_file(strings.clone_to_cstring(path), opts, &tree)
+			if tree == nil {
+				// For now flag this as the image being wrong so we dont keep
+				// reloading a wrong or corrupted image
+				return Image{texture = 0}
+			}
 			isize := resvg.get_image_size(tree)
 			w = i32(isize.w)
 			h = i32(isize.h)
