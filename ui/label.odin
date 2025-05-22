@@ -1,5 +1,6 @@
 package ui
 
+import "../platform"
 import cv "../platform/canvas"
 import "../platform/fonts"
 
@@ -10,6 +11,9 @@ Label :: struct {
 	font: ^fonts.Font,
 }
 
-label_draw :: proc(label: Label, canvas: ^cv.Canvas) {
+label_draw :: proc(label: ^Label, canvas: ^cv.Canvas) {
 	cv.draw_text(canvas, label.x, label.y, label.text, label.font)
+}
+
+label_update :: proc(input: ^Label, event: platform.InputEvent) {
 }

@@ -38,15 +38,9 @@ draw :: proc(canvas: ^cv.Canvas) {
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
 	for &widget in app.widget_list {
-		#partial switch &w in widget {
-		case ui.List(string):
-			ui.draw(&w, canvas)
-		case ui.List(actions.Action):
-			ui.draw(&w, canvas)
-		case ui.InputText:
-			ui.draw(&w, canvas)
-		}
+		ui.draw_widget(&widget, canvas)
 	}
+
 	gl.Disable(gl.BLEND)
 	gl.Flush()
 }
@@ -176,14 +170,7 @@ main :: proc() {
 				}
 			}
 			for &widget in app.widget_list {
-				#partial switch &w in widget {
-				case ui.List(actions.Action):
-					ui.update(&w, event)
-				case ui.List(string):
-					ui.update(&w, event)
-				case ui.InputText:
-					ui.update(&w, event)
-				}
+				ui.update_widget(&widget, event)
 			}
 		}
 		engine.render(c1)

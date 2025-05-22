@@ -1,6 +1,8 @@
 package ui
 
 import "../actions"
+import "../platform"
+import cv "../platform/canvas"
 
 
 Widget :: union {
@@ -28,38 +30,28 @@ update :: proc {
 	input_text_update,
 }
 
-draw_widget :: proc(widget: $S/Widget) {
-	w := widget.(S)
-	draw(w)
+draw_widget :: proc(widget: ^Widget, canvas: ^cv.Canvas) {
+	switch &w in widget {
+	case List(string):
+		list_draw(&w, canvas)
+	case List(actions.Action):
+		list_draw(&w, canvas)
+	case InputText:
+		input_text_draw(&w, canvas)
+	case Label:
+		label_draw(&w, canvas)
+	}
 }
 
-// import cv "../platform/canvas"
-
-// Widget2 :: struct {
-// 	type: Widget_Type,
-// }
-
-// Widget_Type :: enum {
-// 	Widget,
-// 	Button,
-// }
-
-// Button :: struct {
-// 	using base: Widget2,
-// }
-
-// Widget_Draw :: #type proc(w: ^Widget2, c: ^cv.Canvas)
-
-// button_draw :: proc(w: ^Widget2, c: ^cv.Canvas) {
-
-// 	b := cast(^Button)w
-// }
-
-// @(rodata)
-// DRAWS := map[Widget_Type]Widget_Draw {
-// 	.Button = button_draw,
-// }
-
-// widget_draw :: proc(w: ^Widget2, c: ^cv.Canvas) {
-// 	if draw, ok := DRAWS[w.type]; ok do draw(w, c)
-// }
+update_widget :: proc(widget: ^Widget, event: platform.InputEvent) {
+	switch &w in widget {
+	case List(actions.Action):
+		list_update(&w, event)
+	case List(string):
+		list_update(&w, event)
+	case InputText:
+		input_text_update(&w, event)
+	case Label:
+		label_update(&w, event)
+	}
+}

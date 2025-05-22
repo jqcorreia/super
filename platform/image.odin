@@ -2,7 +2,6 @@ package platform
 
 import "../vendor/resvg"
 import "core:c"
-import "core:fmt"
 import "core:strings"
 import gl "vendor:OpenGL"
 import "vendor:stb/image"
