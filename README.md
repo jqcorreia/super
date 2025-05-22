@@ -43,11 +43,11 @@ odin build -
 - [x] Image (PNG, JPEG) rendering
 - [x] Image (SVG) rendering
 - [x] BIG GOAL: Make it as usable as `tudo` so I can daily drive this
-- [ ] Load correct sized icons with load hints
+- [x] Load correct sized icons with load hints
+- [ ] Layout manager, dumb, simple one, please... - !
+- [ ] Implement list selected item/index mechanics - !
 - [ ] Make a UI package properly usable
 - [ ] Check why egl.CreateContext() allocates so much memory! 
-- [ ] Implement list selected item/index mechanics - !
-- [ ] Layout manager, dumb, simple one, please...
 - [ ] Keyboard repeat 
 - [ ] Mouse input
 - [ ] Multiple canvas support. Dunno why no work...
