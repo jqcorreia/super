@@ -101,7 +101,6 @@ main :: proc() {
 		},
 	}
 	ui.layout_resize_leafs(layout, 0, 0, u32(c1.width), u32(c1.height), 0)
-	fmt.println(search, list)
 
 	append(&app.widget_list, search)
 	append(&app.widget_list, list)
