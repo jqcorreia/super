@@ -21,7 +21,6 @@ ImageManager :: struct {
 
 @(private)
 load_image :: proc(manager: ^ImageManager, path: string) -> Image {
-	fmt.println("----------", path)
 	img, ok := manager.images[path]
 
 	if !ok {
