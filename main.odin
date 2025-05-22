@@ -90,17 +90,20 @@ main :: proc() {
 	}
 
 	layout: ui.Layout = {
-		root = ui.Split {
-			type = .Vertical,
+		root = {
 			size = 100,
 			size_t = .Abs,
-			children = {
-				ui.Leaf{widget = &search, size = 50, size_t = .Abs},
-				ui.Leaf{widget = &list, size = 100, size_t = .Per},
+			type = ui.Split {
+				type = .Vertical,
+				children = {
+					{type = ui.Leaf{widget = &search}, size = 60, size_t = .Abs},
+					{type = ui.Leaf{widget = &list}, size = 100, size_t = .Per},
+				},
 			},
 		},
 	}
-	ui.layout_resize_leafs(layout, 0, 0, u32(c1.width), u32(c1.height), 0)
+
+	ui.layout_resize_leafs(layout, 0, 0, u32(c1.width), u32(c1.height), 4)
 
 	append(&app.widget_list, search)
 	append(&app.widget_list, list)

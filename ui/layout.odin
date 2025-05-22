@@ -7,10 +7,17 @@ SplitType :: enum {
 	Vertical,
 }
 
-Cell :: union {
+
+CellType :: union {
 	Split,
 	Leaf,
 }
+
+Cell :: struct {
+	using base: Size,
+	type:       CellType,
+}
+
 
 Size :: struct {
 	size:   u32,
@@ -39,7 +46,7 @@ Layout :: struct {
 @(private)
 layout_resize_from_cell :: proc(cell: Cell, x, y, w, h, gap: u32) {
 	fmt.println("-----------", x, y, w, h)
-	switch c in cell {
+	switch c in cell.type {
 	case Leaf:
 		{
 			wi := c.widget
@@ -57,36 +64,16 @@ layout_resize_from_cell :: proc(cell: Cell, x, y, w, h, gap: u32) {
 				sum_fixed_size: u32 = 0
 
 				for split_c in c.children {
-					switch sc in split_c {
-					case Split:
-						{
-							if sc.size_t == .Abs {
-								sum_fixed_size += sc.size
-							}
-
-						}
-					case Leaf:
-						{
-							if sc.size_t == .Abs {
-								sum_fixed_size += sc.size
-							}
-						}
+					if split_c.size_t == .Abs {
+						sum_fixed_size += split_c.size
 					}
 				}
 
 				remaining_size := h - sum_fixed_size
 				for split_c in c.children {
 					h_step: u32 = 0
-					switch sc in split_c {
-					case Split:
-						{
-							h_step = sc.size_t == .Abs ? sc.size : remaining_size * (sc.size / 100)
-						}
-					case Leaf:
-						{
-							h_step = sc.size_t == .Abs ? sc.size : remaining_size * (sc.size / 100)
-						}
-					}
+					h_step =
+						split_c.size_t == .Abs ? split_c.size : remaining_size * (split_c.size / 100)
 					layout_resize_from_cell(split_c, accum_x, accum_y, w, h_step, gap)
 					accum_y += h_step
 				}
