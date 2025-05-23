@@ -1,0 +1,24 @@
+name: Build on Push
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t odin-build-env -f Dockerfile .
+
+      - name: Build project inside container
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/project \
+            -w /project \
+            odin-build-env \
+            odin build src -out:build/my_binary
