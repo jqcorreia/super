@@ -16,7 +16,10 @@ jobs:
 
       - name: Build project inside container
         run: |
+          git config --file .gitmodules submodule.vendor/wayland-odin.url https://github.com/jqcorreia/wayland-odin.git
+          git submodule sync
           git submodule update --init --recursive
+
           docker run --rm \
             -v ${{ github.workspace }}:/project \
             -w /project \
