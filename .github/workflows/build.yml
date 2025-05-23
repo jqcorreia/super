@@ -21,8 +21,8 @@ jobs:
           git submodule update --init --recursive
 
           ls -l .
-          # docker run --rm \
-          #   -v ${{ github.workspace }}:/project \
-          #   -w /project \
-          #   ghcr.io/jqcorreia/super-build:latest \
-          #   odin build . -out:build/super
+          docker run --rm \
+            -v ${{ github.workspace }}:/project \
+            -w /project \
+            ghcr.io/jqcorreia/super-build:latest \
+            odin build . 
