@@ -1,3 +1,3 @@
 #!/bin/env sh
-mkdir -p /tmp 
-odin build . 
+mkdir -p /tmp build 
+odin build . -out:build/super
