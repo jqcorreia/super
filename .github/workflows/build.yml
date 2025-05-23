@@ -20,8 +20,9 @@ jobs:
           git submodule sync
           git submodule update --init --recursive
 
-          docker run --rm \
-            -v ${{ github.workspace }}:/project \
-            -w /project \
-            ghcr.io/jqcorreia/super-build:latest \
-            odin build . -out:build/super
+          ls -l .
+          # docker run --rm \
+          #   -v ${{ github.workspace }}:/project \
+          #   -w /project \
+          #   ghcr.io/jqcorreia/super-build:latest \
+          #   odin build . -out:build/super
