@@ -16,6 +16,7 @@ jobs:
 
       - name: Build project inside container
         run: |
+          git submodule update --init --recursive
           docker run --rm \
             -v ${{ github.workspace }}:/project \
             -w /project \
