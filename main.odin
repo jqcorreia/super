@@ -49,9 +49,9 @@ draw :: proc(canvas: ^cv.Canvas) {
 
 
 main :: proc() {
-	in_buf: [10000]u8
-	n, e := io.read_full(os2.stdin.stream, in_buf[:])
-	fmt.println("##", in_buf, n, e)
+	// in_buf: [10000]u8
+	// n, e := io.read_full(os2.stdin.stream, in_buf[:])
+	// fmt.println("##", in_buf, n, e)
 
 	action_items: [dynamic]actions.Action
 
