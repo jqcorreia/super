@@ -26,5 +26,7 @@ jobs:
             ghcr.io/jqcorreia/super-build:latest \
             ci/ci_build.sh 
 
-          tar -czf super.tar.gz super
+          pwd
           ls -l .
+
+          # tar -czf super.tar.gz super
