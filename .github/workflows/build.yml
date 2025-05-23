@@ -20,9 +20,11 @@ jobs:
           git submodule sync
           git submodule update --init --recursive
 
-          ls -l .
           docker run --rm \
             -v ${{ github.workspace }}:/project \
             -w /project \
             ghcr.io/jqcorreia/super-build:latest \
             ci/ci_build.sh 
+
+          tar -czf super.tar.gz super
+          ls -l .
