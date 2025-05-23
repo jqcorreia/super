@@ -27,3 +27,9 @@ jobs:
             ci/ci_build.sh 
 
           tar -czf super.tar.gz build/super
+
+      - name: Upload tar.gz as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-archive
+          path: super.tar.gz
