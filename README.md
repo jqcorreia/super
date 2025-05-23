@@ -44,6 +44,7 @@ odin build -
 - [x] Image (SVG) rendering
 - [x] BIG GOAL: Make it as usable as `tudo` so I can daily drive this
 - [x] Load correct sized icons with load hints
+- [ ] Vendor some assets like default font
 - [ ] Layout manager, dumb, simple one, please... - !
 - [ ] Implement list selected item/index mechanics - !
 - [ ] Make a UI package properly usable
