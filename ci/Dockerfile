@@ -1,15 +1,21 @@
-FROM debian:bookworm-slim
+FROM archlinux:latest
 
-RUN apt-get update && apt-get install -y \
-    curl unzip build-essential git tar clang
+RUN pacman -Sy && pacman -S archlinux-keyring --noconfirm && pacman-key --init && pacman-key --populate 
+RUN pacman -Syu --noconfirm
 
-RUN curl -LO https://github.com/odin-lang/Odin/releases/download/dev-2025-04/odin-ubuntu-amd64-dev-2025-04.zip 
+RUN pacman -S odin --noconfirm
+RUN pacman -S wayland --noconfirm
+RUN pacman -S libegl --noconfirm
+RUN pacman -S libxkbcommon --noconfirm
 
-RUN unzip odin-ubuntu-amd64-dev-2025-04.zip -d /opt/odin && \
-    tar xvzf /opt/odin/dist.tar.gz -C /opt/odin && \ 
-    rm odin-ubuntu-amd64-dev-2025-04.zip && \
-    rm /opt/odin/dist.tar.gz  
-    # ln -s /opt/odin/odin /usr/local/bin/odin
+# Install libschrift
+RUN pacman -S git base-devel --noconfirm 
+RUN cd / && git clone https://github.com/tomolt/libschrift --depth 1 && cd libschrift && make install
 
-ENV PATH="/opt/odin:${PATH}"
-
+# Install resvg
+RUN pacman -S cargo wget --noconfirm
+RUN cd / && wget https://github.com/linebender/resvg/releases/download/v0.45.1/resvg-0.45.1.tar.xz && \
+    tar -xf resvg-0.45.1.tar.xz && \
+    cd resvg-0.45.1  && \
+    cargo build --release --all && \
+    mv target/release/libresvg.a /usr/lib
