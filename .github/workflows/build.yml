@@ -25,4 +25,4 @@ jobs:
             -v ${{ github.workspace }}:/project \
             -w /project \
             ghcr.io/jqcorreia/super-build:latest \
-            "mkdir -p /tmp && odin build ." 
+            ci/ci_build.sh 
