@@ -47,23 +47,36 @@ draw :: proc(canvas: ^cv.Canvas) {
 	gl.Flush()
 }
 
+check_stdin :: proc() -> bool {
+	return cast(bool)posix.isatty(cast(posix.FD)(os2.fd(os2.stdin)))
+}
+
+import "core:sys/posix"
 
 main :: proc() {
-	// in_buf: [10000]u8
-	// n, e := io.read_full(os2.stdin.stream, in_buf[:])
-	// fmt.println("##", in_buf, n, e)
-
 	action_items: [dynamic]actions.Action
 
-	app_items := actions.get_application_actions()
-	secrets_items := actions.get_secret_actions()
+	if !check_stdin() {
+		buf: []u8 = make([]u8, 1000)
+		fmt.println("Should read from stdin")
+		io.read_full(os2.stdin.stream, buf)
 
-	for i in app_items {
-		append(&action_items, i)
+		for line in strings.split(string(buf), "\n") {
+			append(&action_items, actions.SecretAction{name = line})
+		}
+	} else {
+		fmt.println("Should NOT read from stdin")
+		app_items := actions.get_application_actions()
+		secrets_items := actions.get_secret_actions()
+
+		for i in app_items {
+			append(&action_items, i)
+		}
+		for i in secrets_items {
+			append(&action_items, i)
+		}
 	}
-	for i in secrets_items {
-		append(&action_items, i)
-	}
+
 
 	// action_items += actions.get_secret_actions()
 	fmt.println("Number of apps detected:", len(action_items))

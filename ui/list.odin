@@ -157,21 +157,21 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 		y: f32 = 0
 		for item, idx in list.items {
 			if idx == list.selected_index {
-				cv.draw_rect_raw(
-					{main_texture_w, main_texture_h},
-					0,
-					y,
-					100,
-					list.font.line_height,
-					{color = {0.0, 0.0, 1.0, 1.0}},
-				)
+				// cv.draw_rect_raw(
+				// 	{main_texture_w, main_texture_h},
+				// 	0,
+				// 	y,
+				// 	100,
+				// 	list.font.line_height,
+				// 	{color = {0.0, 0.0, 1.0, 1.0}},
+				// )
 				cv.draw_rect_raw(
 					{main_texture_w, main_texture_h},
 					0,
 					y,
 					main_texture_w,
 					list.font.line_height + 2 * MARGIN_SIZE,
-					{color = {0.2, 0.2, 0.4, 1.0}},
+					{color = {0.2, 0.2, 0.4, 0.95}},
 				)
 			}
 			draw_func := list.draw_item != nil ? list.draw_item : list_draw_item
@@ -243,11 +243,11 @@ list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 				offset = -SCROLL_SPEED
 			}
 			if e.key == platform.KeySym.XK_Down {
-				list.selected_index += 1
+				list.selected_index = math.clamp(list.selected_index + 1, 0, len(list.items))
 				list.main_texture = 0
 			}
 			if e.key == platform.KeySym.XK_Up {
-				list.selected_index -= 1
+				list.selected_index = math.clamp(list.selected_index - 1, 0, len(list.items))
 				list_free_fbo_and_texture(list)
 			}
 		}
