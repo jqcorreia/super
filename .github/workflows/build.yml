@@ -20,6 +20,10 @@ jobs:
           git submodule sync
           git submodule update --init --recursive
 
+          ls -l .
+          echo "========================"
+          echo ${{ github.workspace }}
+
           docker run --rm \
             -v ${{ github.workspace }}:/project \
             -w /project \
@@ -27,6 +31,6 @@ jobs:
             ci/ci_build.sh 
 
           pwd
-          ls -l .
+          ls -l ./project
 
           # tar -czf super.tar.gz super
