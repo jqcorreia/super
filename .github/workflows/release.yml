@@ -41,16 +41,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # - name: Install Odin
-      #   run: |
-      #     curl -LO https://github.com/odin-lang/Odin/releases/latest/download/odin-linux.zip
-      #     unzip odin-linux.zip -d odin
-      #     echo "${GITHUB_WORKSPACE}/odin" >> $GITHUB_PATH
-
-      # - name: Build project
-      #   run: |
-      #     odin build src -out:build/super
-
       - name: Create Git Tag
         run: |
           git config user.name "github-actions"
@@ -63,12 +53,12 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.tag }}
           body: ${{ github.event.inputs.notes }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Release Asset
-        uses: softprops/action-gh-release@v2
-        with:
           files: super
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Upload Release Asset
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
