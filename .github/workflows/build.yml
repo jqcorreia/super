@@ -25,12 +25,12 @@ jobs:
           echo ${{ github.workspace }}
 
           docker run --rm \
-            -v ${{ github.workspace }}:/project \
-            -w /project \
+            -v ${{ github.workspace }}:/code \
+            -w /code \
             ghcr.io/jqcorreia/super-build:latest \
             ci/ci_build.sh 
 
           pwd
-          ls -l ./project
+          ls -l .
 
           # tar -czf super.tar.gz super
