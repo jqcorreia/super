@@ -11,14 +11,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build Docker image
-        run: |
-          docker build -t odin-build-env -f Dockerfile .
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build project inside container
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/project \
             -w /project \
-            odin-build-env \
-            odin build src -out:build/my_binary
+            ghcr.io/jqcorreia/super-build:latest \
+            odin build . -out:build/super
