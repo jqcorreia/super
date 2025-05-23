@@ -11,6 +11,28 @@ on:
         required: false
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build project inside container
+        run: |
+          git config --file .gitmodules submodule.vendor/wayland-odin.url https://github.com/jqcorreia/wayland-odin.git
+          git submodule sync
+          git submodule update --init --recursive
+
+          ls -l .
+          docker run --rm \
+            -v ${{ github.workspace }}:/project \
+            -w /project \
+            ghcr.io/jqcorreia/super-build:latest \
+            ci/ci_build.sh 
   release:
     runs-on: ubuntu-latest
 
@@ -18,22 +40,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Odin
-        run: |
-          curl -LO https://github.com/odin-lang/Odin/releases/latest/download/odin-linux.zip
-          unzip odin-linux.zip -d odin
-          echo "${GITHUB_WORKSPACE}/odin" >> $GITHUB_PATH
+      # - name: Install Odin
+      #   run: |
+      #     curl -LO https://github.com/odin-lang/Odin/releases/latest/download/odin-linux.zip
+      #     unzip odin-linux.zip -d odin
+      #     echo "${GITHUB_WORKSPACE}/odin" >> $GITHUB_PATH
 
-      - name: Build project
-        run: |
-          odin build src -out:build/super
+      # - name: Build project
+      #   run: |
+      #     odin build src -out:build/super
 
-      - name: Create Git Tag
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git tag ${{ github.event.inputs.tag }}
-          git push origin ${{ github.event.inputs.tag }}
+      # - name: Create Git Tag
+      #   run: |
+      #     git config user.name "github-actions"
+      #     git config user.email "github-actions@github.com"
+      #     git tag ${{ github.event.inputs.tag }}
+      #     git push origin ${{ github.event.inputs.tag }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -46,6 +68,6 @@ jobs:
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
-          files: build/super
+          files: super
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
