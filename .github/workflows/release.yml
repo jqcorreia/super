@@ -35,6 +35,7 @@ jobs:
             ci/ci_build.sh 
   release:
     runs-on: ubuntu-latest
+    needs: build
 
     steps:
       - name: Checkout code
@@ -50,12 +51,12 @@ jobs:
       #   run: |
       #     odin build src -out:build/super
 
-      # - name: Create Git Tag
-      #   run: |
-      #     git config user.name "github-actions"
-      #     git config user.email "github-actions@github.com"
-      #     git tag ${{ github.event.inputs.tag }}
-      #     git push origin ${{ github.event.inputs.tag }}
+      - name: Create Git Tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag ${{ github.event.inputs.tag }}
+          git push origin ${{ github.event.inputs.tag }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
