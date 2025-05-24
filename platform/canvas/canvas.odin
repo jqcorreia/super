@@ -6,7 +6,7 @@ import wl "../../vendor/wayland-odin/wayland"
 
 import "base:runtime"
 import "core:c"
-import "core:fmt"
+import "core:log"
 import "vendor:egl"
 
 
@@ -43,7 +43,7 @@ resize_egl_window :: proc(
 	width: i32,
 	height: i32,
 ) {
-	fmt.println("Resize EGL window")
+	log.debug("Resize EGL window")
 	wl.egl_window_resize(canvas.egl_window, c.int(width), c.int(height), 0, 0)
 	canvas.width = width
 	canvas.height = height
@@ -54,7 +54,7 @@ create_egl_window :: proc(
 	width: i32,
 	height: i32,
 ) {
-	fmt.println("Recreate EGL window")
+	log.debug("Recreate EGL window")
 	egl_window := wl.egl_window_create(canvas.surface, canvas.width, canvas.height)
 	egl_surface := egl.CreateWindowSurface(
 		egl_render_context.display,
@@ -64,7 +64,7 @@ create_egl_window :: proc(
 	)
 
 	if egl_surface == egl.NO_SURFACE {
-		fmt.println("Error creating window surface")
+		log.error("Error creating window surface")
 	}
 	if (!egl.MakeCurrent(
 			   egl_render_context.display,
@@ -72,7 +72,7 @@ create_egl_window :: proc(
 			   egl_surface,
 			   egl_render_context.ctx,
 		   )) {
-		fmt.println("Error making current!")
+		log.error("Error making current!")
 	}
 
 	canvas.egl_surface = egl_surface
@@ -109,7 +109,7 @@ create_canvas :: proc(
 	canvas.surface = wl.wl_compositor_create_surface(platform.compositor)
 
 	if canvas.surface == nil {
-		fmt.println("Error creating surface")
+		log.debug("Error creating surface")
 		return canvas
 	}
 
@@ -117,7 +117,7 @@ create_canvas :: proc(
 	cc.canvas = canvas
 	cc.platform_state = platform
 
-	fmt.println("Create canvas")
+	log.debug("Create canvas")
 	if type == CanvasType.Window {
 		init_window_canvas(cc)
 	}

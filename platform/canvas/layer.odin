@@ -4,7 +4,7 @@ import "../../platform"
 import wl "../../vendor/wayland-odin/wayland"
 import "base:runtime"
 import "core:c"
-import "core:fmt"
+import "core:log"
 
 layer_listener := wl.zwlr_layer_surface_v1_listener {
 	configure = proc "c" (
@@ -15,7 +15,7 @@ layer_listener := wl.zwlr_layer_surface_v1_listener {
 		height: c.uint32_t,
 	) {
 		context = runtime.default_context()
-		fmt.println("layer_configure")
+		log.debug("layer_configure")
 		cc := cast(^CanvasCallback)data
 		canvas := cc.canvas
 		// state := cc.platform_state

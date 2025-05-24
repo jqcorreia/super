@@ -1,7 +1,7 @@
 package fonts
 
 import "../../vendor/libschrift-odin/sft"
-import "core:fmt"
+import "core:log"
 import "core:os/os2"
 import "core:strings"
 
@@ -49,11 +49,10 @@ new_font_manager :: proc() -> FontManager {
 load_font :: proc(fm: ^FontManager, name: string, size: f64) -> Font {
 	// Check if the font is already loaded
 	if loaded_font, ok := fm.loaded_fonts[name]; ok {
-		fmt.println("Font already loaded:", name)
 		return loaded_font
 	}
 
-	fmt.println("Loading new font:", name)
+	log.info("Loading new font:", name)
 	font: ^sft.SFT_Font
 	font = sft.loadfile(strings.clone_to_cstring(fm.font_map[name]))
 	if (font == nil) {
@@ -82,7 +81,7 @@ load_font :: proc(fm: ^FontManager, name: string, size: f64) -> Font {
 
 	fm.loaded_fonts[name] = _font
 
-	fmt.println(
+	log.info(
 		"Font metrics:",
 		_font.line_metrics.ascender,
 		_font.line_metrics.descender,

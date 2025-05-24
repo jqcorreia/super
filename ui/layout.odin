@@ -45,7 +45,6 @@ Layout :: struct {
 
 @(private)
 layout_resize_from_cell :: proc(cell: Cell, x, y, w, h, gap: u32) {
-	fmt.println("-----------", x, y, w, h)
 	switch c in cell.type {
 	case Leaf:
 		{
@@ -85,7 +84,5 @@ layout_resize_from_cell :: proc(cell: Cell, x, y, w, h, gap: u32) {
 
 }
 layout_resize_leafs :: proc(l: Layout, x, y, w, h, gap: u32) {
-
 	layout_resize_from_cell(l.root, x, y, w, h, gap)
-	fmt.println(l.root)
 }

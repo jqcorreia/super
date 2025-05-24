@@ -5,7 +5,7 @@ import cv "../platform/canvas"
 import "../platform/fonts"
 import "../utils/xdg"
 
-import "core:fmt"
+import "core:log"
 import "core:math"
 import gl "vendor:OpenGL"
 
@@ -47,7 +47,6 @@ list_draw_action :: proc(
 	case actions.ApplicationAction:
 		{
 			icon, ok_icon := xdg.icon_manager_get_icon(xdg.IconLookup{name = i.icon, size = 32})
-			// fmt.println(icon)
 			img := engine.state.images->load(icon.path)
 			if ok_icon {
 				if img.texture != 0 {
@@ -146,7 +145,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 
 		// Check status
 		if (gl.CheckFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) {
-			fmt.println("FBO not complete!")
+			log.error("FBO not complete!")
 		}
 		gl.Viewport(0, 0, i32(main_texture_w), i32(main_texture_h))
 

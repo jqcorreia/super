@@ -2,7 +2,7 @@ package platform
 
 import wl "../vendor/wayland-odin/wayland"
 import "core:c"
-import "core:fmt"
+import "core:log"
 import "vendor:egl"
 
 foreign import foo "system:EGL"
@@ -56,29 +56,29 @@ init_egl :: proc(display: ^wl.wl_display) -> RenderContext {
 
 	GetError() // clear error code
 	if (egl_display == egl.NO_DISPLAY) {
-		fmt.println("Can't create egl display")
+		log.error("Can't create egl display")
 	} else {
-		fmt.println("Created egl display")
+		log.info("Created egl display")
 	}
 	if (!egl.Initialize(egl_display, &major, &minor)) {
-		fmt.println("Can't initialise egl display")
-		fmt.printf("Error code: 0x%x\n", GetError())
+		log.error("Can't initialise egl display")
+		log.errorf("Error code: 0x%x\n", GetError())
 	}
-	fmt.printf("EGL major: %d, minor %d\n", major, minor)
+	log.info("EGL major: %d, minor %d\n", major, minor)
 	if (!GetConfigs(egl_display, nil, 0, &count)) {
-		fmt.println("Can't get configs")
-		fmt.printf("Error code: 0x%x\n", GetError())
+		log.error("Can't get configs")
+		log.errorf("Error code: 0x%x\n", GetError())
 	}
-	fmt.printf("EGL has %d configs\n", count)
+	log.info("EGL has %d configs\n", count)
 
 	res := ChooseConfig(egl_display, raw_data(config_attribs), &egl_conf, 1, &n)
 	if res == egl.FALSE {
-		fmt.printf("Error choosing config with error code: %x\n", GetError())
+		log.errorf("Error choosing config with error code: %x\n", GetError())
 	}
-	fmt.printf("EGL chose %d configs\n", n)
+	log.infof("EGL chose %d configs\n", n)
 
-	fmt.println(configs)
-	fmt.println(egl_conf)
+	log.info(configs)
+	log.info(egl_conf)
 
 	egl_context := egl.CreateContext(
 		egl_display,
@@ -86,7 +86,7 @@ init_egl :: proc(display: ^wl.wl_display) -> RenderContext {
 		egl.NO_CONTEXT,
 		raw_data(context_attribs),
 	)
-	fmt.println(egl_context)
+	log.info(egl_context)
 
 	return RenderContext{ctx = egl_context, display = egl_display, config = egl_conf}
 }

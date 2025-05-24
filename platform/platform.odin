@@ -42,8 +42,6 @@ global :: proc "c" (
 	interface: cstring,
 	version: c.uint32_t,
 ) {
-	// context = runtime.default_context()
-	// fmt.println(interface)
 	if interface == wl.wl_compositor_interface.name {
 		state: ^PlatformState = cast(^PlatformState)data
 		state.compositor =

@@ -5,6 +5,7 @@ import "core:strings"
 
 import "actions"
 import "core:io"
+import "core:log"
 import "core:os/os2"
 import "engine"
 import "platform"
@@ -58,14 +59,12 @@ main :: proc() {
 
 	if !check_stdin() {
 		buf: []u8 = make([]u8, 1000)
-		fmt.println("Should read from stdin")
 		io.read_full(os2.stdin.stream, buf)
 
 		for line in strings.split(string(buf), "\n") {
 			append(&action_items, actions.SecretAction{name = line})
 		}
 	} else {
-		fmt.println("Should NOT read from stdin")
 		app_items := actions.get_application_actions()
 		secrets_items := actions.get_secret_actions()
 
@@ -79,7 +78,7 @@ main :: proc() {
 
 
 	// action_items += actions.get_secret_actions()
-	fmt.println("Number of apps detected:", len(action_items))
+	log.log(.Debug, "Number of apps detected:", len(action_items))
 
 	c1 := engine.create_canvas(WIDTH, HEIGHT, cv.CanvasType.Window, draw)
 
@@ -120,7 +119,6 @@ main :: proc() {
 	append(&app.widget_list, search)
 	append(&app.widget_list, list)
 
-	fmt.println("LOOOOAD")
 	platform.new_shader(
 		"Singularity",
 		#load("shaders/basic_vert.glsl"),

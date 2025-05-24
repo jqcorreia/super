@@ -47,7 +47,6 @@ new_shader_from_source :: proc(
 ) {
 	shaders := inst().shaders
 	shaders.shaders[name] = load_shader(vertex_shader_path, fragment_shader_path)
-	fmt.println(name, shaders.shaders[name])
 }
 
 new_shader_from_path :: proc(

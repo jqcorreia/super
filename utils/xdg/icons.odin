@@ -111,13 +111,11 @@ generate_icon_map :: proc() {
 				}
 			}
 
-			// fmt.println(dirs)
 			for base_folder2 in base_folders {
 				for dir in dirs {
 					if section, ok3 := res[dir]; ok3 {
 						size, _ := strconv.parse_int(section["Size"] or_else "1")
 						scale, _ := strconv.parse_int(section["Scale"] or_else "1")
-						// fmt.println(section, size, scale)
 						if scale > 1 {
 							// Ignore scaled icon for now
 							continue

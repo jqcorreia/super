@@ -5,6 +5,7 @@ import "../vendor/xkbcommon"
 import "base:runtime"
 import "core:c"
 import "core:fmt"
+import "core:log"
 import "core:sys/posix"
 import "vendor:x11/xlib"
 
@@ -44,7 +45,7 @@ Xkb :: struct {
 seat_listener := wl.wl_seat_listener {
 	capabilities = proc "c" (data: rawptr, wl_seat: ^wl.wl_seat, capabilities: c.uint32_t) {
 		context = runtime.default_context()
-		fmt.println("Input capabilities: ", capabilities)
+		log.debug("Input capabilities: ", capabilities)
 		state := cast(^PlatformState)data
 		pointer := wl.wl_seat_get_pointer(state.seat)
 		wl.wl_pointer_add_listener(pointer, &pointer_listener, state)
@@ -53,7 +54,7 @@ seat_listener := wl.wl_seat_listener {
 	},
 	name = proc "c" (data: rawptr, wl_seat: ^wl.wl_seat, name: cstring) {
 		context = runtime.default_context()
-		fmt.println("Seat Name: ", name)
+		log.debug("Seat Name: ", name)
 	},
 }
 
@@ -68,7 +69,7 @@ keyboard_listener := wl.wl_keyboard_listener {
 		// This event contains a file descriptor for the current keymap in xkb format
 		context = runtime.default_context()
 		state := cast(^PlatformState)data
-		fmt.println("Keymap: ", format, fd, size)
+		log.debug("Keymap: ", format, fd, size)
 		buf := posix.mmap(
 			nil,
 			uint(size),
@@ -143,7 +144,6 @@ pointer_listener := wl.wl_pointer_listener {
 		surface_y: wl.wl_fixed_t,
 	) {
 		context = runtime.default_context()
-		// fmt.println("Pointer enter")
 	},
 	leave = proc "c" (
 		data: rawptr,
@@ -152,7 +152,6 @@ pointer_listener := wl.wl_pointer_listener {
 		surface: ^wl.wl_surface,
 	) {
 		context = runtime.default_context()
-		// fmt.println("Pointer leave")
 	},
 	motion = proc "c" (
 		data: rawptr,
@@ -162,7 +161,6 @@ pointer_listener := wl.wl_pointer_listener {
 		surface_y: wl.wl_fixed_t,
 	) {
 		context = runtime.default_context()
-		// fmt.println("Pointer motion", (surface_x / 256.0), (surface_y / 256.0))
 	},
 	button = proc "c" (
 		data: rawptr,
@@ -248,8 +246,6 @@ key_handler :: proc "c" (
 				}
 			} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_CANCELLED ||
 			   status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSING {
-				// Cancelled, do nothing
-				// fmt.println("Cancelled")
 			} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_NOTHING {
 				size := xkbcommon.state_key_get_utf8(
 					_state.xkb.state,
@@ -287,7 +283,7 @@ is_modifier := proc(key_sym: KeySym) -> bool {
 
 
 init_input :: proc(state: ^PlatformState) {
-	fmt.println("Initializing input controller.")
+	log.info("Initializing input controller.")
 	input := new(Input)
 	input.events = make([dynamic]InputEvent)
 	input.consume_all_events = consume_all_events

@@ -4,12 +4,12 @@ import pl "../../platform"
 import wl "../../vendor/wayland-odin/wayland"
 import "base:runtime"
 import "core:c"
-import "core:fmt"
+import "core:log"
 
 window_listener := wl.xdg_surface_listener {
 	configure = proc "c" (data: rawptr, surface: ^wl.xdg_surface, serial: c.uint32_t) {
 		context = runtime.default_context()
-		fmt.println("window configure")
+		log.debug("window configure")
 		cc := cast(^CanvasCallback)data
 		canvas := cc.canvas
 
@@ -28,7 +28,7 @@ toplevel_listener := wl.xdg_toplevel_listener {
 		states: ^wl.wl_array,
 	) {
 		context = runtime.default_context()
-		fmt.println("Top level configure", width, height, states)
+		log.debug("Top level configure", width, height, states)
 		cc := cast(^CanvasCallback)data
 		canvas := cc.canvas
 		// egl_render_context := cc.platform_state.egl_render_context
@@ -46,7 +46,7 @@ toplevel_listener := wl.xdg_toplevel_listener {
 		height: c.int32_t,
 	) {
 		context = runtime.default_context()
-		fmt.println("Top level configure bounds", width, height)
+		log.debug("Top level configure bounds", width, height)
 
 	},
 	wm_capabilities = proc "c" (
