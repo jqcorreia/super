@@ -1,12 +1,11 @@
 package main
 
-import "core:fmt"
 import "core:strings"
 
 import "actions"
-import "core:io"
 import "core:log"
 import "core:os/os2"
+import "core:slice"
 import "engine"
 import "platform"
 import cv "platform/canvas"
@@ -58,11 +57,8 @@ main :: proc() {
 	action_items: [dynamic]actions.Action
 
 	if !check_stdin() {
-		buf: []u8 = make([]u8, 1000)
-		io.read_full(os2.stdin.stream, buf)
-
-		for line in strings.split(string(buf), "\n") {
-			append(&action_items, actions.SecretAction{name = line})
+		for i in actions.compute_pipeline_actions() {
+			append(&action_items, i)
 		}
 	} else {
 		app_items := actions.get_application_actions()

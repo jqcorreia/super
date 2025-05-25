@@ -68,6 +68,11 @@ list_draw_action :: proc(
 			w, h = cv.draw_text(resolution, x + ICON_SIZE + 5, y + MARGIN_SIZE, i.name, list.font)
 			return w, item_size
 		}
+	case actions.PipelineAction:
+		{
+			w, h = cv.draw_text(resolution, x + ICON_SIZE + 5, y + MARGIN_SIZE, i.name, list.font)
+			return w, item_size
+		}
 	}
 	return 0, 0
 }
