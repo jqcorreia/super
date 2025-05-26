@@ -35,6 +35,8 @@ registry_listener := wl.wl_registry_listener {
 	global_remove = global_remove,
 }
 
+display_listener := wl.wl_display_listener{}
+
 global :: proc "c" (
 	data: rawptr,
 	registry: ^wl.wl_registry,
@@ -134,4 +136,5 @@ init_platform :: proc() {
 render :: proc(platform: ^PlatformState) {
 	platform.time_elapsed = time.diff(platform.start_time, time.now())
 	wl.display_dispatch_pending(platform.display)
+	wl.display_flush(platform.display)
 }
