@@ -4,8 +4,9 @@ import wl "../vendor/wayland-odin/wayland"
 import "../vendor/xkbcommon"
 import "base:runtime"
 import "core:c"
-import "core:fmt"
 import "core:log"
+import "core:os"
+import "core:strings"
 import "core:sys/posix"
 import "vendor:x11/xlib"
 
@@ -87,7 +88,15 @@ keyboard_listener := wl.wl_keyboard_listener {
 			xkbcommon.keymap_compile_flags.XKB_KEYMAP_COMPILE_NO_FLAGS,
 		)
 		ks := xkbcommon.state_new(km)
-		compose_table := xkbcommon.compose_table_new_from_locale(ctx, "pt_PT.UTF-8", 0)
+
+		// FIXME(quadrado): For now use LC_NAME because LC_ALL is not always set and LANG can be a different language than
+		// intended. There should be a canonical way to get this but i'm not finding it.
+		locale := os.get_env("LC_NAME")
+		compose_table := xkbcommon.compose_table_new_from_locale(
+			ctx,
+			strings.clone_to_cstring(locale),
+			0,
+		)
 		compose := xkbcommon.compose_state_new(compose_table, 0)
 
 		state.xkb = Xkb {
@@ -125,6 +134,18 @@ keyboard_listener := wl.wl_keyboard_listener {
 		mods_locked: c.uint32_t,
 		group: c.uint32_t,
 	) {
+		context = runtime.default_context()
+		state := cast(^PlatformState)data
+		xkbcommon.state_update_mask(
+			state.xkb.state,
+			mods_depressed,
+			mods_latched,
+			mods_locked,
+			0,
+			0,
+			0,
+		)
+		// fmt.println(mods_depressed, mods_latched, mods_locked, group)
 	},
 	repeat_info = proc "c" (
 		data: rawptr,
@@ -225,15 +246,14 @@ key_handler :: proc "c" (
 			key = key_sym,
 		}
 		append(&_state.input.events, event)
-		xkbcommon.state_update_key(_state.xkb.state, keycode, false)
 	}
 
 	if state == 1 {
 		event := KeyPressed {
 			key = key_sym,
 		}
-		append(&_state.input.events, event)
 
+		append(&_state.input.events, event)
 
 		if !is_modifier(key_sym) {
 			xkbcommon.compose_state_feed(_state.xkb.compose, c.uint32_t(key_sym))
@@ -263,7 +283,6 @@ key_handler :: proc "c" (
 				}
 			}
 		}
-		xkbcommon.state_update_key(_state.xkb.state, keycode, true)
 	}
 }
 
