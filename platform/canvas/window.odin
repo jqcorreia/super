@@ -56,6 +56,12 @@ toplevel_listener := wl.xdg_toplevel_listener {
 	) {},
 }
 
+wm_base_listener := wl.xdg_wm_base_listener {
+	ping = proc "c" (data: rawptr, xdg_wm_base: ^wl.xdg_wm_base, serial: c.uint32_t) {
+		wl.xdg_wm_base_pong(xdg_wm_base, serial)
+	},
+}
+
 init_window_canvas :: proc(cc: ^CanvasCallback) {
 	canvas := cc.canvas
 	platform := cc.platform_state
@@ -66,6 +72,8 @@ init_window_canvas :: proc(cc: ^CanvasCallback) {
 		pl.create_default_shaders()
 		cc.platform_state.default_shaders_loaded = true
 	}
+
+	wl.xdg_wm_base_add_listener(platform.xdg_base, &wm_base_listener, nil)
 
 	xdg_surface := wl.xdg_wm_base_get_xdg_surface(platform.xdg_base, canvas.surface)
 	toplevel := wl.xdg_surface_get_toplevel(xdg_surface)
