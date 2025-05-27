@@ -45,9 +45,11 @@ odin build -
 - [x] BIG GOAL: Make it as usable as `tudo` so I can daily drive this
 - [x] Load correct sized icons with load hints
 - [x] Keyboard repeat (some edge cases may not work, but it's usable) 
-- [ ] Vendor some assets like default font
+- [x] Implement list selected item/index mechanics - !
+- [x] Colored text
+- [ ] Vendor some assets like default font -- ! 
+- [ ] List scroll along with selection
 - [ ] Layout manager, dumb, simple one, please... - !
-- [ ] Implement list selected item/index mechanics - !
 - [ ] Make a UI package properly usable
 - [ ] Check why egl.CreateContext() allocates so much memory! 
 - [ ] Mouse input

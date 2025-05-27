@@ -36,10 +36,17 @@ input_text_draw :: proc(input: ^InputText, canvas: ^cv.Canvas) {
 	x := input.x + 5
 	text_y := input.y + ((input.h - input.font.line_height) / 2)
 
-	tw, th := cv.draw_text(canvas, x, text_y, input.text, &input.font)
+	tw, th := cv.draw_text(
+		canvas,
+		x,
+		text_y,
+		input.text,
+		&input.font,
+		// color = [4]f32{0.2, 0.4, 0.9, 1.0},
+	)
 
 	// Draw cursor
-	input.cursor_x = math.lerp(input.cursor_x, tw, f32(0.25))
+	input.cursor_x = math.lerp(input.cursor_x, tw, f32(0.35))
 
 	// Draw the cursor at the text_y in the cursor x position with a fifth of the text height
 	cv.draw_rect(canvas, x + input.cursor_x, text_y, th / 5, th, {color = {0.1, 0.2, 0.7, 1.0}})
