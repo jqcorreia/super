@@ -195,7 +195,7 @@ main :: proc() {
 			#partial switch e in event {
 			case platform.KeyPressed:
 				{
-					if e.key == platform.KeySym.XK_Escape {
+					if e.key == platform.KeySym.XK_Escape && e.modifiers == {} {
 						engine.state.running = false
 					}
 					if e.key == platform.KeySym.XK_Return {

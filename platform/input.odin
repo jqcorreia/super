@@ -154,7 +154,6 @@ keyboard_listener := wl.wl_keyboard_listener {
 		group: c.uint32_t,
 	) {
 		context = runtime.default_context()
-		fmt.println(mods_depressed)
 		state := cast(^PlatformState)data
 		xkbcommon.state_update_mask(
 			state.input.xkb.state,
@@ -179,7 +178,6 @@ keyboard_listener := wl.wl_keyboard_listener {
 			current_mods = current_mods + {.Super}
 		}
 		state.input.current_modifiers = current_mods
-		fmt.println(state.input.current_modifiers)
 	},
 	repeat_info = proc "c" (
 		data: rawptr,
@@ -292,44 +290,12 @@ key_handler :: proc "c" (
 
 	if state == 1 {
 		event := KeyPressed {
-			key     = key_sym,
-			keycode = keycode,
+			key       = key_sym,
+			keycode   = keycode,
+			modifiers = _state.input.current_modifiers,
 		}
 
 		process_key_press(_state.input, event)
-		// append(&_state.input.events, event)
-		// _state.input.current_press = event
-		// _state.input.current_press_timestamp = time.now()
-		// _state.input.delay_hit = false
-
-		// if !is_modifier(key_sym) {
-		// 	xkbcommon.compose_state_feed(_state.xkb.compose, c.uint32_t(key_sym))
-		// 	status := xkbcommon.compose_state_get_status(_state.xkb.compose)
-		// 	buf: []byte = make([]byte, 4)
-		// 	if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSED {
-		// 		size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
-		// 		if size > 0 {
-		// 			append(&_state.input.events, TextInput{text = string(buf[:size])})
-		// 		}
-		// 	} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_CANCELLED ||
-		// 	   status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSING {
-		// 	} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_NOTHING {
-		// 		size := xkbcommon.state_key_get_utf8(
-		// 			_state.xkb.state,
-		// 			keycode,
-		// 			cstring(&buf[0]),
-		// 			4,
-		// 		)
-		// 		if size > 0 {
-		// 			append(&_state.input.events, TextInput{text = string(buf[:size])})
-		// 		}
-		// 	} else {
-		// 		size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
-		// 		if size > 0 {
-		// 			append(&_state.input.events, TextInput{text = string(buf[:size])})
-		// 		}
-		// 	}
-		// }
 	}
 }
 
@@ -396,6 +362,7 @@ init_input :: proc(state: ^PlatformState) {
 }
 
 consume_all_events :: proc(input: ^Input) -> [dynamic]InputEvent {
+	// FIXME(quadrado): This repeating code should go elsewhere, probably on platform update function
 	if input.current_press != {} {
 		diff := time.diff(input.current_press_timestamp, time.now())
 
