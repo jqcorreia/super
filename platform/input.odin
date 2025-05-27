@@ -6,14 +6,27 @@ import "base:runtime"
 import "core:c"
 import "core:fmt"
 import "core:log"
+import "core:os"
+import "core:strings"
 import "core:sys/posix"
+import "core:time"
 import "vendor:x11/xlib"
 
 KeySym :: xlib.KeySym
 
+Modifiers :: enum u32 {
+	Shift = 1,
+	Ctrl  = 4,
+	Alt   = 8,
+	Super = 64,
+}
+
+
 KeyPressed :: struct {
-	key:    KeySym,
-	serial: u32,
+	key:       KeySym,
+	keycode:   u32,
+	serial:    u32,
+	modifiers: bit_set[Modifiers],
 }
 
 KeyReleased :: struct {
@@ -32,8 +45,15 @@ InputEvent :: union {
 }
 
 Input :: struct {
-	events:             [dynamic]InputEvent,
-	consume_all_events: proc(input: ^Input) -> [dynamic]InputEvent,
+	xkb:                     Xkb,
+	events:                  [dynamic]InputEvent,
+	consume_all_events:      proc(input: ^Input) -> [dynamic]InputEvent,
+	current_modifiers:       bit_set[Modifiers],
+	repeat_rate:             u32,
+	repeat_delay:            u32,
+	current_press:           KeyPressed,
+	current_press_timestamp: time.Time,
+	delay_hit:               bool,
 }
 
 Xkb :: struct {
@@ -87,10 +107,18 @@ keyboard_listener := wl.wl_keyboard_listener {
 			xkbcommon.keymap_compile_flags.XKB_KEYMAP_COMPILE_NO_FLAGS,
 		)
 		ks := xkbcommon.state_new(km)
-		compose_table := xkbcommon.compose_table_new_from_locale(ctx, "pt_PT.UTF-8", 0)
+
+		// FIXME(quadrado): For now use LC_NAME because LC_ALL is not always set and LANG can be a different language than
+		// intended. There should be a canonical way to get this but i'm not finding it.
+		locale := os.get_env("LC_NAME")
+		compose_table := xkbcommon.compose_table_new_from_locale(
+			ctx,
+			strings.clone_to_cstring(locale),
+			0,
+		)
 		compose := xkbcommon.compose_state_new(compose_table, 0)
 
-		state.xkb = Xkb {
+		state.input.xkb = Xkb {
 			keymap  = km,
 			state   = ks,
 			compose = compose,
@@ -125,13 +153,48 @@ keyboard_listener := wl.wl_keyboard_listener {
 		mods_locked: c.uint32_t,
 		group: c.uint32_t,
 	) {
+		context = runtime.default_context()
+		state := cast(^PlatformState)data
+		xkbcommon.state_update_mask(
+			state.input.xkb.state,
+			mods_depressed,
+			mods_latched,
+			mods_locked,
+			0,
+			0,
+			0,
+		)
+		// This is shady but it works. Converting to u64 since bit_set[Modifiers] is a 8 byte value
+		current_mods := transmute(bit_set[Modifiers])u64(mods_depressed)
+
+		// This would be expanded version of the above
+		// current_mods: bit_set[Modifiers]
+		// if mods_depressed & u32(Modifiers.Alt) > 0 {
+		// 	current_mods = current_mods + {.Alt}
+		// }
+		// if mods_depressed & u32(Modifiers.Ctrl) > 0 {
+		// 	current_mods = current_mods + {.Ctrl}
+		// }
+		// if mods_depressed & u32(Modifiers.Shift) > 0 {
+		// 	current_mods = current_mods + {.Shift}
+		// }
+		// if mods_depressed & u32(Modifiers.Super) > 0 {
+		// 	current_mods = current_mods + {.Super}
+		// }
+
+		state.input.current_modifiers = current_mods
 	},
 	repeat_info = proc "c" (
 		data: rawptr,
 		wl_keyboard: ^wl.wl_keyboard,
 		rate: c.int32_t,
 		delay: c.int32_t,
-	) {},
+	) {
+		state := cast(^PlatformState)data
+
+		state.input.repeat_rate = u32(rate)
+		state.input.repeat_delay = u32(delay)
+	},
 }
 
 pointer_listener := wl.wl_pointer_listener {
@@ -209,7 +272,7 @@ key_handler :: proc "c" (
 	data: rawptr,
 	keyboard: ^wl.wl_keyboard,
 	serial: c.uint32_t,
-	time: c.uint32_t,
+	t: c.uint32_t,
 	key: c.uint32_t,
 	state: c.uint32_t,
 ) {
@@ -218,52 +281,26 @@ key_handler :: proc "c" (
 
 	// This converts evdev events to xkb events 
 	keycode := key + 8
-	key_sym := xkbcommon.state_key_get_one_sym(_state.xkb.state, keycode)
+	key_sym := xkbcommon.state_key_get_one_sym(_state.input.xkb.state, keycode)
 
 	if state == 0 {
 		event := KeyReleased {
 			key = key_sym,
 		}
 		append(&_state.input.events, event)
-		xkbcommon.state_update_key(_state.xkb.state, keycode, false)
+		_state.input.current_press = {}
+		_state.input.current_press_timestamp = time.now()
+		_state.input.delay_hit = false
 	}
 
 	if state == 1 {
 		event := KeyPressed {
-			key = key_sym,
+			key       = key_sym,
+			keycode   = keycode,
+			modifiers = _state.input.current_modifiers,
 		}
-		append(&_state.input.events, event)
 
-
-		if !is_modifier(key_sym) {
-			xkbcommon.compose_state_feed(_state.xkb.compose, c.uint32_t(key_sym))
-			status := xkbcommon.compose_state_get_status(_state.xkb.compose)
-			buf: []byte = make([]byte, 4)
-			if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSED {
-				size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
-				if size > 0 {
-					append(&_state.input.events, TextInput{text = string(buf[:size])})
-				}
-			} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_CANCELLED ||
-			   status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSING {
-			} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_NOTHING {
-				size := xkbcommon.state_key_get_utf8(
-					_state.xkb.state,
-					keycode,
-					cstring(&buf[0]),
-					4,
-				)
-				if size > 0 {
-					append(&_state.input.events, TextInput{text = string(buf[:size])})
-				}
-			} else {
-				size := xkbcommon.compose_state_get_utf8(_state.xkb.compose, cstring(&buf[0]), 4)
-				if size > 0 {
-					append(&_state.input.events, TextInput{text = string(buf[:size])})
-				}
-			}
-		}
-		xkbcommon.state_update_key(_state.xkb.state, keycode, true)
+		process_key_press(_state.input, event)
 	}
 }
 
@@ -282,6 +319,43 @@ is_modifier := proc(key_sym: KeySym) -> bool {
 }
 
 
+process_key_press :: proc(input: ^Input, key_pressed: KeyPressed, repeating: bool = false) {
+	key_sym := key_pressed.key
+	keycode := key_pressed.keycode
+
+	append(&input.events, key_pressed)
+	if !repeating {
+		input.current_press = key_pressed
+		input.current_press_timestamp = time.now()
+		input.delay_hit = false
+	}
+
+
+	if !is_modifier(key_sym) {
+		xkbcommon.compose_state_feed(input.xkb.compose, c.uint32_t(key_sym))
+		status := xkbcommon.compose_state_get_status(input.xkb.compose)
+		buf: []byte = make([]byte, 4)
+		if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSED {
+			size := xkbcommon.compose_state_get_utf8(input.xkb.compose, cstring(&buf[0]), 4)
+			if size > 0 {
+				append(&input.events, TextInput{text = string(buf[:size])})
+			}
+		} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_CANCELLED ||
+		   status == xkbcommon.xkb_compose_status.XKB_COMPOSE_COMPOSING {
+		} else if status == xkbcommon.xkb_compose_status.XKB_COMPOSE_NOTHING {
+			size := xkbcommon.state_key_get_utf8(input.xkb.state, keycode, cstring(&buf[0]), 4)
+			if size > 0 {
+				append(&input.events, TextInput{text = string(buf[:size])})
+			}
+		} else {
+			size := xkbcommon.compose_state_get_utf8(input.xkb.compose, cstring(&buf[0]), 4)
+			if size > 0 {
+				append(&input.events, TextInput{text = string(buf[:size])})
+			}
+		}
+	}
+}
+
 init_input :: proc(state: ^PlatformState) {
 	log.info("Initializing input controller.")
 	input := new(Input)
@@ -293,6 +367,26 @@ init_input :: proc(state: ^PlatformState) {
 }
 
 consume_all_events :: proc(input: ^Input) -> [dynamic]InputEvent {
+	// FIXME(quadrado): This repeating code should go elsewhere, probably on platform update function
+	if input.current_press != {} {
+		diff := time.diff(input.current_press_timestamp, time.now())
+
+		if input.delay_hit {
+			if diff > time.Duration(input.repeat_rate) * time.Millisecond {
+				process_key_press(input, input.current_press, repeating = true)
+				// append(&input.events, input.current_press)
+				input.current_press_timestamp = time.now()
+			}
+		} else {
+			if diff > time.Duration(input.repeat_delay) * time.Millisecond {
+				process_key_press(input, input.current_press, repeating = true)
+				// append(&input.events, input.current_press)
+				input.delay_hit = true
+				input.current_press_timestamp = time.now()
+			}
+		}
+	}
+
 	events: [dynamic]InputEvent
 	for event in input.events {
 		append(&events, event)

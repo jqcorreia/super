@@ -247,11 +247,11 @@ list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 				offset = -SCROLL_SPEED
 			}
 			if e.key == platform.KeySym.XK_Down {
-				list.selected_index = math.clamp(list.selected_index + 1, 0, len(list.items))
+				list.selected_index = math.clamp(list.selected_index + 1, 0, len(list.items) - 1)
 				list.main_texture = 0
 			}
 			if e.key == platform.KeySym.XK_Up {
-				list.selected_index = math.clamp(list.selected_index - 1, 0, len(list.items))
+				list.selected_index = math.clamp(list.selected_index - 1, 0, len(list.items) - 1)
 				list_free_fbo_and_texture(list)
 			}
 		}

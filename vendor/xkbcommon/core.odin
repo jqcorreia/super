@@ -18,14 +18,20 @@ foreign xkb {
 	compose_state_get_status :: proc(state: ^xkb_compose_state) -> xkb_compose_status ---
 	compose_state_get_utf8 :: proc(state: ^xkb_compose_state, buffer: cstring, size: c.size_t) -> c.int ---
 	state_update_key :: proc(state: ^xkb_state, key: c.uint32_t, is_pressed: bool) ---
+	state_update_mask :: proc(state: ^xkb_state, depressed: c.uint32_t, latched: c.uint32_t, locked: c.uint32_t, depressed_layout: c.uint32_t, latched_layout: c.uint32_t, locked_layout: c.uint32_t) ---
 }
 
 // Opaque structs
-xkb_context :: struct {}
-xkb_keymap :: struct {}
-xkb_state :: struct {}
-xkb_compose_table :: struct {}
-xkb_compose_state :: struct {}
+xkb_context :: struct {
+}
+xkb_keymap :: struct {
+}
+xkb_state :: struct {
+}
+xkb_compose_table :: struct {
+}
+xkb_compose_state :: struct {
+}
 
 // Various enums
 keymap_format :: enum u32 {
@@ -40,7 +46,7 @@ xkb_compose_feed_result :: enum u32 {
 	XKB_COMPOSE_FEED_IGNORED  = 0,
 	XKB_COMPOSE_FEED_ACCEPTED = 1,
 }
-xkb_compose_status :: enum {
+xkb_compose_status :: enum u32 {
 	/** The initial state; no sequence has started yet. */
 	XKB_COMPOSE_NOTHING,
 	/** In the middle of a sequence. */
@@ -50,3 +56,5 @@ xkb_compose_status :: enum {
 	/** The last sequence was cancelled due to an unmatched keysym. */
 	XKB_COMPOSE_CANCELLED,
 }
+
+xkb_state_component :: enum u32 {}

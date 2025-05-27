@@ -17,7 +17,7 @@ PlatformState :: struct {
 	egl_render_context:     RenderContext,
 	input:                  ^Input,
 	shaders:                ^Shaders,
-	xkb:                    Xkb,
+	// xkb:                    Xkb,
 	default_shaders_loaded: bool,
 	start_time:             time.Time,
 	time_elapsed:           time.Duration,
