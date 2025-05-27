@@ -164,19 +164,24 @@ keyboard_listener := wl.wl_keyboard_listener {
 			0,
 			0,
 		)
-		current_mods: bit_set[Modifiers]
-		if mods_depressed & u32(Modifiers.Alt) > 0 {
-			current_mods = current_mods + {.Alt}
-		}
-		if mods_depressed & u32(Modifiers.Ctrl) > 0 {
-			current_mods = current_mods + {.Ctrl}
-		}
-		if mods_depressed & u32(Modifiers.Shift) > 0 {
-			current_mods = current_mods + {.Shift}
-		}
-		if mods_depressed & u32(Modifiers.Super) > 0 {
-			current_mods = current_mods + {.Super}
-		}
+		// This is shady but it works. Converting to u64 since bit_set[Modifiers] is a 8 byte value
+		current_mods := transmute(bit_set[Modifiers])u64(mods_depressed)
+
+		// This would be expanded version of the above
+		// current_mods: bit_set[Modifiers]
+		// if mods_depressed & u32(Modifiers.Alt) > 0 {
+		// 	current_mods = current_mods + {.Alt}
+		// }
+		// if mods_depressed & u32(Modifiers.Ctrl) > 0 {
+		// 	current_mods = current_mods + {.Ctrl}
+		// }
+		// if mods_depressed & u32(Modifiers.Shift) > 0 {
+		// 	current_mods = current_mods + {.Shift}
+		// }
+		// if mods_depressed & u32(Modifiers.Super) > 0 {
+		// 	current_mods = current_mods + {.Super}
+		// }
+
 		state.input.current_modifiers = current_mods
 	},
 	repeat_info = proc "c" (
