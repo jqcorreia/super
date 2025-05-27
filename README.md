@@ -47,7 +47,7 @@ odin build -
 - [x] Keyboard repeat (some edge cases may not work, but it's usable) 
 - [x] Implement list selected item/index mechanics - !
 - [x] Colored text
-- [ ] Vendor some assets like default font -- ! 
+- [ ] Embed some assets like default font -- ! 
 - [ ] List scroll along with selection
 - [ ] Layout manager, dumb, simple one, please... - !
 - [ ] Make a UI package properly usable
