@@ -45,9 +45,9 @@ odin build -
 - [x] BIG GOAL: Make it as usable as `tudo` so I can daily drive this
 - [x] Load correct sized icons with load hints
 - [x] Keyboard repeat (some edge cases may not work, but it's usable) 
-- [x] Implement list selected item/index mechanics - !
 - [x] Colored text
-- [ ] Embed some assets like default font -- ! 
+- [x] Embed some assets like default font 
+- [ ] Implement list selected item/index mechanics - !
 - [ ] List scroll along with selection
 - [ ] Layout manager, dumb, simple one, please... - !
 - [ ] Make a UI package properly usable
