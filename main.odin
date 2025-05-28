@@ -3,9 +3,7 @@ package main
 import "core:strings"
 
 import "actions"
-import "core:fmt"
 import "core:log"
-import "core:mem"
 import "core:os/os2"
 import "engine"
 import "platform"

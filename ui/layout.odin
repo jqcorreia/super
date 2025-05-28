@@ -1,6 +1,5 @@
 package ui
 
-import "core:fmt"
 
 SplitType :: enum {
 	Horizontal,
