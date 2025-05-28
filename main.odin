@@ -3,8 +3,11 @@ package main
 import "core:strings"
 
 import "actions"
+import "core:fmt"
 import "core:log"
+import "core:mem"
 import "core:os/os2"
+import "core:sys/posix"
 import "engine"
 import "platform"
 import cv "platform/canvas"
@@ -50,9 +53,9 @@ check_stdin :: proc() -> bool {
 	return cast(bool)posix.isatty(cast(posix.FD)(os2.fd(os2.stdin)))
 }
 
-import "core:sys/posix"
 
 main :: proc() {
+
 	when ODIN_DEBUG {
 		track: mem.Tracking_Allocator
 		mem.tracking_allocator_init(&track, context.allocator)
@@ -74,6 +77,7 @@ main :: proc() {
 			mem.tracking_allocator_destroy(&track)
 		}
 	}
+	context.logger = log.create_console_logger()
 
 	action_items: [dynamic]actions.Action
 

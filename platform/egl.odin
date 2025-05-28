@@ -64,18 +64,18 @@ init_egl :: proc(display: ^wl.wl_display) -> RenderContext {
 		log.error("Can't initialise egl display")
 		log.errorf("Error code: 0x%x\n", GetError())
 	}
-	log.info("EGL major: %d, minor %d\n", major, minor)
+	log.debugf("EGL major: %d, minor %d", major, minor)
 	if (!GetConfigs(egl_display, nil, 0, &count)) {
 		log.error("Can't get configs")
-		log.errorf("Error code: 0x%x\n", GetError())
+		log.errorf("Error code: 0x%x", GetError())
 	}
-	log.info("EGL has %d configs\n", count)
+	log.debugf("EGL has %d configs", count)
 
 	res := ChooseConfig(egl_display, raw_data(config_attribs), &egl_conf, 1, &n)
 	if res == egl.FALSE {
 		log.errorf("Error choosing config with error code: %x\n", GetError())
 	}
-	log.infof("EGL chose %d configs\n", n)
+	log.debugf("EGL chose %d configs", n)
 
 	log.info(configs)
 	log.info(egl_conf)

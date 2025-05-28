@@ -28,7 +28,6 @@ RenderedGlyph :: struct {
 FontManager :: struct {
 	font_map:     map[string]string,
 	loaded_fonts: map[string]Font,
-	load_font:    proc(fm: ^FontManager, filename: string, size: f64) -> Font,
 }
 
 
@@ -41,20 +40,71 @@ new_font_manager :: proc() -> FontManager {
 	fm.font_map = font_map
 	fm.loaded_fonts = loaded_fonts
 
-	fm.load_font = load_font
-
 	return fm
 }
 
-load_font :: proc(fm: ^FontManager, name: string, size: f64) -> Font {
+
+load_font_buffer :: proc(
+	fm: ^FontManager,
+	name: string,
+	buffer: []u8,
+	buf_size: u64,
+	size: f64,
+) -> Font {
+	font := sft.loadmem(raw_data(buffer), uint(buf_size))
+
+	sft_obj: sft.SFT
+	sft_obj.font = font
+	sft_obj.xScale = size
+	sft_obj.yScale = size
+	sft_obj.xOffset = 0.0
+	sft_obj.yOffset = 0.0
+	sft_obj.flags = sft.SFT_DOWNWARD_Y
+
+	// Calculate line metrics
+	lmetrics := new(sft.SFT_LMetrics)
+	sft.lmetrics(&sft_obj, lmetrics)
+
+	_font := Font {
+		_font        = sft_obj,
+		cache        = make(map[u8]RenderedGlyph),
+		line_metrics = lmetrics,
+		render_glyph = render_glyph,
+		line_height  = f32(lmetrics.ascender + lmetrics.lineGap),
+	}
+
+	fm.loaded_fonts[name] = _font
+
+	log.info(
+		"Font metrics:",
+		_font.line_metrics.ascender,
+		_font.line_metrics.descender,
+		_font.line_metrics.lineGap,
+	)
+
+	return _font
+}
+
+FontBuffer :: struct {
+	buffer:   []u8,
+	buf_size: u64,
+}
+
+load_font :: proc(fm: ^FontManager, name: string, size: f64, buffer := FontBuffer{}) -> Font {
 	// Check if the font is already loaded
 	if loaded_font, ok := fm.loaded_fonts[name]; ok {
 		return loaded_font
 	}
 
-	log.info("Loading new font:", name)
 	font: ^sft.SFT_Font
-	font = sft.loadfile(strings.clone_to_cstring(fm.font_map[name]))
+	if buffer.buf_size == 0 {
+		font_file := fm.font_map[name]
+		log.info("Loading new font from file:", name, font_file)
+		font = sft.loadfile(strings.clone_to_cstring(fm.font_map[name]))
+	} else {
+		log.info("Loading new font from mem:", name)
+		font = sft.loadmem(raw_data(buffer.buffer), uint(buffer.buf_size))
+	}
 	if (font == nil) {
 		panic("Failed to load font")
 	}

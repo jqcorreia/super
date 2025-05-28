@@ -5,6 +5,7 @@ import "core:time"
 import pl "../platform"
 import "../platform/canvas"
 import fonts "../platform/fonts"
+import "core:log"
 import "vendor:egl"
 
 
@@ -23,6 +24,8 @@ state: ^EngineState
 
 @(init)
 init :: proc() {
+	context.logger = log.create_console_logger()
+
 	state = new(EngineState)
 	pl.init_platform()
 	state.start_time = time.now()
@@ -31,7 +34,14 @@ init :: proc() {
 
 	fm := fonts.new_font_manager()
 
-	state.font = fm->load_font(FONT, 24)
+	font_buf := #load("../assets/JetBrainsMonoNerdFont-Regular.ttf")
+
+	state.font = fonts.load_font(
+		&fm,
+		FONT,
+		24,
+		fonts.FontBuffer{buffer = font_buf, buf_size = u64(len(font_buf))},
+	)
 
 	state.images = pl.new_image_manager()
 }
