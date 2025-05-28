@@ -17,6 +17,7 @@ jobs:
       - name: Build project inside container
         run: |
           git config --file .gitmodules submodule.vendor/wayland-odin.url https://github.com/jqcorreia/wayland-odin.git
+          git config --file .gitmodules submodule.vendor/libschrift-odin.url https://github.com/jqcorreia/libschrift-odin.git
           git submodule sync
           git submodule update --init --recursive
 
