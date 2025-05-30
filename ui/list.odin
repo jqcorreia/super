@@ -283,8 +283,6 @@ list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 			list.new_scroll_offset = 0
 			return
 		}
-		// This is the number of lines minus line height - the height of the list 'container'
-		// The abs here is to account for the actual list be smaller than the container
 		list.new_scroll_offset = math.clamp(list.scroll_offset + offset, 0, max_scroll_offset)
 	}
 
