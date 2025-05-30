@@ -47,9 +47,10 @@ odin build -
 - [x] Keyboard repeat (some edge cases may not work, but it's usable) 
 - [x] Colored text
 - [x] Embed some assets like default font 
-- [ ] Implement list selected item/index mechanics - !
-- [ ] List scroll along with selection
-- [ ] Layout manager, dumb, simple one, please... - !
+- [x] Implement list selected item/index mechanics
+- [x] List scroll along with selection
+- [x] Layout manager, dumb, simple one, please... - !
+- [ ] Implement tmux sessions source
 - [ ] Make a UI package properly usable
 - [ ] Check why egl.CreateContext() allocates so much memory! 
 - [ ] Mouse input
