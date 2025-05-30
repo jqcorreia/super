@@ -237,6 +237,10 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 
 list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 	offset: f32 = 0
+	item_size := list.font.line_height + 2 * MARGIN_SIZE
+	rendered_height := f32(len(list.items)) * f32(item_size)
+	max_scroll_offset := math.abs(rendered_height - list.h)
+
 	#partial switch e in event {
 	case platform.KeyPressed:
 		{
@@ -246,20 +250,34 @@ list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 			if e.key == platform.KeySym.XK_Page_Up {
 				offset = -SCROLL_SPEED
 			}
+			// Janky ass keyboard scroll
 			if e.key == platform.KeySym.XK_Down {
 				list.selected_index = math.clamp(list.selected_index + 1, 0, len(list.items) - 1)
-				list.main_texture = 0
+				if f32(list.selected_index) * item_size > list.scroll_offset + list.h - item_size {
+					list.new_scroll_offset = math.clamp(
+						list.scroll_offset + item_size,
+						0,
+						max_scroll_offset,
+					)
+				}
+				list_free_fbo_and_texture(list)
 			}
 			if e.key == platform.KeySym.XK_Up {
 				list.selected_index = math.clamp(list.selected_index - 1, 0, len(list.items) - 1)
+				if f32(list.selected_index) * item_size < list.scroll_offset {
+					list.new_scroll_offset = math.clamp(
+						list.scroll_offset - item_size,
+						0,
+						max_scroll_offset,
+					)
+
+				}
 				list_free_fbo_and_texture(list)
 			}
 		}
 	}
-	if offset != 0 {
-		item_size := list.font.line_height + 2 * MARGIN_SIZE
-		rendered_height := f32(len(list.items)) * f32(item_size)
 
+	if offset != 0 {
 		if rendered_height < list.h {
 			// Do not scroll
 			list.new_scroll_offset = 0
@@ -267,7 +285,7 @@ list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 		}
 		// This is the number of lines minus line height - the height of the list 'container'
 		// The abs here is to account for the actual list be smaller than the container
-		max_scroll_offset := math.abs(rendered_height - list.h)
 		list.new_scroll_offset = math.clamp(list.scroll_offset + offset, 0, max_scroll_offset)
 	}
+
 }
