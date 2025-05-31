@@ -29,14 +29,27 @@ draw :: proc(canvas: ^cv.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
-	cv.draw_rect(
-		canvas,
-		0,
-		0,
-		f32(canvas.width),
-		f32(canvas.height),
-		{color = {0.0, 0.0, 0.0, 1.0}, shader = platform.get_shader("Singularity")},
-	)
+	if ui.current_theme.background.color != nil {
+		cv.draw_rect(
+			canvas,
+			0,
+			0,
+			f32(canvas.width),
+			f32(canvas.height),
+			{color = ui.current_theme.background.color^},
+		)
+	}
+	if ui.current_theme.background.shader != "" {
+		cv.draw_rect(
+			canvas,
+			0,
+			0,
+			f32(canvas.width),
+			f32(canvas.height),
+			{shader = platform.get_shader(ui.current_theme.background.shader)},
+		)
+
+	}
 
 	gl.Enable(gl.BLEND)
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
@@ -55,7 +68,6 @@ check_stdin :: proc() -> bool {
 
 
 main :: proc() {
-
 	when ODIN_DEBUG {
 		track: mem.Tracking_Allocator
 		mem.tracking_allocator_init(&track, context.allocator)
@@ -203,6 +215,10 @@ main :: proc() {
 					if e.key == platform.KeySym.XK_Return {
 						selected_action := l.items[l.selected_index]
 						actions.do_action(selected_action)
+					}
+					if e.key == platform.KeySym.XK_F1 {
+						ui.change_theme()
+						// ui.current_theme = ui.other_theme
 					}
 				}
 			}

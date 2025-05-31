@@ -50,6 +50,7 @@ odin build -
 - [x] Implement list selected item/index mechanics
 - [x] List scroll along with selection
 - [x] Layout manager, dumb, simple one, please... - !
+- [ ] Implement theming -- !
 - [ ] Implement tmux sessions source
 - [ ] Make a UI package properly usable
 - [ ] Check why egl.CreateContext() allocates so much memory! 

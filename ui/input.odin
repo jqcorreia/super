@@ -23,7 +23,7 @@ input_text_draw :: proc(input: ^InputText, canvas: ^cv.Canvas) {
 		input.y,
 		input.w,
 		input.h,
-		{color = {0.5, 0.5, 0.5, 1.0}, shader = platform.get_shader("Rounded")},
+		{color = current_theme.input_border_color, shader = platform.get_shader("Rounded")},
 	)
 	rect: []i32 = {
 		i32(input.x),
@@ -42,7 +42,7 @@ input_text_draw :: proc(input: ^InputText, canvas: ^cv.Canvas) {
 		text_y,
 		input.text,
 		&input.font,
-		// color = [4]f32{0.2, 0.4, 0.9, 1.0},
+		color = current_theme.input_text_color,
 	)
 
 	// Draw cursor
