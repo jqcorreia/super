@@ -107,9 +107,9 @@ keyboard_listener := wl.wl_keyboard_listener {
 		)
 		ks := xkbcommon.state_new(km)
 
-		// FIXME(quadrado): For now use LC_NAME because LC_ALL is not always set and LANG can be a different language than
-		// intended. There should be a canonical way to get this but i'm not finding it.
-		locale := os.get_env("LC_NAME")
+		locale := os.get_env("LC_ALL")
+		if len(locale) == 0 do locale = os.get_env("LANG")
+		if len(locale) == 0 do locale = "POSIX"
 		compose_table := xkbcommon.compose_table_new_from_locale(
 			ctx,
 			strings.clone_to_cstring(locale),
