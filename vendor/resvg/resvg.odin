@@ -15,7 +15,20 @@ transform :: struct {
 	a, b, c, d, e, f: c.float,
 }
 
-foreign import resvg "system:libresvg.a"
+@(private)
+LIB :: (
+    "libresvg.a"         when #exists("libresvg.a") else
+    "system:libresvg.a"  when #exists("/usr/lib/libresvg.a") else
+    ""
+)
+
+when LIB == "" {
+    #panic("Could not find the compiled resvg lib. It can be compiled by running `make -C \"vendor/resvg\"`")
+}
+
+foreign import resvg {
+    LIB when LIB != "" else "system:libresvg.a",
+}
 
 @(default_calling_convention = "c", link_prefix = "resvg_")
 foreign resvg {
