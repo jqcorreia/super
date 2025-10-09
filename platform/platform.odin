@@ -132,9 +132,8 @@ init_platform :: proc() {
 	platform.start_time = time.now()
 }
 
-
 render :: proc(platform: ^PlatformState) {
 	platform.time_elapsed = time.diff(platform.start_time, time.now())
-	wl.display_dispatch_pending(platform.display)
+	wl.display_dispatch(platform.display)
 	wl.display_flush(platform.display)
 }
