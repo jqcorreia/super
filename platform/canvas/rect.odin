@@ -5,7 +5,6 @@ import gl "vendor:OpenGL"
 
 import "../../platform"
 import "../../types"
-import "../../utils/gmath"
 
 DrawRectParams :: struct {
 	vertices:       ^[]f32,
@@ -42,7 +41,7 @@ draw_rect_raw :: proc(
 	color := params.color
 	_resolution := resolution
 
-	projectionMatrix := gmath.ortho(0, resolution[0], resolution[1], 0)
+	projectionMatrix := ortho(0, resolution[0], resolution[1], 0)
 	gl.Uniform1fv(
 		gl.GetUniformLocation(shader, cstring("iTime")),
 		1,

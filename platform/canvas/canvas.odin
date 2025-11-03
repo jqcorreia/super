@@ -35,8 +35,6 @@ CanvasCallback :: struct {
 }
 
 
-ortho :: gmath.ortho
-
 resize_egl_window :: proc(
 	canvas: ^Canvas,
 	egl_render_context: pl.RenderContext,
