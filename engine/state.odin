@@ -1,5 +1,6 @@
 package engine
 
+import "base:runtime"
 import "core:time"
 
 import pl "../platform"
@@ -23,7 +24,8 @@ FONT :: "JetBrainsMono Nerd Font"
 state: ^EngineState
 
 @(init)
-init :: proc() {
+init :: proc "contextless" () {
+	context = runtime.default_context()
 	context.logger = log.create_console_logger()
 
 	state = new(EngineState)

@@ -8,6 +8,8 @@ import "core:slice"
 import "core:strconv"
 import "core:strings"
 
+import "base:runtime"
+
 Icon :: struct {
 	path: string,
 }
@@ -90,7 +92,8 @@ icon_manager_get_icon :: proc(il: IconLookup) -> (Icon, bool) {
 //     }
 // }
 @(init)
-generate_icon_map :: proc() {
+generate_icon_map :: proc "contextless" () {
+	context = runtime.default_context()
 	icon_manager.icon_map = make(map[IconLookup]Icon)
 	icon_manager.sizes = make(map[u32]bool)
 
