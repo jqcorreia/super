@@ -13,14 +13,15 @@ import "vendor:egl"
 CanvasDrawProc :: proc(_: ^Canvas)
 
 Canvas :: struct {
-	width:         i32,
-	height:        i32,
-	surface:       ^wl.wl_surface,
-	layer_surface: ^wl.zwlr_layer_surface_v1,
-	egl_surface:   egl.Surface,
-	egl_window:    ^wl.egl_window,
-	draw_proc:     CanvasDrawProc,
-	ready:         bool,
+	width:           i32,
+	height:          i32,
+	surface:         ^wl.wl_surface,
+	layer_surface:   ^wl.zwlr_layer_surface_v1,
+	egl_surface:     egl.Surface,
+	egl_window:      ^wl.egl_window,
+	draw_proc:       CanvasDrawProc,
+	ready:           bool,
+	frame_requested: bool
 }
 
 CanvasType :: enum {
@@ -80,14 +81,9 @@ create_egl_window :: proc(
 done :: proc "c" (data: rawptr, wl_callback: ^wl.wl_callback, callback_data: c.uint32_t) {
 	context = runtime.default_context()
 	cc := cast(^CanvasCallback)data
-
 	wl.wl_callback_destroy(wl_callback)
-	callback := wl.wl_surface_frame(cc.canvas.surface)
-	wl.wl_callback_add_listener(callback, &frame_callback, cc)
-
-	if cc.canvas.ready {
-		cc.canvas.draw_proc(cc.canvas)
-	}
+	cc.canvas.frame_requested = true
+	free(cc)
 }
 
 frame_callback := wl.wl_callback_listener {
@@ -105,6 +101,7 @@ create_canvas :: proc(
 	canvas.width = i32(width)
 	canvas.height = i32(height)
 	canvas.surface = wl.wl_compositor_create_surface(platform.compositor)
+	canvas.frame_requested = true
 
 	if canvas.surface == nil {
 		log.debug("Error creating surface")
