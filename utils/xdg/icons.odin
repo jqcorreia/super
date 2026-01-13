@@ -1,4 +1,3 @@
-#+feature global-context
 package xdg
 
 import "core:encoding/ini"

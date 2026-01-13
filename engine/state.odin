@@ -1,14 +1,13 @@
-#+feature global-context
 package engine
 
 import "base:runtime"
-import "core:time"
 import "core:fmt"
+import "core:time"
 
 import pl "../platform"
 import "../platform/canvas"
-import wl "../vendor/wayland-odin/wayland"
 import fonts "../platform/fonts"
+import wl "../vendor/wayland-odin/wayland"
 import "core:log"
 import "vendor:egl"
 
@@ -60,15 +59,15 @@ create_canvas :: proc(
 	return canvas.create_canvas(pl.inst(), width, height, type, draw_proc)
 }
 render :: proc(canv: ^canvas.Canvas) {
-    if canv.frame_requested {
-        canv->draw_proc()
-        callback := wl.wl_surface_frame(canv.surface)
-        canv.frame_requested = false
-        cc := new(canvas.CanvasCallback)
-        cc.platform_state = pl.inst()
-        cc.canvas = canv
-        wl.wl_callback_add_listener(callback, &canvas.frame_callback, cc)
-        egl.SwapBuffers(pl.inst().egl_render_context.display, canv.egl_surface)
-    }
-    pl.render(pl.inst())
+	if canv.frame_requested {
+		canv->draw_proc()
+		callback := wl.wl_surface_frame(canv.surface)
+		canv.frame_requested = false
+		cc := new(canvas.CanvasCallback)
+		cc.platform_state = pl.inst()
+		cc.canvas = canv
+		wl.wl_callback_add_listener(callback, &canvas.frame_callback, cc)
+		egl.SwapBuffers(pl.inst().egl_render_context.display, canv.egl_surface)
+	}
+	pl.render(pl.inst())
 }
