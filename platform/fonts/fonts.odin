@@ -1,6 +1,6 @@
 package fonts
 
-import "../../vendor/libschrift-odin/sft"
+import "../vendor/libschrift-odin/sft"
 import "core:log"
 import "core:os/os2"
 import "core:strings"
@@ -186,6 +186,7 @@ render_glyph :: proc(font: ^Font, char: u8, previous_glyph: ^RenderedGlyph) -> R
 		width  = (metrics.minWidth + 3) & ~i32(3),
 		height = metrics.minHeight,
 	}
+
 	gp := make([]u8, image.width * image.height)
 	image.pixels = raw_data(gp)
 	sft.render(&font._font, glyph^, image)
@@ -214,6 +215,8 @@ render_glyph :: proc(font: ^Font, char: u8, previous_glyph: ^RenderedGlyph) -> R
 
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_SWIZZLE_R, gl.RED)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_SWIZZLE_G, gl.RED)

@@ -1,4 +1,4 @@
-package canvas
+package platform
 
 ortho :: proc(l: f32, r: f32, b: f32, t: f32) -> [16]f32 {
 	return [16]f32 {

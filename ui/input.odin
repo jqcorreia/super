@@ -1,7 +1,6 @@
 package ui
 
-import "../platform"
-import cv "../platform/canvas"
+import pl "../platform"
 import "../platform/fonts"
 
 import "core:math"
@@ -16,14 +15,14 @@ InputText :: struct {
 	cursor_x:   f32,
 }
 
-input_text_draw :: proc(input: ^InputText, canvas: ^cv.Canvas) {
-	cv.draw_rect(
+input_text_draw :: proc(input: ^InputText, canvas: ^pl.Canvas) {
+	pl.draw_rect(
 		canvas,
 		input.x,
 		input.y,
 		input.w,
 		input.h,
-		{color = current_theme.input_border_color, shader = platform.get_shader("Rounded")},
+		{color = current_theme.input_border_color, shader = pl.get_shader("Rounded")},
 	)
 	rect: []i32 = {
 		i32(input.x),
@@ -36,7 +35,7 @@ input_text_draw :: proc(input: ^InputText, canvas: ^cv.Canvas) {
 	x := input.x + 5
 	text_y := input.y + ((input.h - input.font.line_height) / 2)
 
-	tw, th := cv.draw_text(
+	tw, th := pl.draw_text(
 		canvas,
 		x,
 		text_y,
@@ -49,17 +48,17 @@ input_text_draw :: proc(input: ^InputText, canvas: ^cv.Canvas) {
 	input.cursor_x = math.lerp(input.cursor_x, tw, f32(0.35))
 
 	// Draw the cursor at the text_y in the cursor x position with a fifth of the text height
-	cv.draw_rect(canvas, x + input.cursor_x, text_y, th / 5, th, {color = {0.1, 0.2, 0.7, 1.0}})
+	pl.draw_rect(canvas, x + input.cursor_x, text_y, th / 5, th, {color = {0.1, 0.2, 0.7, 1.0}})
 
 	gl.Scissor(0, 0, canvas.width, canvas.height)
 	gl.Disable(gl.SCISSOR_TEST)
 }
 
-input_text_update :: proc(input: ^InputText, event: platform.InputEvent) {
+input_text_update :: proc(input: ^InputText, event: pl.Event) {
 	#partial switch e in event {
-	case platform.KeyPressed:
+	case pl.KeyPressed:
 		{
-			if e.key == platform.KeySym.XK_BackSpace {
+			if e.key == pl.KeySym.XK_BackSpace {
 				if len(input.text) > 0 {
 					input.text, _ = strings.substring(
 						input.text,
@@ -69,7 +68,7 @@ input_text_update :: proc(input: ^InputText, event: platform.InputEvent) {
 				}
 			}
 		}
-	case platform.TextInput:
+	case pl.TextInput:
 		{
 			input.text = strings.concatenate([]string{input.text, e.text})
 		}

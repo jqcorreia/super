@@ -2,7 +2,6 @@ package ui
 
 import "../actions"
 import "../platform"
-import cv "../platform/canvas"
 
 
 Widget :: union {
@@ -30,7 +29,7 @@ update :: proc {
 	input_text_update,
 }
 
-draw_widget :: proc(widget: ^Widget, canvas: ^cv.Canvas) {
+draw_widget :: proc(widget: ^Widget, canvas: ^platform.Canvas) {
 	switch &w in widget {
 	case List(string):
 		list_draw(&w, canvas)
@@ -43,7 +42,7 @@ draw_widget :: proc(widget: ^Widget, canvas: ^cv.Canvas) {
 	}
 }
 
-update_widget :: proc(widget: ^Widget, event: platform.InputEvent) {
+update_widget :: proc(widget: ^Widget, event: platform.Event) {
 	switch &w in widget {
 	case List(actions.Action):
 		list_update(&w, event)

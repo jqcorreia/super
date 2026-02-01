@@ -1,0 +1,13 @@
+odin
+main
+scanner
+.gdb_history
+
+wayland-client.c
+wayland-code.c
+wayland-header.h
+wayland.xml
+wayland-odin
+*.bin
+*.bin
+

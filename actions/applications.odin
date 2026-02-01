@@ -68,5 +68,5 @@ get_icon :: proc(name: string) -> platform.Image {
 
 	}
 
-	return engine.state.images->load(path)
+	return engine.state.images.load(path)
 }

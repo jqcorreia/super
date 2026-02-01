@@ -1,9 +1,9 @@
 package platform
 
-import wl "../vendor/wayland-odin/wayland"
 import "base:runtime"
 import "core:c"
 import "core:log"
+import wl "vendor/wayland-odin/wayland"
 
 // THIS IS VERY WIP, actually not working.
 data_source_listener := wl.wl_data_source_listener {

@@ -1,9 +1,6 @@
-package canvas
+package platform
 
-import "../../platform"
-import fonts "../../platform/fonts"
-import "../../types"
-
+import fonts "./fonts"
 
 draw_text_raw :: proc(
 	resolution: [2]f32,
@@ -11,17 +8,16 @@ draw_text_raw :: proc(
 	y: f32,
 	text: string,
 	font: ^fonts.Font,
-	color: types.Color = {1, 1, 1, 1},
-	_shader: u32 = 0,
+	color: Color = {1, 1, 1, 1},
+	_shader: ^Shader = nil,
 ) -> (
 	f32,
 	f32,
 ) {
-	shader := _shader == 0 ? platform.get_shader("Text") : _shader
+	shader := _shader == nil ? get_shader("Text") : _shader
 
 	current_x := x
 	buffers: [dynamic]fonts.RenderedGlyph
-
 	previous_glyph: ^fonts.RenderedGlyph = nil
 
 	total_line_height := font.line_height
@@ -55,14 +51,58 @@ draw_text_raw :: proc(
 	return current_x - x, total_line_height // current_x - x is equal to total_line_width
 }
 
+text_size :: proc(text: string, font: ^fonts.Font) -> (f32, f32) {
+	w: f32 = 0
+	h: f32 = font.line_height
+
+	buffers: [dynamic]fonts.RenderedGlyph
+	previous_glyph: ^fonts.RenderedGlyph = nil
+
+	for c in text {
+		rg := font->render_glyph(u8(c), previous_glyph)
+		previous_glyph = &rg
+
+		append(&buffers, rg)
+	}
+
+	for rg in buffers {
+		metrics := rg.metrics
+		w += f32(metrics.advanceWidth)
+	}
+
+	return w, h
+}
+
+text_size_u32 :: proc(text: string, font: ^fonts.Font) -> (u32, u32) {
+	w: f32 = 0
+	h: f32 = font.line_height
+
+	buffers: [dynamic]fonts.RenderedGlyph
+	previous_glyph: ^fonts.RenderedGlyph = nil
+
+	for c in text {
+		rg := font->render_glyph(u8(c), previous_glyph)
+		previous_glyph = &rg
+
+		append(&buffers, rg)
+	}
+
+	for rg in buffers {
+		metrics := rg.metrics
+		w += f32(metrics.advanceWidth)
+	}
+
+	return u32(w), u32(h)
+}
+
 draw_text_canvas :: proc(
 	canvas: ^Canvas,
 	x: f32,
 	y: f32,
 	text: string,
 	font: ^fonts.Font,
-	_shader: u32 = 0,
-	color: types.Color = {1.0, 1.0, 1.0, 1.0},
+	_shader: ^Shader = nil,
+	color: Color = {1.0, 1.0, 1.0, 1.0},
 ) -> (
 	f32,
 	f32,

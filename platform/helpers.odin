@@ -1,9 +1,8 @@
-package canvas
+package platform
 
 import gl "vendor:OpenGL"
 
 get_quad :: proc(_vertices: ^[]f32) -> (u32, u32) {
-
 	vertices: []f32
 	if _vertices != nil {
 		vertices = _vertices^

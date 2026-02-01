@@ -1,7 +1,5 @@
 package platform
 
-import wl "../vendor/wayland-odin/wayland"
-import "../vendor/xkbcommon"
 import "base:runtime"
 import "core:c"
 import "core:log"
@@ -9,44 +7,17 @@ import "core:os"
 import "core:strings"
 import "core:sys/posix"
 import "core:time"
+import wl "vendor/wayland-odin/wayland"
+import "vendor/xkbcommon"
 import "vendor:x11/xlib"
 
 KeySym :: xlib.KeySym
 
-Modifiers :: enum u32 {
-	Shift = 1,
-	Ctrl  = 4,
-	Alt   = 8,
-	Super = 64,
-}
-
-
-KeyPressed :: struct {
-	key:       KeySym,
-	keycode:   u32,
-	serial:    u32,
-	modifiers: bit_set[Modifiers],
-}
-
-KeyReleased :: struct {
-	key:    KeySym,
-	serial: u32,
-}
-
-TextInput :: struct {
-	text: string,
-}
-
-InputEvent :: union {
-	KeyPressed,
-	KeyReleased,
-	TextInput,
-}
 
 Input :: struct {
 	xkb:                     Xkb,
-	events:                  [dynamic]InputEvent,
-	consume_all_events:      proc(input: ^Input) -> [dynamic]InputEvent,
+	events:                  [dynamic]Event,
+	consume_all_events:      proc(input: ^Input) -> [dynamic]Event,
 	current_modifiers:       bit_set[Modifiers],
 	repeat_rate:             u32,
 	repeat_delay:            u32,
@@ -78,6 +49,7 @@ seat_listener := wl.wl_seat_listener {
 }
 
 keyboard_listener := wl.wl_keyboard_listener {
+	// odinfmt: disable
 	keymap = proc "c" (
 		data: rawptr,
 		keyboard: ^wl.wl_keyboard,
@@ -223,6 +195,8 @@ pointer_listener := wl.wl_pointer_listener {
 		surface_y: wl.wl_fixed_t,
 	) {
 		context = runtime.default_context()
+		state := cast(^PlatformState)data
+		append(&state.input.events, MouseMove{x = surface_x >> 8, y = surface_y >> 8})
 	},
 	button = proc "c" (
 		data: rawptr,
@@ -231,14 +205,27 @@ pointer_listener := wl.wl_pointer_listener {
 		time: c.uint32_t,
 		button: c.uint32_t,
 		state: c.uint32_t,
-	) {},
+	) {
+		context = runtime.default_context()
+		pstate := cast(^PlatformState)data
+		append(
+			&pstate.input.events,
+			MouseButton{button = MouseButtonId(button), state = MouseButtonState(state)},
+		)
+	},
 	axis = proc "c" (
 		data: rawptr,
 		wl_pointer: ^wl.wl_pointer,
 		time: c.uint32_t,
 		axis: c.uint32_t,
 		value: wl.wl_fixed_t,
-	) {},
+	) {
+		context = runtime.default_context()
+		pstate := cast(^PlatformState)data
+		event_axis := axis == 0 ? MouseWheelAxis.Vertical : MouseWheelAxis.Horizontal
+		event_direction: i8 = value > 0 ? 1 : -1
+		append(&pstate.input.events, MouseWheel{axis = event_axis, direction = event_direction})
+	},
 	frame = proc "c" (data: rawptr, wl_pointer: ^wl.wl_pointer) {},
 	axis_source = proc "c" (data: rawptr, wl_pointer: ^wl.wl_pointer, axis_source: c.uint32_t) {},
 	axis_stop = proc "c" (
@@ -278,7 +265,7 @@ key_handler :: proc "c" (
 	context = runtime.default_context()
 	_state := cast(^PlatformState)data
 
-	// This converts evdev events to xkb events 
+	// This converts evdev events to xkb events
 	keycode := key + 8
 	key_sym := xkbcommon.state_key_get_one_sym(_state.input.xkb.state, keycode)
 
@@ -358,14 +345,14 @@ process_key_press :: proc(input: ^Input, key_pressed: KeyPressed, repeating: boo
 init_input :: proc(state: ^PlatformState) {
 	log.info("Initializing input controller.")
 	input := new(Input)
-	input.events = make([dynamic]InputEvent)
+	input.events = make([dynamic]Event)
 	input.consume_all_events = consume_all_events
 
 	wl.wl_seat_add_listener(state.seat, &seat_listener, state)
 	state.input = input
 }
 
-consume_all_events :: proc(input: ^Input) -> [dynamic]InputEvent {
+consume_all_events :: proc(input: ^Input) -> [dynamic]Event {
 	// FIXME(quadrado): This repeating code should go elsewhere, probably on platform update function
 	if input.current_press != {} {
 		diff := time.diff(input.current_press_timestamp, time.now())
@@ -386,7 +373,7 @@ consume_all_events :: proc(input: ^Input) -> [dynamic]InputEvent {
 		}
 	}
 
-	events: [dynamic]InputEvent
+	events: [dynamic]Event
 	for event in input.events {
 		append(&events, event)
 	}

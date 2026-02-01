@@ -1,10 +1,9 @@
-package canvas
+package platform
 
-import "../../platform"
-import wl "../../vendor/wayland-odin/wayland"
 import "base:runtime"
 import "core:c"
 import "core:log"
+import wl "vendor/wayland-odin/wayland"
 
 layer_listener := wl.zwlr_layer_surface_v1_listener {
 	configure = proc "c" (
@@ -26,9 +25,9 @@ layer_listener := wl.zwlr_layer_surface_v1_listener {
 		egl_render_context := cc.platform_state.egl_render_context
 		if !canvas.ready || canvas.width != width || canvas.height != height {
 			create_egl_window(canvas, egl_render_context, width, height)
-			if (!cc.platform_state.default_shaders_loaded) {
-				platform.create_default_shaders()
-				cc.platform_state.default_shaders_loaded = true
+			if (!cc.platform_state.default_resources_loaded) {
+				load_default_resources()
+				cc.platform_state.default_resources_loaded = true
 			}
 			canvas.width = width
 			canvas.height = height

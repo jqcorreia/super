@@ -1,15 +1,11 @@
 package engine
 
 import "base:runtime"
-import "core:fmt"
 import "core:time"
 
 import pl "../platform"
-import "../platform/canvas"
 import fonts "../platform/fonts"
-import wl "../vendor/wayland-odin/wayland"
 import "core:log"
-import "vendor:egl"
 
 
 EngineState :: struct {
@@ -53,21 +49,12 @@ init :: proc "contextless" () {
 create_canvas :: proc(
 	width: u32,
 	height: u32,
-	type: canvas.CanvasType,
-	draw_proc: canvas.CanvasDrawProc,
-) -> ^canvas.Canvas {
-	return canvas.create_canvas(pl.inst(), width, height, type, draw_proc)
+	type: pl.CanvasType,
+	draw_proc: pl.CanvasDrawProc,
+) -> ^pl.Canvas {
+	return pl.create_canvas(width, height, type, draw_proc)
 }
-render :: proc(canv: ^canvas.Canvas) {
-	if canv.frame_requested {
-		canv->draw_proc()
-		callback := wl.wl_surface_frame(canv.surface)
-		canv.frame_requested = false
-		cc := new(canvas.CanvasCallback)
-		cc.platform_state = pl.inst()
-		cc.canvas = canv
-		wl.wl_callback_add_listener(callback, &canvas.frame_callback, cc)
-		egl.SwapBuffers(pl.inst().egl_render_context.display, canv.egl_surface)
-	}
-	pl.render(pl.inst())
+
+render :: proc(canv: ^pl.Canvas) {
+	pl.render(canv)
 }

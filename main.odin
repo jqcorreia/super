@@ -9,8 +9,7 @@ import "core:mem"
 import "core:os/os2"
 import "core:sys/posix"
 import "engine"
-import "platform"
-import cv "platform/canvas"
+import pl "platform"
 import "ui"
 import gl "vendor:OpenGL"
 
@@ -25,12 +24,12 @@ App :: struct {
 
 app := App{}
 
-draw :: proc(canvas: ^cv.Canvas) {
+draw :: proc(canvas: ^pl.Canvas) {
 	gl.ClearColor(147.0 / 255.0, 204.0 / 255., 234. / 255., 1.0)
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 
 	if ui.current_theme.background.color != nil {
-		cv.draw_rect(
+		pl.draw_rect(
 			canvas,
 			0,
 			0,
@@ -40,13 +39,13 @@ draw :: proc(canvas: ^cv.Canvas) {
 		)
 	}
 	if ui.current_theme.background.shader != "" {
-		cv.draw_rect(
+		pl.draw_rect(
 			canvas,
 			0,
 			0,
 			f32(canvas.width),
 			f32(canvas.height),
-			{shader = platform.get_shader(ui.current_theme.background.shader)},
+			{shader = pl.get_shader(ui.current_theme.background.shader)},
 		)
 
 	}
@@ -113,7 +112,7 @@ main :: proc() {
 	// action_items += actions.get_secret_actions()
 	log.log(.Debug, "Number of apps detected:", len(action_items))
 
-	c1 := engine.create_canvas(WIDTH, HEIGHT, cv.CanvasType.Window, draw)
+	c1 := engine.create_canvas(WIDTH, HEIGHT, .Window, draw)
 
 	search := ui.InputText {
 		x    = 0,
@@ -152,17 +151,13 @@ main :: proc() {
 	append(&app.widget_list, search)
 	append(&app.widget_list, list)
 
-	platform.new_shader(
+	pl.new_shader(
 		"Singularity",
 		#load("shaders/basic_vert.glsl"),
 		#load("shaders/singularity.glsl"),
 	)
-	platform.new_shader(
-		"Starship",
-		#load("shaders/basic_vert.glsl"),
-		#load("shaders/starship.glsl"),
-	)
-	platform.new_shader("Cosmic", #load("shaders/basic_vert.glsl"), #load("shaders/cosmic.glsl"))
+	pl.new_shader("Starship", #load("shaders/basic_vert.glsl"), #load("shaders/starship.glsl"))
+	pl.new_shader("Cosmic", #load("shaders/basic_vert.glsl"), #load("shaders/cosmic.glsl"))
 
 	previous_search := ""
 
@@ -204,19 +199,19 @@ main :: proc() {
 			previous_search = s.text
 		}
 
-		events := platform.inst().input->consume_all_events()
+		events := pl.inst().input->consume_all_events()
 		for event in events {
 			#partial switch e in event {
-			case platform.KeyPressed:
+			case pl.KeyPressed:
 				{
-					if e.key == platform.KeySym.XK_Escape && e.modifiers == {} {
+					if e.key == pl.KeySym.XK_Escape && e.modifiers == {} {
 						engine.state.running = false
 					}
-					if e.key == platform.KeySym.XK_Return {
+					if e.key == pl.KeySym.XK_Return {
 						selected_action := l.items[l.selected_index]
 						actions.do_action(selected_action)
 					}
-					if e.key == platform.KeySym.XK_F1 {
+					if e.key == pl.KeySym.XK_F1 {
 						ui.change_theme()
 						// ui.current_theme = ui.other_theme
 					}

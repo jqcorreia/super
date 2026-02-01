@@ -1,10 +1,14 @@
 package platform
 
-import "../vendor/resvg"
 import "core:c"
+import "core:fmt"
+import "core:os"
 import "core:strings"
+import "vendor/resvg"
 import gl "vendor:OpenGL"
 import "vendor:stb/image"
+
+import "core:log"
 
 ImageMap :: map[string]Image
 Image :: struct {
@@ -15,14 +19,33 @@ Image :: struct {
 
 ImageManager :: struct {
 	images: ImageMap,
-	load:   proc(_: ^ImageManager, _: string) -> Image,
+	load:   proc(
+		_: string,
+		config: SamplingConfig = {min_filter = gl.LINEAR_MIPMAP_LINEAR, mag_filter = gl.LINEAR},
+		flip_y: bool = false,
+	) -> Image,
 }
 
-@(private)
-load_image :: proc(manager: ^ImageManager, path: string) -> Image {
+SamplingConfig :: struct {
+	min_filter: i32,
+	mag_filter: i32,
+	wrap_s:     i32,
+	wrap_t:     i32,
+}
+
+load_image :: proc(
+	path: string,
+	config: SamplingConfig = {min_filter = gl.LINEAR_MIPMAP_LINEAR, mag_filter = gl.LINEAR},
+	flip_y: bool = false,
+) -> Image {
+	manager := &inst().images
 	img, ok := manager.images[path]
 
+	if !os.exists(path) {
+		panic(fmt.tprintln("File ", path, " not found"))
+	}
 	if !ok {
+		log.infof("Loading image %s", path)
 		w, h, c: c.int
 		buf: []u8
 
@@ -51,27 +74,38 @@ load_image :: proc(manager: ^ImageManager, path: string) -> Image {
 				raw_data(buf),
 			)
 		} else {
-			lbuf := image.load(strings.clone_to_cstring(path), &w, &h, &c, 0)
+			image.set_flip_vertically_on_load(flip_y ? 1 : 0)
+			lbuf := image.load(strings.clone_to_cstring(path), &w, &h, &c, 4)
 			buf = lbuf[0:w * h * c]
 		}
 
 		texture: u32
+		format: u32 = gl.RGBA
+
 		gl.GenTextures(1, &texture)
 		gl.BindTexture(gl.TEXTURE_2D, texture)
+		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, config.min_filter)
+		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, config.mag_filter)
+		gl.TexParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAX_ANISOTROPY, 16.0) // if supported
+
+		if config.wrap_t > 0 {
+			gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, config.wrap_t)
+		}
+		if config.wrap_s > 0 {
+			gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, config.wrap_s)
+		}
 		gl.TexImage2D(
 			gl.TEXTURE_2D,
 			0,
-			gl.RGBA,
+			i32(format),
 			i32(w),
 			i32(h),
 			0,
-			gl.RGBA,
+			u32(format),
 			gl.UNSIGNED_BYTE,
 			raw_data(buf),
 		)
-		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-
+		gl.GenerateMipmap(gl.TEXTURE_2D)
 		gl.BindTexture(gl.TEXTURE_2D, 0)
 		i := Image {
 			w       = u32(w),
@@ -87,6 +121,56 @@ load_image :: proc(manager: ^ImageManager, path: string) -> Image {
 	}
 }
 
+
+load_image_from_buffer :: proc(
+	buf: []u8,
+	config: SamplingConfig = {min_filter = gl.LINEAR_MIPMAP_LINEAR, mag_filter = gl.LINEAR},
+	flip_y: bool = false,
+) -> Image {
+	w, h, c: c.int
+
+	image.set_flip_vertically_on_load(flip_y ? 1 : 0)
+	lbuf := image.load_from_memory(raw_data(buf), i32(len(buf)), &w, &h, &c, 4)
+	ibuf: []u8 = lbuf[0:w * h * c]
+
+	texture: u32
+	format: u32 = gl.RGBA
+
+	gl.GenTextures(1, &texture)
+	gl.BindTexture(gl.TEXTURE_2D, texture)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, config.min_filter)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, config.mag_filter)
+	gl.TexParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAX_ANISOTROPY, 16.0) // if supported
+
+	if config.wrap_t > 0 {
+		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, config.wrap_t)
+	}
+	if config.wrap_s > 0 {
+		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, config.wrap_s)
+	}
+	gl.TexImage2D(
+		gl.TEXTURE_2D,
+		0,
+		i32(format),
+		i32(w),
+		i32(h),
+		0,
+		u32(format),
+		gl.UNSIGNED_BYTE,
+		raw_data(ibuf),
+	)
+	gl.GenerateMipmap(gl.TEXTURE_2D)
+	gl.BindTexture(gl.TEXTURE_2D, 0)
+	i := Image {
+		w       = u32(w),
+		h       = u32(h),
+		c       = u32(c),
+		buf     = ibuf[0:w * h * c],
+		texture = texture,
+	}
+
+	return i
+}
 
 new_image_manager :: proc() -> ImageManager {
 	return ImageManager{images = make(ImageMap), load = load_image}

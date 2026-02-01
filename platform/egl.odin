@@ -1,8 +1,8 @@
 package platform
 
-import wl "../vendor/wayland-odin/wayland"
 import "core:c"
 import "core:log"
+import wl "vendor/wayland-odin/wayland"
 import "vendor:egl"
 
 foreign import foo "system:EGL"
@@ -31,6 +31,13 @@ EGL_PLATFORM_DEVICE_EXT :: 0x313F
 EGL_PLATFORM_GBM_KHR :: 0x31D7
 EGL_PLATFORM_WAYLAND_KHR :: 0x31D8
 
+EGL_SAMPLE_BUFFERS :: 12338
+EGL_SAMPLES :: 12338
+EGL_CONTEXT_FLAGS_KHR :: 0x30FC
+
+EGL_CONTEXT_OPENGL_DEBUG_BIT_KHR :: 0x00000001
+EGL_CONTEXT_OPENGL_FORWARD_COMPATIBLE_BIT_KHR :: 0x00000002
+EGL_CONTEXT_OPENGL_ROBUST_ACCESS_BIT_KHR :: 0x00000004
 init_egl :: proc(display: ^wl.wl_display) -> RenderContext {
 	major, minor, n: i32
 	count: i32 = 0
@@ -47,11 +54,25 @@ init_egl :: proc(display: ^wl.wl_display) -> RenderContext {
 		8,
 		egl.ALPHA_SIZE,
 		0, // Disable surface alpha for now
+		egl.DEPTH_SIZE,
+		24, // Request 24-bit depth buffer
 		egl.RENDERABLE_TYPE,
-		egl.OPENGL_ES2_BIT,
+		egl.OPENGL_BIT,
+		EGL_SAMPLE_BUFFERS,
+		0,
+		EGL_SAMPLES,
+		0,
 		egl.NONE,
 	}
-	context_attribs: []i32 = {egl.CONTEXT_CLIENT_VERSION, 2, egl.NONE}
+	context_flags_bitfield: i32 = EGL_CONTEXT_OPENGL_DEBUG_BIT_KHR
+
+	context_attribs: []i32 = {
+		egl.CONTEXT_CLIENT_VERSION,
+		3,
+		EGL_CONTEXT_FLAGS_KHR,
+		context_flags_bitfield,
+		egl.NONE,
+	}
 	egl_display := egl.GetDisplay(egl.NativeDisplayType(display))
 
 	GetError() // clear error code
@@ -80,6 +101,15 @@ init_egl :: proc(display: ^wl.wl_display) -> RenderContext {
 	log.info(configs)
 	log.info(egl_conf)
 
+	samples: i32 = 0
+	egl.GetConfigAttrib(egl_display, egl_conf, EGL_SAMPLES, &samples)
+	log.infof("MSAA number of samples: %d", samples)
+
+	sample_buffers: i32 = 0
+	egl.GetConfigAttrib(egl_display, egl_conf, EGL_SAMPLE_BUFFERS, &sample_buffers)
+	log.infof("MSAA number of sample buffers: %d", sample_buffers)
+
+	egl.BindAPI(egl.OPENGL_API)
 	egl_context := egl.CreateContext(
 		egl_display,
 		egl_conf,

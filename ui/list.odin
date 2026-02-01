@@ -1,7 +1,7 @@
 package ui
-import "../platform"
+import pl "../platform"
+import "core:os"
 
-import cv "../platform/canvas"
 import "../platform/fonts"
 import "../utils/xdg"
 
@@ -11,6 +11,7 @@ import gl "vendor:OpenGL"
 
 import "../actions"
 import "../engine"
+import "core:fmt"
 
 SCROLL_SPEED :: 200
 MARGIN_SIZE :: 5
@@ -25,7 +26,7 @@ list_draw_string :: proc(
 	f32,
 	f32,
 ) {
-	w, h := cv.draw_text_raw(resolution, x, y, item, list.font)
+	w, h := pl.draw_text_raw(resolution, x, y, item, list.font)
 
 	return w, h
 }
@@ -47,10 +48,10 @@ list_draw_action :: proc(
 	case actions.ApplicationAction:
 		{
 			icon, ok_icon := xdg.icon_manager_get_icon(xdg.IconLookup{name = i.icon, size = 32})
-			img := engine.state.images->load(icon.path)
-			if ok_icon {
+			if ok_icon && os.exists(icon.path) {
+				img := engine.state.images.load(icon.path)
 				if img.texture != 0 {
-					cv.draw_image(
+					pl.draw_image(
 						resolution,
 						x,
 						y + (item_size - ICON_SIZE) / 2,
@@ -60,17 +61,17 @@ list_draw_action :: proc(
 					)
 				}
 			}
-			w, h = cv.draw_text(resolution, x + ICON_SIZE + 5, y + MARGIN_SIZE, i.name, list.font)
+			w, h = pl.draw_text(resolution, x + ICON_SIZE + 5, y + MARGIN_SIZE, i.name, list.font)
 			return w, item_size
 		}
 	case actions.SecretAction:
 		{
-			w, h = cv.draw_text(resolution, x + ICON_SIZE + 5, y + MARGIN_SIZE, i.name, list.font)
+			w, h = pl.draw_text(resolution, x + ICON_SIZE + 5, y + MARGIN_SIZE, i.name, list.font)
 			return w, item_size
 		}
 	case actions.PipelineAction:
 		{
-			w, h = cv.draw_text(resolution, x + ICON_SIZE + 5, y + MARGIN_SIZE, i.name, list.font)
+			w, h = pl.draw_text(resolution, x + ICON_SIZE + 5, y + MARGIN_SIZE, i.name, list.font)
 			return w, item_size
 		}
 	}
@@ -116,7 +117,7 @@ list_free_fbo_and_texture :: proc(list: ^$L/List) {
 	list.main_texture = 0
 }
 
-list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
+list_draw :: proc(list: ^$L/List, canvas: ^pl.Canvas) {
 	item_size := list.font.line_height + 2 * MARGIN_SIZE
 
 	main_texture_w: f32 = list.w
@@ -161,15 +162,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 		y: f32 = 0
 		for item, idx in list.items {
 			if idx == list.selected_index {
-				// cv.draw_rect_raw(
-				// 	{main_texture_w, main_texture_h},
-				// 	0,
-				// 	y,
-				// 	100,
-				// 	list.font.line_height,
-				// 	{color = {0.0, 0.0, 1.0, 1.0}},
-				// )
-				cv.draw_rect_raw(
+				pl.draw_rect_raw(
 					{main_texture_w, main_texture_h},
 					0,
 					y,
@@ -216,7 +209,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 		bottom_v,
 	}
 	// Draw texture in place
-	cv.draw_rect(
+	pl.draw_rect(
 		canvas,
 		list.x,
 		list.y,
@@ -232,26 +225,26 @@ list_draw :: proc(list: ^$L/List, canvas: ^cv.Canvas) {
 	shh: f32 = 40.0
 	shw: f32 = 5.0
 	shy := position_percent * (list.h - shh) + list.y
-	cv.draw_rect(canvas, list.x + list.w - shw, shy, shw, shh, {color = {0.2, 0.2, 0.7, 1.0}})
+	pl.draw_rect(canvas, list.x + list.w - shw, shy, shw, shh, {color = {0.2, 0.2, 0.7, 1.0}})
 }
 
-list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
+list_update :: proc(list: ^$L/List, event: pl.Event) {
 	offset: f32 = 0
 	item_size := list.font.line_height + 2 * MARGIN_SIZE
 	rendered_height := f32(len(list.items)) * f32(item_size)
 	max_scroll_offset := math.abs(rendered_height - list.h)
 
 	#partial switch e in event {
-	case platform.KeyPressed:
+	case pl.KeyPressed:
 		{
-			if e.key == platform.KeySym.XK_Page_Down {
+			if e.key == pl.KeySym.XK_Page_Down {
 				offset = SCROLL_SPEED
 			}
-			if e.key == platform.KeySym.XK_Page_Up {
+			if e.key == pl.KeySym.XK_Page_Up {
 				offset = -SCROLL_SPEED
 			}
 			// Janky ass keyboard scroll
-			if e.key == platform.KeySym.XK_Down {
+			if e.key == pl.KeySym.XK_Down {
 				list.selected_index = math.clamp(list.selected_index + 1, 0, len(list.items) - 1)
 				if f32(list.selected_index) * item_size > list.scroll_offset + list.h - item_size {
 					list.new_scroll_offset = math.clamp(
@@ -262,7 +255,7 @@ list_update :: proc(list: ^$L/List, event: platform.InputEvent) {
 				}
 				list_free_fbo_and_texture(list)
 			}
-			if e.key == platform.KeySym.XK_Up {
+			if e.key == pl.KeySym.XK_Up {
 				list.selected_index = math.clamp(list.selected_index - 1, 0, len(list.items) - 1)
 				if f32(list.selected_index) * item_size < list.scroll_offset {
 					list.new_scroll_offset = math.clamp(
