@@ -121,7 +121,7 @@ list_draw :: proc(list: ^$L/List, canvas: ^pl.Canvas) {
 	item_size := list.font.line_height + 2 * MARGIN_SIZE
 
 	main_texture_w: f32 = list.w
-	main_texture_h: f32 = math.max(f32(len(list.items)) * f32(item_size), list.h)
+	main_texture_h: f32 = math.min(f32(len(list.items)) * f32(item_size), list.h)
 
 	if list.main_texture == 0 {
 		fbo, fboTexture: u32

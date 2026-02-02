@@ -117,7 +117,7 @@ main :: proc() {
 	search := ui.InputText {
 		x    = 0,
 		y    = 0,
-		w    = f32(c1.width),
+		w    = WIDTH,
 		h    = 50,
 		font = engine.state.font,
 		text = "",
@@ -126,8 +126,8 @@ main :: proc() {
 	list := ui.List(actions.Action) {
 		x     = 0,
 		y     = 50,
-		w     = f32(c1.width),
-		h     = f32(c1.height) - 50,
+		w     = WIDTH,
+		h     = HEIGHT - 50,
 		items = action_items[:],
 		font  = &engine.state.font,
 	}
@@ -146,7 +146,6 @@ main :: proc() {
 		},
 	}
 
-	ui.layout_resize_leafs(layout, 0, 0, u32(c1.width), u32(c1.height), 4)
 
 	append(&app.widget_list, search)
 	append(&app.widget_list, list)
@@ -161,6 +160,7 @@ main :: proc() {
 
 	previous_search := ""
 
+	ui.layout_resize_leafs(&layout, 0, 0, WIDTH, HEIGHT, 4)
 	for engine.state.running == true {
 		s := &app.widget_list[0].(ui.InputText)
 		l := &app.widget_list[1].(ui.List(actions.Action))
