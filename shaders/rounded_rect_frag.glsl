@@ -7,7 +7,7 @@ uniform vec2 size;
 uniform vec2 resolution;
 uniform float radius;
 uniform float borderWidth;
-uniform vec4 input;
+uniform vec4 color_input;
 
 // Rounded box signed distance function
 float roundedBoxSDF(vec2 p, vec2 size, float r) {
@@ -18,7 +18,7 @@ float roundedBoxSDF(vec2 p, vec2 size, float r) {
 void main() {
     vec2 localPos = fragCoord.xy * size;
 
-    vec4 borderColor = input;
+    vec4 borderColor = color_input;
     vec4 backgroundColor = vec4(0.0, 0.0, 0.0, 0.6); // Background color
 
     float borderWidth = 2; // Thickness of the border in UV units

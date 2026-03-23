@@ -6,7 +6,7 @@ import "actions"
 import "core:fmt"
 import "core:log"
 import "core:mem"
-import "core:os/os2"
+import "core:os"
 import "core:sys/posix"
 import "engine"
 import pl "platform"
@@ -62,7 +62,7 @@ draw :: proc(canvas: ^pl.Canvas) {
 }
 
 check_stdin :: proc() -> bool {
-	return cast(bool)posix.isatty(cast(posix.FD)(os2.fd(os2.stdin)))
+	return cast(bool)posix.isatty(cast(posix.FD)(os.fd(os.stdin)))
 }
 
 

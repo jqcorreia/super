@@ -2,7 +2,7 @@ package fonts
 
 import "../vendor/libschrift-odin/sft"
 import "core:log"
-import "core:os/os2"
+import "core:os"
 import "core:strings"
 
 import gl "vendor:OpenGL"
@@ -145,7 +145,7 @@ load_font :: proc(fm: ^FontManager, name: string, size: f64, buffer := FontBuffe
 get_font_map :: proc() -> map[string]string {
 	fonts := make(map[string]string)
 
-	_, out, _, _ := os2.process_exec({command = {"fc-list"}}, context.allocator)
+	_, out, _, _ := os.process_exec({command = {"fc-list"}}, context.allocator)
 
 	for line in strings.split(string(out), "\n") {
 		if !strings.contains(line, "style=Regular") {

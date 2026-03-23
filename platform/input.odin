@@ -79,8 +79,8 @@ keyboard_listener := wl.wl_keyboard_listener {
 		)
 		ks := xkbcommon.state_new(km)
 
-		locale := os.get_env("LC_ALL")
-		if len(locale) == 0 do locale = os.get_env("LANG")
+		locale := os.get_env("LC_ALL", context.allocator)
+		if len(locale) == 0 do locale = os.get_env("LANG", context.allocator)
 		if len(locale) == 0 do locale = "POSIX"
 		compose_table := xkbcommon.compose_table_new_from_locale(
 			ctx,

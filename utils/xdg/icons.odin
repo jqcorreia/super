@@ -97,9 +97,9 @@ generate_icon_map :: proc "contextless" () {
 	icon_manager.icon_map = make(map[IconLookup]Icon)
 	icon_manager.sizes = make(map[u32]bool)
 
-	home := os.get_env("HOME")
+	home := os.get_env("HOME", context.allocator)
 	xdg_data_dirs :=
-		os.lookup_env("XDG_DATA_DIRS") or_else fmt.tprintf("/usr/share:%s/.local/share", home)
+		os.lookup_env("XDG_DATA_DIRS", context.allocator) or_else fmt.tprintf("/usr/share:%s/.local/share", home)
 
 	base_folders := strings.split(xdg_data_dirs, ":")
 	themes: []string = {"hicolor"}
@@ -125,7 +125,7 @@ generate_icon_map :: proc "contextless" () {
 						}
 						d := fmt.tprintf("%s/icons/%s/%s", base_folder2, theme, dir)
 						h, _ := os.open(d)
-						fis, _ := os.read_dir(h, -1)
+						fis, _ := os.read_dir(h, -1, context.allocator)
 						for fi in fis {
 							stem := filepath.stem(fi.name)
 							icon_manager.icon_map[IconLookup{name = stem, size = u32(size)}] =

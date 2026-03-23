@@ -43,7 +43,7 @@ draw_rect_raw :: proc(
 		1,
 		raw_data([]f32{f32(time.duration_seconds(inst().time_elapsed))}),
 	)
-	gl.Uniform4fv(gl.GetUniformLocation(shader.program, cstring("input")), 1, raw_data(&color))
+	gl.Uniform4fv(gl.GetUniformLocation(shader.program, cstring("color")), 1, raw_data(&color))
 	gl.Uniform2fv(
 		gl.GetUniformLocation(shader.program, cstring("resolution")),
 		1,

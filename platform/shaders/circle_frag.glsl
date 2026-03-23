@@ -3,7 +3,7 @@
 in vec3 fragCoord;
 out vec4 color;
 
-uniform vec4 input;
+uniform vec4 color_input;
 uniform vec2 resolution;
 
 void main()
@@ -16,7 +16,7 @@ void main()
         col = vec4(0);
     }
     else {
-        col = input;
+        col = color_input;
     }
 
     // Output to screen

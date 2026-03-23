@@ -1,7 +1,7 @@
 package actions
 
 import "core:fmt"
-import "core:os/os2"
+import "core:os"
 import "core:strings"
 
 import "../engine"
@@ -14,7 +14,7 @@ PipelineAction :: struct {
 compute_pipeline_actions :: proc() -> []Action {
 	actions: [dynamic]Action
 	buf: []u8 = make([]u8, 1000)
-	os2.read_full(os2.stdin, buf)
+	os.read_full(os.stdin, buf)
 
 	for line in strings.split(string(buf), "\n") {
 		append(&actions, PipelineAction{name = line, output = line})
