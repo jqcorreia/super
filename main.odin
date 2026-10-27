@@ -99,11 +99,15 @@ main :: proc() {
 	} else {
 		app_items := actions.get_application_actions()
 		secrets_items := actions.get_secret_actions()
+		bluetooth_items := actions.get_bluetooth_actions()
 
 		for i in app_items {
 			append(&action_items, i)
 		}
 		for i in secrets_items {
+			append(&action_items, i)
+		}
+		for i in bluetooth_items {
 			append(&action_items, i)
 		}
 	}
@@ -183,6 +187,15 @@ main :: proc() {
 							}
 						}
 					case actions.SecretAction:
+						{
+							if strings.contains(
+								strings.to_lower(i.name),
+								strings.to_lower(s.text),
+							) {
+								append(&new_items, i)
+							}
+						}
+					case actions.BluetoothAction:
 						{
 							if strings.contains(
 								strings.to_lower(i.name),

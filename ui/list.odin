@@ -74,6 +74,12 @@ list_draw_action :: proc(
 			w, h = pl.draw_text(resolution, x + ICON_SIZE + 5, y + MARGIN_SIZE, i.name, list.font)
 			return w, item_size
 		}
+	case actions.BluetoothAction:
+		{
+			label := fmt.tprintf("%s (%s)", i.name, i.connected ? "disconnect" : "connect")
+			w, h = pl.draw_text(resolution, x + ICON_SIZE + 5, y + MARGIN_SIZE, label, list.font)
+			return w, item_size
+		}
 	}
 	return 0, 0
 }

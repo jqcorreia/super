@@ -4,6 +4,7 @@ Action :: union {
 	ApplicationAction,
 	SecretAction,
 	PipelineAction,
+	BluetoothAction,
 }
 
 
@@ -21,6 +22,10 @@ do_action :: proc(action: Action) {
 		{
 			_do_action(a)
 		}
+	case BluetoothAction:
+		{
+			_do_action(a)
+		}
 	}
 }
 
@@ -28,4 +33,5 @@ _do_action :: proc {
 	do_application_action,
 	do_secret_action,
 	do_pipeline_action,
+	do_bluetooth_action,
 }
