@@ -97,6 +97,8 @@ List :: struct($item_type: typeid) {
 	main_fbo:          u32,
 	scroll_offset:     f32,
 	new_scroll_offset: f32,
+	// Scroll offset the texture was last rendered with
+	rendered_offset:   f32,
 	selected_index:    int,
 	draw_item:         proc(
 		list: List(item_type),
@@ -129,6 +131,16 @@ list_draw :: proc(list: ^$L/List, canvas: ^pl.Canvas) {
 	main_texture_w: f32 = list.w
 	// main_texture_h: f32 = math.min(f32(len(list.items)) * f32(item_size), list.h)
 	main_texture_h: f32 = list.h
+
+	list.scroll_offset = math.lerp(list.scroll_offset, list.new_scroll_offset, f32(0.15))
+	if math.abs(list.new_scroll_offset - list.scroll_offset) < 0.5 {
+		list.scroll_offset = list.new_scroll_offset
+	}
+
+	// The texture only holds the visible window, so it needs re-rendering while scrolling
+	if list.main_texture != 0 && list.scroll_offset != list.rendered_offset {
+		list_free_fbo_and_texture(list)
+	}
 
 	if list.main_texture == 0 {
 		fbo, fboTexture: u32
@@ -166,8 +178,15 @@ list_draw :: proc(list: ^$L/List, canvas: ^pl.Canvas) {
 		gl.ClearColor(0.0, 0.0, 0.0, 0.6)
 		gl.Clear(gl.COLOR_BUFFER_BIT)
 
-		y: f32 = 0
+		y: f32 = -list.scroll_offset
 		for item, idx in list.items {
+			if y + item_size < 0 {
+				y += item_size
+				continue
+			}
+			if y > main_texture_h {
+				break
+			}
 			if idx == list.selected_index {
 				pl.draw_rect_raw(
 					{main_texture_w, main_texture_h},
@@ -191,12 +210,11 @@ list_draw :: proc(list: ^$L/List, canvas: ^pl.Canvas) {
 		gl.Flush()
 
 		list.main_texture = fboTexture
+		list.rendered_offset = list.scroll_offset
 	}
 
-	list.scroll_offset = math.lerp(list.scroll_offset, list.new_scroll_offset, f32(0.15))
-
-	top_v := math.clamp(list.scroll_offset / main_texture_h, 0, 1)
-	bottom_v := math.clamp((list.scroll_offset + list.h) / main_texture_h, 0, 1)
+	top_v: f32 = 0
+	bottom_v: f32 = 1
 	vertices := []f32 {
 		0.0,
 		0.0,
@@ -226,8 +244,11 @@ list_draw :: proc(list: ^$L/List, canvas: ^pl.Canvas) {
 	)
 
 	// Draw scrollbar handle
-	scroll_offset_max := main_texture_h - list.h
-	position_percent := math.clamp(list.scroll_offset / scroll_offset_max, 0, 1)
+	scroll_offset_max := f32(len(list.items)) * item_size - list.h
+	position_percent: f32 = 0
+	if scroll_offset_max > 0 {
+		position_percent = math.clamp(list.scroll_offset / scroll_offset_max, 0, 1)
+	}
 
 	shh: f32 = 40.0
 	shw: f32 = 5.0
@@ -239,7 +260,7 @@ list_update :: proc(list: ^$L/List, event: pl.Event) {
 	offset: f32 = 0
 	item_size := list.font.line_height + 2 * MARGIN_SIZE
 	rendered_height := f32(len(list.items)) * f32(item_size)
-	max_scroll_offset := math.abs(rendered_height - list.h)
+	max_scroll_offset := math.max(rendered_height - list.h, 0)
 
 	#partial switch e in event {
 	case pl.KeyPressed:
@@ -253,24 +274,17 @@ list_update :: proc(list: ^$L/List, event: pl.Event) {
 			// Janky ass keyboard scroll
 			if e.key == pl.KeySym.XK_Down {
 				list.selected_index = math.clamp(list.selected_index + 1, 0, len(list.items) - 1)
-				if f32(list.selected_index) * item_size > list.scroll_offset + list.h - item_size {
-					list.new_scroll_offset = math.clamp(
-						list.scroll_offset + item_size,
-						0,
-						max_scroll_offset,
-					)
+				item_bottom := f32(list.selected_index + 1) * item_size
+				if item_bottom > list.new_scroll_offset + list.h {
+					list.new_scroll_offset = math.clamp(item_bottom - list.h, 0, max_scroll_offset)
 				}
 				list_free_fbo_and_texture(list)
 			}
 			if e.key == pl.KeySym.XK_Up {
 				list.selected_index = math.clamp(list.selected_index - 1, 0, len(list.items) - 1)
-				if f32(list.selected_index) * item_size < list.scroll_offset {
-					list.new_scroll_offset = math.clamp(
-						list.scroll_offset - item_size,
-						0,
-						max_scroll_offset,
-					)
-
+				item_top := f32(list.selected_index) * item_size
+				if item_top < list.new_scroll_offset {
+					list.new_scroll_offset = math.clamp(item_top, 0, max_scroll_offset)
 				}
 				list_free_fbo_and_texture(list)
 			}
@@ -283,7 +297,7 @@ list_update :: proc(list: ^$L/List, event: pl.Event) {
 			list.new_scroll_offset = 0
 			return
 		}
-		list.new_scroll_offset = math.clamp(list.scroll_offset + offset, 0, max_scroll_offset)
+		list.new_scroll_offset = math.clamp(list.new_scroll_offset + offset, 0, max_scroll_offset)
 	}
 
 }
